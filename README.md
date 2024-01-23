@@ -14,13 +14,13 @@ Simulation environment that can be used for GPS-denied navigation frameworks.
 
 ### Installation
 
-#### 1. TODO: Simulation Development Environment Docker Image
+#### 1. Simulation Development Environment Docker Image
 
-A Docker image for the simulation development environment is under development. It includes Ubuntu 22.04, ROS 2 Humble + Gazebo Garden, and PX4 Autopilot.
+A Docker image for the simulation development environment is available at [gps_denied_navigation_docker](https://github.com/riotu-lab/gps_denied_navigation_docker.git). It includes Ubuntu 22.04, ROS 2 Humble + Gazebo Garden, and PX4 Autopilot.
 
 #### 2. Blender
 
-Make sure you have Blender version 3.6.0. Download it [here](https://download.blender.org/release/Blender3.6/), select `blender-3.6.0-linux-x64.tar.xz`, wait for it to download, and unzip it.
+You can do this step outside the docker container. Make sure you have Blender version 3.6.0. Download it [here](https://download.blender.org/release/Blender3.6/), select `blender-3.6.0-linux-x64.tar.xz`, wait for it to download, and unzip it.
 
 ```bash
 cd blender-3.6.0-linux-x64.tar.xz
