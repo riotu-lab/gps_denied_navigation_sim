@@ -99,6 +99,11 @@ Note : Since 2022, the OpenTopography web service requires an API key. Please re
    ![collection](media/collada.png)
 
 11. Copy the exported files (.dae and .tif) to your 'world' package.
+>Note you need to export the model path 
+```bash
+export GZ_SIM_RESOURCE_PATH=/home/user/shared_volume/ros2_ws/src/gps_denied_navigation_sim/models
+```
+
 12. Create an SDF file for Gazebo:
  
 ```xml
@@ -132,3 +137,6 @@ Note : Since 2022, the OpenTopography web service requires an API key. Please re
 </sdf>
 ```
 ![collection](media/gazebo.png)
+
+
+
