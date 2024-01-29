@@ -89,7 +89,7 @@ def generate_launch_description():
                    '/d435/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
                    '/d435/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                    '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
-
+                   '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
                    '--ros-args', '-r', '/d435/depth_image:='+ns+'/depth_image',
                    '-r', '/d435/image:='+ns+'/image',
                    '-r', '/d435/points:='+ns+'/points',

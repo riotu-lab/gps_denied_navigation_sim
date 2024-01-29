@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/user/shared_volume/ros2_ws/install/yolov8_msgs/include/**",
+        "/home/user/shared_volume/ros2_ws/install/mavros_extras/include/**",
+        "/home/user/shared_volume/ros2_ws/install/mavros/include/**",
+        "/home/user/shared_volume/ros2_ws/install/mavros_msgs/include/**",
+        "/home/user/shared_volume/ros2_ws/install/libmavconn/include/**",
+        "/home/user/ros2_ws/install/ros_ign_interfaces/include/**",
+        "/home/user/ros2_ws/install/ros_gz_sim/include/**",
+        "/home/user/ros2_ws/install/ros_gz_bridge/include/**",
+        "/home/user/ros2_ws/install/ros_gz_interfaces/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/user/shared_volume/ros2_ws/src/mavros/libmavconn/include/**",
+        "/home/user/shared_volume/ros2_ws/src/mavros/mavros/include/**",
+        "/home/user/shared_volume/ros2_ws/src/mavros/mavros_extras/include/**",
+        "/home/user/shared_volume/ros2_ws/src/mavros/mavros_msgs/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
