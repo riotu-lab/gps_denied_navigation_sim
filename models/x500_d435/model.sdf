@@ -14,6 +14,16 @@
       <pose relative_to="base_link">.17 0 .25 0 0 1.5707</pose>
     </joint>
 
+    <!--Lidar-->
+    <include merge='true'>
+      <uri>model://lidar</uri>
+      <pose>-0.1 0.0 0.20 0 1.0 3.1400000000000001</pose>
+    </include>
+    <joint name="LidarJoint" type="fixed">
+      <parent>base_link</parent>
+      <child>lidar_link</child>
+      <pose relative_to="base_link">-.17 0 .25 0 0 1.5707</pose>
+    </joint>
     <!-- <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
       <render_engine>ogre2</render_engine>
     </plugin> -->
