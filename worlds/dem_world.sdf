@@ -25,8 +25,11 @@
         <scene>scene</scene>
         <ambient_light>0.5984631152222222 0.5984631152222222 0.5984631152222222</ambient_light>
         <background_color>0.8984631152222222 0.8984631152222222 0.8984631152222222</background_color>
-        <camera_pose>-6 0 6 0 0.5 0</camera_pose>
-      </plugin>
+        <camera_clip>
+          <near>0.25</near>
+          <far>50000</far>
+        </camera_clip>
+        <camera_pose>-23 -45.4 34.5 0.0 0.54 1.11</camera_pose>      </plugin>
       <plugin name='World control' filename='WorldControl'>
         <gz-gui>
           <title>World control</title>
@@ -124,6 +127,7 @@
       <pose>0 0 0 0 -0 0</pose>
       <self_collide>false</self_collide>
     </model>
+
     <light name='sunUTC' type='directional'>
       <pose>0 0 500 0 -0 0</pose>
       <cast_shadows>true</cast_shadows>
