@@ -18,7 +18,7 @@ def generate_launch_description():
     instance_id = {'instance_id': '0'}
     xpos = {'xpos': '0.0'}
     ypos = {'ypos': '0.0'}
-    zpos = {'zpos': '15.0'}
+    zpos = {'zpos': '2000.0'}
     headless= {'headless' : '0'}
 
     # Namespace
