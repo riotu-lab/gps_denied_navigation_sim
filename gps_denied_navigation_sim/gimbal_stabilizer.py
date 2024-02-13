@@ -5,6 +5,8 @@ from std_msgs.msg import Float64
 from rclpy.qos import QoSProfile, qos_profile_sensor_data
 from transformations import euler_from_quaternion
 import tf2_ros
+import math
+
 class GimbalStabilizer(Node):
     def __init__(self):
         super().__init__('gimbal_stabilizer')
@@ -13,7 +15,7 @@ class GimbalStabilizer(Node):
 
         self.imu_sub = self.create_subscription(
             Imu,
-            '/target/mavros/imu/data',
+            '/imu_gimbal',
             self.imu_callback,
             qos_profile=qos_profile_sensor_data
         )
@@ -33,17 +35,17 @@ class GimbalStabilizer(Node):
             imu_msg.orientation.x,
             imu_msg.orientation.y,
             imu_msg.orientation.z)
+        
+        self.get_logger().info('orientation_x: {:.2f}, orientation_y: {:.2f}, orientation_z: {:.2f}'.format(imu_msg.orientation.x, imu_msg.orientation.y, imu_msg.orientation.z))
+
         euler = euler_from_quaternion(quaternion)
-        self.roll_cmd = -euler[0]
-        self.pitch_cmd = -euler[1]
-        # self.yaw_cmd = euler[2]
+        self.roll_cmd  = euler[0]
+        self.pitch_cmd = euler[1]
         self.get_logger().info('Roll: {:.2f}, Pitch: {:.2f}, Yaw: {:.2f}'.format(self.roll_cmd, self.pitch_cmd, self.yaw_cmd))
 
-        self.pitch_pub.publish(Float64(data=self.pitch_cmd))
-        self.roll_pub.publish(Float64(data=self.roll_cmd))
+        # self.pitch_pub.publish(Float64(data=self.pitch_cmd))
+        # self.roll_pub.publish(Float64(data=self.roll_cmd))
         # self.yaw_pub.publish(Float64(data=self.yaw_cmd))
-
-
 
 def main(args=None):
     rclpy.init(args=args)

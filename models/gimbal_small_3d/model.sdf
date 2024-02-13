@@ -189,27 +189,7 @@
         </geometry>
       </collision>
 
-      <visual name="imu_visual">
-        <pose>0 0 0.02 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.05 0.05 0.05</size>
-          </box>
-        </geometry>
-        <material>
-          <ambient>0.4 0.4 0.4</ambient>
-          <diffuse>0.4 0.4 0.4</diffuse>
-          <specular>0.1 0.1 0.1 1.0</specular>
-        </material>
-      </visual>
-      <collision name="imu_collision">
-        <pose>0 0 0.02 0 0 0</pose>
-        <geometry>
-          <box>
-            <size>0.05 0.05 0.05</size>
-          </box>
-        </geometry>
-      </collision>
+
 
 
       <sensor name="camera" type="camera">
@@ -237,6 +217,43 @@
 
       </sensor>
 
+    </link>
+    <link name="imu_link">
+      <pose>0 0 0.02 -1.5705 -1.5705 0</pose>
+
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00001</iyy>
+          <iyz>0</iyz>
+          <izz>0.00001</izz>
+        </inertia>
+      </inertial>
+      <visual name="imu_visual">
+        <!-- <pose>0 0 0.02 -1.5705 -1.5705 0</pose> -->
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.4 0.4 0.4</ambient>
+          <diffuse>0.4 0.4 0.4</diffuse>
+          <specular>0.1 0.1 0.1 1.0</specular>
+        </material>
+      </visual>
+      <collision name="imu_collision">
+        <!-- <pose>0 0 0.02 -1.5705 -1.5705 0</pose> -->
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.05</size>
+          </box>
+        </geometry>
+      </collision>
+
       <sensor name="imu_sensor" type="imu">
         <always_on>1</always_on>
         <update_rate>1</update_rate>
@@ -244,6 +261,13 @@
         <topic>imu_gimbal</topic>
       </sensor>
     </link>
+    <joint name="imu_joint" type="fixed">
+      <parent>pitch_link</parent>
+      <child>imu_link</child>
+      <pose>0 0 0 0 0 0</pose>
+    </joint>
+
+
     <joint name="pitch_joint" type="revolute">
       <parent>roll_link</parent>
       <child>pitch_link</child>
@@ -268,18 +292,36 @@
         <joint_name>yaw_joint</joint_name>
         <topic>/gimbal/cmd_yaw</topic>
         <p_gain>2</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>0.01</d_gain>
+        <i_max>1</i_max>
+        <i_min>-1</i_min>
+        <cmd_max>1000</cmd_max>
+        <cmd_min>-1000</cmd_min>
       </plugin>
       <plugin name="gz::sim::systems::JointPositionController"
         filename="gz-sim-joint-position-controller-system">
         <joint_name>roll_joint</joint_name>
         <topic>/gimbal/cmd_roll</topic>
         <p_gain>2</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>0.01</d_gain>
+        <i_max>1</i_max>
+        <i_min>-1</i_min>
+        <cmd_max>1000</cmd_max>
+        <cmd_min>-1000</cmd_min>
       </plugin>
       <plugin name="gz::sim::systems::JointPositionController"
         filename="gz-sim-joint-position-controller-system">
         <joint_name>pitch_joint</joint_name>
         <topic>/gimbal/cmd_pitch</topic>
         <p_gain>2</p_gain>
+        <i_gain>0.1</i_gain>
+        <d_gain>0.01</d_gain>
+        <i_max>1</i_max>
+        <i_min>-1</i_min>
+        <cmd_max>1000</cmd_max>
+        <cmd_min>-1000</cmd_min>
       </plugin>
   </model>
 </sdf>

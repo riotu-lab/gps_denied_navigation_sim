@@ -93,6 +93,8 @@ def generate_launch_description():
                    '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
+                   '/imu_gimbal@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+
                    '--ros-args', '-r', '/d435/depth_image:='+ns+'/depth_image',
                    '-r', '/d435/image:='+ns+'/image',
                    '-r', '/d435/points:='+ns+'/points',
