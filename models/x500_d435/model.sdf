@@ -18,24 +18,23 @@
     <include merge='true'>
       <uri>model://lidar</uri>
       <!-- <pose>0.1 0 0.9055 0 1.0 3.1400000000000001</pose> -->
-        <pose degrees="true">.08 0.03 .15 0 0 0</pose>
+      <pose degrees="true">0.1 0.0 0.12 0 90 0</pose>
 
     </include>
     <joint name="LidarJoint" type="fixed">
       <parent>pitch_link</parent>
       <child>lidar_link</child>
-      <pose relative_to="base_link_gimbal">0.0 0.0 .25 0 0 1.5707</pose>
+      <!-- <pose relative_to="base_link_gimbal">0.0 0.0 .25 0 0 0</pose> -->
     </joint>
 
       <include merge='true'>
         <uri>model://gimbal_small_3d</uri>
-        <pose degrees="true">.10 0 .15 90 0 180</pose>
+        <pose relative_to="base_link" degrees="true">0.10 0 -0.10 90 0 90</pose>
       </include>
       <joint name="gimbal_joint" type="fixed">
         <parent>base_link</parent>
         <child>base_link_gimbal</child>
-        <pose relative_to="base_link">0 0 .25 0 0 1.5707</pose>
-
+        <!-- <pose relative_to="base_link">0 0 0.5 1.57 0 0</pose> -->
         <axis>
           <dynamics>
             <damping>0.5</damping>

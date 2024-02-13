@@ -8,8 +8,8 @@
         <transparency>0</transparency>
         <geometry>
           <mesh>
-            <uri>media/sec.dae</uri>
-            <scale>0.001121131 0.001121131 0.001121131</scale>
+            <uri>media/bigdem.dae</uri>
+            <scale>1 1 1</scale>
           </mesh>
         </geometry>
 
@@ -17,12 +17,14 @@
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>media/sec.dae</uri>
-            <scale>0.001121131 0.001121131 0.001121131</scale>
+            <uri>media/bigdem.dae</uri>
+
+            <scale>1 1 1</scale>
           </mesh>
 
         </geometry>
       </collision>
     </link>
+
   </model>
 </sdf>
