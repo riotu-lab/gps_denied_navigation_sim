@@ -24,6 +24,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+        'gimbal_stabilizer = gps_denied_navigation_sim.gimbal_stabilizer:main',
         ],
     },
 )

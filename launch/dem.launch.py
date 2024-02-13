@@ -16,8 +16,8 @@ def generate_launch_description():
     model_name = {'gz_model_name': 'x500_d435'}
     autostart_id = {'px4_autostart_id': '4020'}
     instance_id = {'instance_id': '0'}
-    xpos = {'xpos': '0.0'}
-    ypos = {'ypos': '0.0'}
+    xpos = {'xpos': '10.0'}
+    ypos = {'ypos': '10.0'}
     zpos = {'zpos': '2000.0'}
     headless= {'headless' : '0'}
 
@@ -90,6 +90,9 @@ def generate_launch_description():
                    '/d435/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                    '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                    '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
+                   '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
+                   '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
+                   '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
                    '--ros-args', '-r', '/d435/depth_image:='+ns+'/depth_image',
                    '-r', '/d435/image:='+ns+'/image',
                    '-r', '/d435/points:='+ns+'/points',
@@ -120,10 +123,19 @@ def generate_launch_description():
     #         ('mavros/setpoint_raw/local', 'mavros/setpoint_raw/local')
     #     ]
     # )
+    gimbal_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='gimbal_stabilizer',
+        name='gimbal_stabilizer',
+        output='screen',
+         )
+
 
     ld.add_action(gz_launch)
     ld.add_action(map2pose_tf_node)
     ld.add_action(mavros_launch)
     # ld.add_action(random_trajectories_node)
+    ld.add_action(gimbal_node)
+
     ld.add_action(ros_gz_bridge)
     return ld
