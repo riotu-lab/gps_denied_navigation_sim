@@ -254,9 +254,9 @@
         </geometry>
       </collision>
 
-      <sensor name="imu_sensor" type="imu">
+      <sensor name="imu_sensor_sensor" type="imu">
         <always_on>1</always_on>
-        <update_rate>1</update_rate>
+        <update_rate>250</update_rate>
         <visualize>true</visualize>
         <topic>imu_gimbal</topic>
       </sensor>

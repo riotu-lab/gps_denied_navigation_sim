@@ -39,12 +39,12 @@ class GimbalStabilizer(Node):
         self.get_logger().info('orientation_x: {:.2f}, orientation_y: {:.2f}, orientation_z: {:.2f}'.format(imu_msg.orientation.x, imu_msg.orientation.y, imu_msg.orientation.z))
 
         euler = euler_from_quaternion(quaternion)
-        self.roll_cmd  = euler[0]
-        self.pitch_cmd = euler[1]
+        self.roll_cmd  = -euler[0]
+        self.pitch_cmd = -euler[1]
         self.get_logger().info('Roll: {:.2f}, Pitch: {:.2f}, Yaw: {:.2f}'.format(self.roll_cmd, self.pitch_cmd, self.yaw_cmd))
 
-        # self.pitch_pub.publish(Float64(data=self.pitch_cmd))
-        # self.roll_pub.publish(Float64(data=self.roll_cmd))
+        self.pitch_pub.publish(Float64(data=self.pitch_cmd))
+        self.roll_pub.publish(Float64(data=self.roll_cmd))
         # self.yaw_pub.publish(Float64(data=self.yaw_cmd))
 
 def main(args=None):
