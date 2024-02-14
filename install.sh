@@ -76,6 +76,11 @@ else
     make distclean
 fi
 
+# Build px4_sitl
+cd $PX4_DIR && make px4_sitl
+# Checkout commit f1c461f in https://github.com/PX4/PX4-gazebo-models.git
+cd $PX4_DIR/Tools/simulation/gz && git checkout f1c461f
+
 # Copy files to $PX4_DIR
 echo && echo  "Copying files to ${PX4_DIR}" && echo
 sleep 1
@@ -83,10 +88,6 @@ cp -r ${ROS2_SRC}/gps_denied_navigation_sim/models/* ${PX4_DIR}/Tools/simulation
 cp -r ${ROS2_SRC}/gps_denied_navigation_sim/worlds/* ${PX4_DIR}/Tools/simulation/gz/worlds/
 cp -r ${ROS2_SRC}/gps_denied_navigation_sim//config/px4/* ${PX4_DIR}/ROMFS/px4fmu_common/init.d-posix/airframes/
 
-# Build px4_sitl
-cd $PX4_DIR && make px4_sitl
-# Checkout commit f1c461f in https://github.com/PX4/PX4-gazebo-models.git
-cd $PX4_DIR/Tools/simulation/gz && git checkout f1c461f
 cd $DEV_DIR
 
 
