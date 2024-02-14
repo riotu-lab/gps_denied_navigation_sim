@@ -53,12 +53,13 @@ fi
 if [ ! -d "$PX4_DIR" ]; then
     echo "Cloning $PX4_DIR..."
     cd $DEV_DIR
-    git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+    git clone https://github.com/riotu-lab/PX4-Autopilot.git --recursive
     make submodulesclean
     make clean
     make distclean
     cd $PX4_DIR
-    git checkout v1.14.0
+    # git checkout v1.14.0
+    git checkout navsat_callback
     make submodulesclean
     make clean
     make distclean
@@ -68,7 +69,8 @@ else
     make submodulesclean
     make clean
     make distclean
-    git checkout v1.14.0
+    # git checkout v1.14.0
+    git checkout navsat_callback
     make submodulesclean
     make clean
     make distclean
@@ -83,11 +85,9 @@ cp -r ${ROS2_SRC}/gps_denied_navigation_sim//config/px4/* ${PX4_DIR}/ROMFS/px4fm
 
 # Build px4_sitl
 cd $PX4_DIR && make px4_sitl
-
-
-
-
-
+# Checkout commit f1c461f in https://github.com/PX4/PX4-gazebo-models.git
+cd $PX4_DIR/Tools/simulation/gz && git checkout f1c461f
+cd $DEV_DIR
 
 
 #
