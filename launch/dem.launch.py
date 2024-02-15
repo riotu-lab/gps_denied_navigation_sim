@@ -90,6 +90,8 @@ def generate_launch_description():
                    '/d435/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                    '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                    '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
+                   '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+
                    '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
