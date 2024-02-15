@@ -11,6 +11,8 @@
     <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
     <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
     <plugin name='gz::sim::systems::AirPressure' filename='gz-sim-air-pressure-system'/>
+    <plugin name='gz::sim::systems::ApplyLinkWrench' filename='gz-sim-apply-link-wrench-system'/>
+    <plugin name='gz::sim::systems::NavSat' filename='gz-sim-navsat-system'/>
     <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
       <render_engine>ogre2</render_engine>
     </plugin>
@@ -125,7 +127,7 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>0 0 2000 0 -0 0</pose>
+      <pose>0 0 1500 0 -0 0</pose>
       <self_collide>false</self_collide>
     </model>
 
@@ -153,5 +155,13 @@
       model://dem
       </uri>
     </include>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.75095997493402</latitude_deg>
+      <longitude_deg>-123.5650639612084</longitude_deg>
+      <altitude>6378137</altitude>
+    </spherical_coordinates>
   </world>
 </sdf>
+
