@@ -17,8 +17,8 @@ def generate_launch_description():
     autostart_id = {'px4_autostart_id': '4020'}
     instance_id = {'instance_id': '0'}
     xpos = {'xpos': '0.0'}
-    ypos = {'ypos': '0.0'}
-    zpos = {'zpos': '1500.0'}
+    ypos = {'ypos': '200.0'}
+    zpos = {'zpos': '900.0'}
     headless= {'headless' : '0'}
 
     # Namespace
@@ -91,6 +91,8 @@ def generate_launch_description():
                    '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                    '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
                    '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                   '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                   '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
 
                    '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
@@ -100,33 +102,36 @@ def generate_launch_description():
                    '--ros-args', '-r', '/d435/depth_image:='+ns+'/depth_image',
                    '-r', '/d435/image:='+ns+'/image',
                    '-r', '/d435/points:='+ns+'/points',
-                   '-r', '/d435/camera_info:='+ns+'/camera_info'
+                   '-r', '/d435/camera_info:='+ns+'/camera_info',
+                   '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/image:='+ns+'/mono_camera',
+                   '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/camera_info:='+ns+'/mono_info'
+
                    ],
     )    
-    # random_trajectories_node = Node(
-    #     package='gps_denied_navigation_sim',
-    #     executable='execute_random_trajectories',
-    #     output='screen',
-    #     name='execute_random_trajectories',
-    #     namespace=ns,
-    #     parameters=[{'system_id': 1},
-    #                 {'radius_bounds': [1.0, 5.0]},
-    #                 {'omega_bounds': [0.5,1.0]},
-    #                 {'xyz_bound_min': [-20.0, -20.0, 3.0]},
-    #                 {'xyz_bound_max': [20.0, 20.0, 5.0]},
-    #                 {'num_traj': 200},
-    #                 {'traj_2D': True},
-    #                 {'traj_directory': '/home/user/shared_volume/gazebo_trajectories/'},
-    #                 {'file_name': 'gazebo_trajectory2D'},
-    #                 {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'},
-    #                 {'depth_image_directory': '/home/user/shared_volume/gazebo_trajectories/depth_images'}
-    #     ],
-    #     remappings=[
-    #         ('mavros/state', 'mavros/state'),
-    #         ('mavros/local_position/odom', 'mavros/local_position/odom'),
-    #         ('mavros/setpoint_raw/local', 'mavros/setpoint_raw/local')
-    #     ]
-    # )
+    random_trajectories_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='execute_random_trajectories',
+        output='screen',
+        name='execute_random_trajectories',
+        namespace=ns,
+        parameters=[{'system_id': 1},
+                    {'radius_bounds': [1.0, 5.0]},
+                    {'omega_bounds': [0.5,1.0]},
+                    {'xyz_bound_min': [-20.0, -20.0, 20.0]},
+                    {'xyz_bound_max': [20.0, 20.0, 40.0]},
+                    {'num_traj': 200},
+                    {'traj_2D': True},
+                    {'traj_directory': '/home/user/shared_volume/gazebo_trajectories/'},
+                    {'file_name': 'gazebo_trajectory2D'},
+                    {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'},
+                    {'depth_image_directory': '/home/user/shared_volume/gazebo_trajectories/depth_images'}
+        ],
+        remappings=[
+            ('mavros/state', 'mavros/state'),
+            ('mavros/local_position/odom', 'mavros/local_position/odom'),
+            ('mavros/setpoint_raw/local', 'mavros/setpoint_raw/local')
+        ]
+    )
     gimbal_node = Node(
         package='gps_denied_navigation_sim',
         executable='gimbal_stabilizer',
@@ -138,7 +143,7 @@ def generate_launch_description():
     ld.add_action(gz_launch)
     ld.add_action(map2pose_tf_node)
     ld.add_action(mavros_launch)
-    # ld.add_action(random_trajectories_node)
+    ld.add_action(random_trajectories_node)
     ld.add_action(gimbal_node)
 
     ld.add_action(ros_gz_bridge)

@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
         'gimbal_stabilizer = gps_denied_navigation_sim.gimbal_stabilizer:main',
+        'execute_random_trajectories = gps_denied_navigation_sim.execute_random_trajectories_node:main',
         ],
     },
 )
