@@ -74,7 +74,7 @@
           </scan> -->
           <range>
             <min>0.080000000000000002</min>
-            <max>10</max>
+            <max>300</max>
             <resolution>0.01</resolution>
           </range>
           <noise>

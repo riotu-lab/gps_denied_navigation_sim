@@ -12,6 +12,7 @@ from .trajectories import Circle3D, Infinity3D
 from visualization_msgs.msg import Marker
 
 from mavros_msgs.msg import State, PositionTarget
+from mavros_msgs.msg import Altitude
 
 from time import time, sleep
 from sensor_msgs.msg import Image
@@ -39,6 +40,7 @@ class OffboardControl(Node):
         self.previous_imu_timestamp = 0.0
         self.previous_gps_timestamp = 0.0
         self.previous_lidar_timestamp = 0.0
+        self.previous_amsl_timestamp = 0.0
 
         self.declare_parameter("record_odom", True)
         self.record_odom_ = self.get_parameter('record_odom').get_parameter_value().bool_value
@@ -58,6 +60,8 @@ class OffboardControl(Node):
         self.declare_parameter("record_lidar", True)
         self.record_lidar_ = self.get_parameter('record_lidar').get_parameter_value().bool_value
 
+        self.declare_parameter("record_amsl", True)
+        self.record_lidar_ = self.get_parameter('record_amsl').get_parameter_value().bool_value
 
         self.declare_parameter('system_id', 1)
         self.sys_id_ = self.get_parameter('system_id').get_parameter_value().integer_value
@@ -131,7 +135,7 @@ class OffboardControl(Node):
                                     "angular_vel_x", "angular_vel_y", "angular_vel_z",
                                     "linear_acc_x","linear_acc_y","linear_acc_z",
                                     "latitude", "longitude", "altitude",
-                                    "lidar_range"])
+                                    "lidar_range", "AMSL"])
 
 
         qos_profile = QoSProfile(
@@ -166,7 +170,7 @@ class OffboardControl(Node):
         self.imu_ = Imu()
         self.gps_ = NavSatFix()
         self.lidar_ = LaserScan()
-
+        self.amsl_ = Altitude()
         self.status_sub_ = self.create_subscription(
             State,
             'mavros/state',
@@ -204,12 +208,16 @@ class OffboardControl(Node):
             LaserScan,
             '/scan',qos_profile=sensor_qos_profile)
 
+        self.amsl_sub = message_filters.Subscriber(
+            self,
+            Altitude,
+            '/target/mavros/altitude',qos_profile=sensor_qos_profile)
+
         self.time_synchronizer = ApproximateTimeSynchronizer(
-            [self.odom_sub, self.rgb_sub, self.depth_sub, self.imu_sub, self.gps_sub, self.lidar_sub],
+            [self.odom_sub, self.rgb_sub, self.depth_sub, self.imu_sub, self.gps_sub, self.lidar_sub, self.amsl_sub],
             self.QUEUE_SIZE,
             slop=0.15
         )
-
         self.time_synchronizer.registerCallback(self.dataCallback)
 
         self.vehicle_path_pub_ = self.create_publisher(Path, 'offboard_visualizer/vehicle_path', 10)
@@ -246,13 +254,14 @@ class OffboardControl(Node):
             image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_depth.png"
         cv2.imwrite(os.path.join(directory, image_name), cv_image)   
     
-    def dataCallback(self, odom_msg, img_msg, depth_msg, imu_msg, gps_msg, lidar_msg):
+    def dataCallback(self, odom_msg, img_msg, depth_msg, imu_msg, gps_msg, lidar_msg, amsl_msg):
         self.odom_ = odom_msg
         self.rgb_image_ = img_msg
         self.depth_image_ = depth_msg
         self.imu_ = imu_msg
         self.gps_ = gps_msg
         self.lidar_ = lidar_msg
+        self.amsl_ = amsl_msg
 
         record_odom = self.get_parameter('record_odom').value
         record_img = self.get_parameter('record_img').value
@@ -260,6 +269,7 @@ class OffboardControl(Node):
         record_imu = self.get_parameter('record_imu').value
         record_gps = self.get_parameter('record_gps').value
         record_lidar = self.get_parameter('record_lidar').value
+        record_amsl = self.get_parameter('record_amsl').value
 
 
 
@@ -275,6 +285,8 @@ class OffboardControl(Node):
                                 float(self.gps_.header.stamp.nanosec)/1e9   
         current_lidar_timestamp = (self.lidar_.header.stamp.sec) + \
                                 float(self.lidar_.header.stamp.nanosec)/1e9                
+        current_amsl_timestamp = (self.amsl_.header.stamp.sec) + \
+                                float(self.amsl_.header.stamp.nanosec)/1e9                
 
         threshold = 0.001
         if self.reached_first_point_:
@@ -283,7 +295,8 @@ class OffboardControl(Node):
                 abs(current_odom_timestamp - self.previous_odom_timestamp) or
                 abs(current_imu_timestamp - self.previous_imu_timestamp) or
                 abs(current_gps_timestamp - self.previous_gps_timestamp)or
-                abs(current_lidar_timestamp - self.previous_lidar_timestamp)) >= threshold:
+                abs(current_lidar_timestamp - self.previous_lidar_timestamp)or
+                abs(current_amsl_timestamp - self.previous_amsl_timestamp)) >= threshold:
 
                 if record_odom:
                     self.t = self.odom_.header.stamp.sec + self.odom_.header.stamp.nanosec * 1e-9
@@ -299,9 +312,10 @@ class OffboardControl(Node):
                 if record_lidar:
                     self.lidar_range = self.lidar_.ranges[0]
 
+                if record_amsl:
+                    self.amsl_val = self.amsl_.amsl
 
                 if record_imu:
-                   
                     self.orientation_x = self.imu_.orientation.x
                     self.orientation_y = self.imu_.orientation.y
                     self.orientation_z = self.imu_.orientation.z
@@ -351,7 +365,7 @@ class OffboardControl(Node):
                             self.angular_velocity_x, self.angular_velocity_y, self.angular_velocity_z,
                             self.linear_acceleration_x, self.linear_acceleration_y, self.linear_acceleration_z,
                             self.latitude, self.longitude, self.altitude,
-                            self.lidar_range
+                            self.lidar_range, self.amsl_val
                         ]
 
                         if not record_odom:
@@ -502,7 +516,7 @@ class OffboardControl(Node):
                                        "angular_vel_x", "angular_vel_y", "angular_vel_z",
                                        "linear_acc_x","linear_acc_y","linear_acc_z",
                                        "latitude", "longitude", "altitude",
-                                       "lidar_range"])
+                                       "lidar_range", "AMSL"])
             return
 
         if not self.reached_first_point_:
