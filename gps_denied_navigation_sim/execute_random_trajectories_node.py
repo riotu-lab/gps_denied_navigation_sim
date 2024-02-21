@@ -34,7 +34,7 @@ class OffboardControl(Node):
         super().__init__('random_trajectories_node')
 
         self.previous_imu_timestamp = 0.0
-        self.previous_depth_timestamp = 0.0
+        # self.previous_depth_timestamp = 0.0
         self.previous_img_timestamp = 0.0
         self.previous_odom_timestamp = 0.0
         self.previous_imu_timestamp = 0.0
@@ -48,8 +48,8 @@ class OffboardControl(Node):
         self.declare_parameter("record_img", True)
         self.record_img_ = self.get_parameter('record_img').get_parameter_value().bool_value
 
-        self.declare_parameter("record_depth", True)
-        self.record_depth_ = self.get_parameter('record_depth').get_parameter_value().bool_value
+        # self.declare_parameter("record_depth", True)
+        # self.record_depth_ = self.get_parameter('record_depth').get_parameter_value().bool_value
 
         self.declare_parameter("record_imu", True)
         self.record_imu_ = self.get_parameter('record_imu').get_parameter_value().bool_value
@@ -94,15 +94,15 @@ class OffboardControl(Node):
         self.declare_parameter('rgb_image_directory', '/home/user/shared_volume/gazebo_trajectories/rbg_images')
         self.rgb_img_directory_ = self.get_parameter('rgb_image_directory').get_parameter_value().string_value
 
-        self.declare_parameter('depth_image_directory', '/home/user/shared_volume/gazebo_trajectories/depth_images')
-        self.depth_img_directory_ = self.get_parameter('depth_image_directory').get_parameter_value().string_value
+        # self.declare_parameter('depth_image_directory', '/home/user/shared_volume/gazebo_trajectories/depth_images')
+        # self.depth_img_directory_ = self.get_parameter('depth_image_directory').get_parameter_value().string_value
 
         self.declare_parameter('file_name', 'gazebo_trajectory')
         self.file_name_ = self.get_parameter('file_name').get_parameter_value().string_value
 
         self.create_folder(self.traj_directory_)
         self.create_folder(self.rgb_img_directory_)
-        self.create_folder(self.depth_img_directory_)
+        # self.create_folder(self.depth_img_directory_)
 
         self.traj_objects_=[]
         self.traj_objects_.append(Circle3D(np.array([0,0,1]), np.array([0,0,1]), radius=1, omega=0.5))
@@ -129,7 +129,7 @@ class OffboardControl(Node):
         self.file_ = open(self.csv_file_, 'w', newline='')
         self.csv_writer_ = csv.writer(self.file_)
         # Write the header
-        self.csv_writer_.writerow(["timestamp", "image_name", "depth_image", 
+        self.csv_writer_.writerow(["timestamp", "image_name", 
                                     "tx", "ty", "tz", "vel_x", "vel_y", "vel_z",
                                     "orientation_x", "orientation_y", "orientation_z", "orientation_w",
                                     "angular_vel_x", "angular_vel_y", "angular_vel_z",
@@ -166,7 +166,7 @@ class OffboardControl(Node):
         )
         self.odom_ = Odometry() 
         self.rgb_image_ = Image() 
-        self.depth_image_ = Image() 
+        # self.depth_image_ = Image() 
         self.imu_ = Imu()
         self.gps_ = NavSatFix()
         self.lidar_ = LaserScan()
@@ -188,10 +188,10 @@ class OffboardControl(Node):
             self,
             Image,
             '/target/mono_camera',qos_profile=sensor_qos_profile)
-        self.depth_sub = message_filters.Subscriber(
-            self,
-            Image,
-            'depth_image',qos_profile=sensor_qos_profile)
+        # self.depth_sub = message_filters.Subscriber(
+        #     self,
+        #     Image,
+        #     'depth_image',qos_profile=sensor_qos_profile)
         
         self.imu_sub = message_filters.Subscriber(
             self,
@@ -214,7 +214,7 @@ class OffboardControl(Node):
             '/target/mavros/altitude',qos_profile=sensor_qos_profile)
 
         self.time_synchronizer = ApproximateTimeSynchronizer(
-            [self.odom_sub, self.rgb_sub, self.depth_sub, self.imu_sub, self.gps_sub, self.lidar_sub, self.amsl_sub],
+            [self.odom_sub, self.rgb_sub, self.imu_sub, self.gps_sub, self.lidar_sub, self.amsl_sub],
             self.QUEUE_SIZE,
             slop=0.15
         )
@@ -235,7 +235,7 @@ class OffboardControl(Node):
         self.setpoint_path_msg_ = Path()
 
         self.image_name = ""
-        self.depth_name = ""
+        # self.depth_name = ""
 
     def create_folder(self, directory_path):
         if not os.path.exists(directory_path):
@@ -250,14 +250,14 @@ class OffboardControl(Node):
     def save_image(self, cv_image, directory, image_type):
         if image_type == "rgb":
             image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_rgb.png"
-        elif image_type == "depth":
-            image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_depth.png"
-        cv2.imwrite(os.path.join(directory, image_name), cv_image)   
+        # elif image_type == "depth":
+        #     image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_depth.png"
+        # cv2.imwrite(os.path.join(directory, image_name), cv_image)   
     
-    def dataCallback(self, odom_msg, img_msg, depth_msg, imu_msg, gps_msg, lidar_msg, amsl_msg):
+    def dataCallback(self, odom_msg, img_msg, imu_msg, gps_msg, lidar_msg, amsl_msg):
         self.odom_ = odom_msg
         self.rgb_image_ = img_msg
-        self.depth_image_ = depth_msg
+        # self.depth_image_ = depth_msg
         self.imu_ = imu_msg
         self.gps_ = gps_msg
         self.lidar_ = lidar_msg
@@ -265,7 +265,7 @@ class OffboardControl(Node):
 
         record_odom = self.get_parameter('record_odom').value
         record_img = self.get_parameter('record_img').value
-        record_depth = self.get_parameter('record_depth').value
+        # record_depth = self.get_parameter('record_depth').value
         record_imu = self.get_parameter('record_imu').value
         record_gps = self.get_parameter('record_gps').value
         record_lidar = self.get_parameter('record_lidar').value
@@ -273,8 +273,8 @@ class OffboardControl(Node):
 
 
 
-        current_depth_timestamp = (self.depth_image_.header.stamp.sec) + \
-                                float(self.depth_image_.header.stamp.nanosec)/1e9
+        # current_depth_timestamp = (self.depth_image_.header.stamp.sec) + \
+        #                         float(self.depth_image_.header.stamp.nanosec)/1e9
         current_img_timestamp = (self.rgb_image_.header.stamp.sec) + \
                                 float(self.rgb_image_.header.stamp.nanosec)/1e9
         current_odom_timestamp = (self.odom_.header.stamp.sec) + \
@@ -290,7 +290,7 @@ class OffboardControl(Node):
 
         threshold = 0.001
         if self.reached_first_point_:
-            if (abs(current_depth_timestamp - self.previous_depth_timestamp) or 
+            if ( 
                 abs(current_img_timestamp - self.previous_img_timestamp) or 
                 abs(current_odom_timestamp - self.previous_odom_timestamp) or
                 abs(current_imu_timestamp - self.previous_imu_timestamp) or
@@ -342,14 +342,6 @@ class OffboardControl(Node):
                     self.save_image(self.cv_image_rgb, self.rgb_img_directory_, "rgb")
                     # self.previous_img_timestamp = current_img_timestamp
 
-                if record_depth:
-                    self.depth_image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_depth.png"
-                    self.cv_image_depth = CvBridge().imgmsg_to_cv2(self.depth_image_, "passthrough")
-                    self.normalized_depth_img = cv2.normalize(
-                        self.cv_image_depth, None, 100, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-                    self.save_image(self.normalized_depth_img, self.depth_img_directory_, "depth")
-                    # self.previous_depth_timestamp = current_depth_timestamp
-
 
 
                     if (
@@ -359,7 +351,7 @@ class OffboardControl(Node):
                         
                     ):  # Check if any of these types are being recorded
                         data_to_write = [
-                            self.t, self.rgb_image_name, self.depth_image_name,
+                            self.t, self.rgb_image_name,
                             self.tx, self.ty, self.tz, self.vel_x, self.vel_y, self.vel_z,
                             self.orientation_x, self.orientation_y, self.orientation_z, self.orientation_w,
                             self.angular_velocity_x, self.angular_velocity_y, self.angular_velocity_z,
@@ -383,7 +375,7 @@ class OffboardControl(Node):
                         self.csv_writer_.writerow(data_to_write)
                         self.offboard_setpoint_counter_ += 1
 
-            self.previous_depth_timestamp = current_depth_timestamp
+            # self.previous_depth_timestamp = current_depth_timestamp
             self.previous_img_timestamp = current_img_timestamp
             self.previous_odom_timestamp = current_odom_timestamp
             self.previous_imu_timestamp = current_imu_timestamp
@@ -510,7 +502,7 @@ class OffboardControl(Node):
             self.file_ = open(self.csv_file_, 'w', newline='')
             self.csv_writer_ = csv.writer(self.file_)
             # Write the header
-            self.csv_writer_.writerow(["timestamp", "image_name", "depth_image", 
+            self.csv_writer_.writerow(["timestamp", "image_name",  
                                        "tx", "ty", "tz", "vel_x", "vel_y", "vel_z",
                                        "orientation_x", "orientation_y", "orientation_z", "orientation_w",
                                        "angular_vel_x", "angular_vel_y", "angular_vel_z",

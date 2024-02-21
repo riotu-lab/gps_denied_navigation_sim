@@ -84,10 +84,7 @@ def generate_launch_description():
         package='ros_gz_bridge',
         name='ros_bridge_node_depthcam',
         executable='parameter_bridge',
-        arguments=['/d435/depth_image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/d435/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/d435/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
-                   '/d435/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+        arguments=[
                    '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                    '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
                    '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
@@ -98,12 +95,7 @@ def generate_launch_description():
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/imu_gimbal@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-
-                   '--ros-args', '-r', '/d435/depth_image:='+ns+'/depth_image',
-                   '-r', '/d435/image:='+ns+'/image',
-                   '-r', '/d435/points:='+ns+'/points',
-                   '-r', '/d435/camera_info:='+ns+'/camera_info',
-                   '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/image:='+ns+'/mono_camera',
+                   '--ros-args', '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/image:='+ns+'/mono_camera',
                    '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/camera_info:='+ns+'/mono_info'
 
                    ],
@@ -117,14 +109,14 @@ def generate_launch_description():
         parameters=[{'system_id': 1},
                     {'radius_bounds': [100.0, 2500.0]},
                     {'omega_bounds': [1.0,2.0]},
-                    {'xyz_bound_min': [-6000.0, -6000.0, 400.0]},
-                    {'xyz_bound_max': [6000.0, 6000.0, 500.0]},
+                    {'xyz_bound_min': [-100.0, -100.0, 300.0]},
+                    {'xyz_bound_max': [100.0, 100.0, 500.0]},
                     {'num_traj': 5},
                     {'traj_2D': True},
                     {'traj_directory': '/home/user/shared_volume/gazebo_trajectories/'},
                     {'file_name': 'gazebo_trajectory2D'},
-                    {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'},
-                    {'depth_image_directory': '/home/user/shared_volume/gazebo_trajectories/depth_images'}
+                    {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'}
+
         ],
         remappings=[
             ('mavros/state', 'mavros/state'),
