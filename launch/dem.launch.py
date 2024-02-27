@@ -109,10 +109,10 @@ def generate_launch_description():
         parameters=[{'system_id': 1},
                     {'radius_bounds': [100.0, 2500.0]},
                     {'omega_bounds': [1.0,2.0]},
-                    {'xyz_bound_min': [-100.0, -100.0, 300.0]},
-                    {'xyz_bound_max': [100.0, 100.0, 500.0]},
+                    {'xyz_bound_min': [-100.0, -100.0, 1000.0]},
+                    {'xyz_bound_max': [100.0, 100.0, 1500.0]},
                     {'num_traj': 5},
-                    {'traj_2D': True},
+                    {'traj_2D': False},
                     {'traj_directory': '/home/user/shared_volume/gazebo_trajectories/'},
                     {'file_name': 'gazebo_trajectory2D'},
                     {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'}
@@ -124,6 +124,30 @@ def generate_launch_description():
             ('mavros/setpoint_raw/local', 'mavros/setpoint_raw/local')
         ]
     )
+    # random_trajectories_node = Node(
+    #     package='gps_denied_navigation_sim',
+    #     executable='execute_random_trajectories',
+    #     output='screen',
+    #     name='execute_random_trajectories',
+    #     namespace=ns,
+    #     parameters=[{'system_id': 1},
+    #                 {'radius_bounds': [1.0, 2.0]},
+    #                 {'omega_bounds': [1.0,2.0]},
+    #                 {'xyz_bound_min': [-10.0, -10.0, 100.0]},
+    #                 {'xyz_bound_max': [10.0, 10.0, 150.0]},
+    #                 {'num_traj': 5},
+    #                 {'traj_2D': False},
+    #                 {'traj_directory': '/home/user/shared_volume/gazebo_trajectories/'},
+    #                 {'file_name': 'gazebo_trajectory2D'},
+    #                 {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'}
+
+    #     ],
+    #     remappings=[
+    #         ('mavros/state', 'mavros/state'),
+    #         ('mavros/local_position/odom', 'mavros/local_position/odom'),
+    #         ('mavros/setpoint_raw/local', 'mavros/setpoint_raw/local')
+    #     ]
+    # )
     gimbal_node = Node(
         package='gps_denied_navigation_sim',
         executable='gimbal_stabilizer',

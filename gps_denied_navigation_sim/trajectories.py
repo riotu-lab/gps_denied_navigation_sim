@@ -66,6 +66,6 @@ class Infinity3D:
         self.v2 /= np.linalg.norm(self.v2)
 
     def timeToCompleteFullTrajectory(self):
-        return 4 * np.pi / self.omega
+        return 16 * np.pi / self.omega
 
 # infinity = Infinity3D(np.array([1, 2, 3]), np.array([2, 3, 4]), radius=2, omega=1)

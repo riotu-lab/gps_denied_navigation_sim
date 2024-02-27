@@ -81,7 +81,7 @@
       <background>0.7 0.7 0.7 1</background>
       <shadows>true</shadows>
     </scene>
-    <model name='ground_plane'>
+    <!-- <model name='ground_plane'>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -127,9 +127,9 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>0 0 1500 0 -0 0</pose>
+      <pose>0 0 900 0 -0 0</pose>
       <self_collide>false</self_collide>
-    </model>
+    </model> -->
 
     <light name='sunUTC' type='directional'>
       <pose>0 0 500 0 -0 0</pose>

@@ -106,7 +106,7 @@ class OffboardControl(Node):
 
         self.traj_objects_=[]
         self.traj_objects_.append(Circle3D(np.array([0,0,1]), np.array([0,0,1]), radius=1, omega=0.5))
-        self.traj_objects_.append(Infinity3D(np.array([0,0,1]), np.array([0,0,1]), radius=1, omega=0.5))
+        # self.traj_objects_.append(Infinity3D(np.array([0,0,1]), np.array([0,0,1]), radius=1, omega=0.5))
 
         # Generate random parameters
         self.random_traj_params_ = self.generateRandomParameters()
@@ -252,7 +252,7 @@ class OffboardControl(Node):
             image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_rgb.png"
         # elif image_type == "depth":
         #     image_name = f"{self.file_name_}_{self.traj_counter_}_{self.offboard_setpoint_counter_}_depth.png"
-        # cv2.imwrite(os.path.join(directory, image_name), cv_image)   
+        cv2.imwrite(os.path.join(directory, image_name), cv_image)   
     
     def dataCallback(self, odom_msg, img_msg, imu_msg, gps_msg, lidar_msg, amsl_msg):
         self.odom_ = odom_msg
@@ -513,7 +513,7 @@ class OffboardControl(Node):
 
         if not self.reached_first_point_:
             # First go to the first waypoint before starting the trajectory
-            self.get_logger().info(f'Going to the first point of trajectory # {self.traj_counter_}.')
+            # self.get_logger().info(f'Going to the first point of trajectory # {self.traj_counter_}.')
             point = traj_type.generate_trajectory_setpoint(self.first_point_t_)
             if point[2]< self.xyz_bound_min_[2]:
                 point[2] = self.xyz_bound_min_[2]
@@ -527,9 +527,14 @@ class OffboardControl(Node):
             setpoint_msg.position.x = point[0]
             setpoint_msg.position.y = point[1]
             setpoint_msg.position.z = point[2]
-            # yaw  = atan(d_y, d_x)
-            yaw = np.arctan2(point[1] - self.odom_.pose.pose.position.y, point[0] - self.odom_.pose.pose.position.x)
-            setpoint_msg.yaw = yaw
+            
+            dy = point[1] - self.odom_.pose.pose.position.y
+            dx = point[0] - self.odom_.pose.pose.position.x
+            d = (dx**2 + dy**2)**0.5
+            if d > 5.0:
+                yaw  = np.arctan2(dy, dx)
+                setpoint_msg.yaw = yaw
+            
 
             self.setopint_pub_.publish(setpoint_msg)
 
@@ -545,7 +550,7 @@ class OffboardControl(Node):
         
         self.get_logger().info(f'Executing trajectory # {self.traj_counter_}.')
         t_now = Clock().now()
-        point = traj_type.generate_trajectory_setpoint(t_now.nanoseconds / 1000/1000/1000)
+        point = traj_type.generate_trajectory_setpoint(Clock().now().nanoseconds/1000/1000/1000)
         if point[2]< self.xyz_bound_min_[2]:
             point[2] = self.xyz_bound_min_[2]
 
