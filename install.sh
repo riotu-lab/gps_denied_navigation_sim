@@ -54,32 +54,26 @@ if [ ! -d "$PX4_DIR" ]; then
     echo "Cloning $PX4_DIR..."
     cd $DEV_DIR
     git clone https://github.com/riotu-lab/PX4-Autopilot.git --recursive
-    make submodulesclean
-    make clean
-    make distclean
     cd $PX4_DIR
+    make submodulesclean
+    make distclean
+    make clean
     # git checkout v1.14.0
     git checkout navsat_callback
-    make submodulesclean
-    make clean
-    make distclean
 else
     echo "PX4_DIR=$PX4_DIR already exists"
     cd $PX4_DIR
     make submodulesclean
-    make clean
     make distclean
+    make clean
     # git checkout v1.14.0
     git checkout navsat_callback
-    make submodulesclean
-    make clean
-    make distclean
 fi
-
 # Build px4_sitl
 cd $PX4_DIR && make px4_sitl
 # Checkout commit f1c461f in https://github.com/PX4/PX4-gazebo-models.git
-cd $PX4_DIR/Tools/simulation/gz && git checkout f1c461f
+# cd $PX4_DIR/Tools/simulation/gz && git checkout f1c461f
+cd $PX4_DIR/Tools/simulation/gz && git checkout main
 
 # Copy files to $PX4_DIR
 echo && echo  "Copying files to ${PX4_DIR}" && echo
@@ -87,6 +81,12 @@ sleep 1
 cp -r ${ROS2_SRC}/gps_denied_navigation_sim/models/* ${PX4_DIR}/Tools/simulation/gz/models/
 cp -r ${ROS2_SRC}/gps_denied_navigation_sim/worlds/* ${PX4_DIR}/Tools/simulation/gz/worlds/
 cp -r ${ROS2_SRC}/gps_denied_navigation_sim//config/px4/* ${PX4_DIR}/ROMFS/px4fmu_common/init.d-posix/airframes/
+
+
+# Build px4_sitl
+cd $PX4_DIR && make px4_sitl
+
+
 
 cd $DEV_DIR
 

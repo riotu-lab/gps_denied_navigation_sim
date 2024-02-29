@@ -1,5 +1,5 @@
 <sdf version='1.9'>
-  <world name='default'>
+  <world name='dem_world'>
     <physics type="ode">
       <max_step_size>0.004</max_step_size>
       <real_time_factor>1.0</real_time_factor>
@@ -11,6 +11,8 @@
     <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
     <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
     <plugin name='gz::sim::systems::AirPressure' filename='gz-sim-air-pressure-system'/>
+    <plugin name='gz::sim::systems::ApplyLinkWrench' filename='gz-sim-apply-link-wrench-system'/>
+    <plugin name='gz::sim::systems::NavSat' filename='gz-sim-navsat-system'/>
     <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
       <render_engine>ogre2</render_engine>
     </plugin>
@@ -29,7 +31,8 @@
           <near>0.25</near>
           <far>50000</far>
         </camera_clip>
-        <camera_pose>-23 -45.4 34.5 0.0 0.54 1.11</camera_pose>      </plugin>
+        <camera_pose>-23 -45.4 34.5 0.0 0.54 1.11</camera_pose>
+      </plugin>
       <plugin name='World control' filename='WorldControl'>
         <gz-gui>
           <title>World control</title>
@@ -78,7 +81,7 @@
       <background>0.7 0.7 0.7 1</background>
       <shadows>true</shadows>
     </scene>
-    <model name='ground_plane'>
+    <!-- <model name='ground_plane'>
       <static>true</static>
       <link name='link'>
         <collision name='collision'>
@@ -124,9 +127,9 @@
         </inertial>
         <enable_wind>false</enable_wind>
       </link>
-      <pose>0 0 0 0 -0 0</pose>
+      <pose>0 0 900 0 -0 0</pose>
       <self_collide>false</self_collide>
-    </model>
+    </model> -->
 
     <light name='sunUTC' type='directional'>
       <pose>0 0 500 0 -0 0</pose>
@@ -152,6 +155,13 @@
       model://dem
       </uri>
     </include>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>47.75095997493402</latitude_deg>
+      <longitude_deg>-123.5650639612084</longitude_deg>
+      <altitude>6378137</altitude>
+    </spherical_coordinates>
   </world>
 </sdf>
 

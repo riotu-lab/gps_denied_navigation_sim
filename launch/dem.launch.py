@@ -12,8 +12,9 @@ from launch.substitutions import PathJoinSubstitution
 def generate_launch_description():
     ld = LaunchDescription()
 
-    # Node for Drone 2
+    # gz node
     model_name = {'gz_model_name': 'x500_d435'}
+    world_name = {'gz_world': 'dem_world'}
     autostart_id = {'px4_autostart_id': '4020'}
     instance_id = {'instance_id': '0'}
     xpos = {'xpos': '0.0'}
@@ -36,6 +37,7 @@ def generate_launch_description():
             'gz_ns': ns,
             'headless': headless['headless'],
             'gz_model_name': model_name['gz_model_name'],
+            'gz_world': world_name['gz_world'],
             'px4_autostart_id': autostart_id['px4_autostart_id'],
             'instance_id': instance_id['instance_id'],
             'xpos': xpos['xpos'],
