@@ -3,7 +3,7 @@
 ### Dependencies
 
 * Blender
-* Blender GIS 
+* Blender GIS (plugin)
 
 ### Installation
 
@@ -18,10 +18,9 @@ cd blender-3.6.0-linux-x64.tar.xz
 
 ### 2. Blender GIS 
 
-Clone the BlenderGIS repository:
-```bash
-git clone https://github.com/domlysz/BlenderGIS
-```
+Download the BlenderGIS repository as a `.zip` file:
+* Go to `https://github.com/domlysz/BlenderGIS`
+* Click on the green `Code` icon, and sleect `Download zip`
 
 Note : Since 2022, the OpenTopography web service requires an API key. Please register to opentopography.org and request a key. This service is still free.
 
@@ -34,12 +33,13 @@ Note : Since 2022, the OpenTopography web service requires an API key. Please re
 
 2. Add the Blender GIS plugin:
     * Go to `Edit` select `Preferences`. 
-    * select `Install` and add the plugin path from the downloaded .zip file.
+    * Select the `Add-ons` side tab
+    * select `Install` and select the path to the BlenderGIS `.zip` file.
     * select 3D view: Blender GIS
       
     ![collection](media/preference.png)
    
-    * In the search tab, search for `node` and mark it as selected.
+    * In the search tab, search for `node` add-on and mark it as selected.
       
     ![collection](media/node.png)
 
@@ -61,25 +61,25 @@ Note : Since 2022, the OpenTopography web service requires an API key. Please re
    ![collection](media/mt_wilder.png)
 
 
-7. Select the region of interest (ROI) and press `E` to bring up the planar map of `Mt. Wilder`.
+7. Select the region of interest (ROI) and press `E` to bring up the planar map of `Mt. Wilder` (or whatever location you selected).
 
    ![collection](media/map_wi.png)
    ![collection](media/planer.png)
 
 
 8. Get the elevation data:
-    * Go to GIS, Web geodata, and select `Get elevation (SRTM)`.
+    * Go to GIS Menu, select  `Web geodata -> Get elevation (SRTM)`.
     
    ![collection](media/srtm.png)
 
     * Choose the SRTM option (e.g., 'OpenTopography SRTM 30m').
 
 9. Convert elevation to mesh:
-    * Right-click and choose `Convert to` -> `Mesh`.
+    * Right-click on the map and choose `Convert to` -> `Mesh`.
    
    ![collection](media/mesh.png)
 
-    * Switch to Edit Mode to find the DEM converted to mesh
+    * Switch to Edit Mode (toolbar at the top left) to find the DEM converted to mesh
     
    ![collection](media/edit.png)
 
