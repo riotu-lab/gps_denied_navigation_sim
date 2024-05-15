@@ -1,5 +1,6 @@
 import sys
-from osgeo import gdal
+import os
+from osgeo import gdal, osr
 import numpy as np
 
 def print_metadata(dataset):
@@ -36,6 +37,8 @@ def add_gps_metadata(image_path, output_path, center_lat, center_lon):
     geotransform = dataset.GetGeoTransform()
     width = dataset.RasterXSize
     height = dataset.RasterYSize
+    num_bands = dataset.RasterCount
+    data_type = dataset.GetRasterBand(1).DataType
 
     # Extract resolution (pixel size)
     resolution_x = dataset.GetMetadataItem('TIFFTAG_XRESOLUTION')
@@ -74,20 +77,46 @@ def add_gps_metadata(image_path, output_path, center_lat, center_lon):
     print(f"  Bottom-left:  ({lat_grid[-1, 0]}, {lon_grid[-1, 0]})")
     print(f"  Bottom-right: ({lat_grid[-1, -1]}, {lon_grid[-1, -1]})")
 
-    # Read the original image data
-    band = dataset.GetRasterBand(1)
-    image_data = band.ReadAsArray()
-
-    # Create a new TIFF file with the same dimensions
+    # Create a new TIFF file with the same dimensions and number of bands
+    options = ['PHOTOMETRIC=RGB'] if num_bands >= 3 else []
     driver = gdal.GetDriverByName('GTiff')
-    out_dataset = driver.Create(output_path, width, height, 1, gdal.GDT_Float32)
+    out_dataset = driver.Create(output_path, width, height, num_bands, data_type, options)
 
     # Write the image data to the new file
-    out_dataset.GetRasterBand(1).WriteArray(image_data)
+    for band in range(1, num_bands + 1):
+        in_band = dataset.GetRasterBand(band)
+        out_band = out_dataset.GetRasterBand(band)
+        out_band.WriteArray(in_band.ReadAsArray())
 
-    # Set the geotransform and projection to the new file
-    out_dataset.SetGeoTransform(geotransform)
-    out_dataset.SetProjection(dataset.GetProjection())
+        # Check if a NoData value is set and copy it
+        no_data_value = in_band.GetNoDataValue()
+        if no_data_value is not None:
+            out_band.SetNoDataValue(no_data_value)
+
+        # Copy color interpretation
+        out_band.SetColorInterpretation(in_band.GetColorInterpretation())
+
+    # Copy metadata
+    out_dataset.SetMetadata(dataset.GetMetadata())
+
+    # Set the geotransform to the new file (adjusting to match the center lat/lon)
+    out_geotransform = (
+        center_lon - (width // 2) * pixel_width,  # top left x
+        pixel_width,                              # w-e pixel resolution
+        0,                                        # rotation, 0 if image is "north up"
+        center_lat + (height // 2) * pixel_height, # top left y
+        0,                                        # rotation, 0 if image is "north up"
+        -pixel_height                             # n-s pixel resolution (negative value)
+    )
+    out_dataset.SetGeoTransform(out_geotransform)
+
+    # Set the projection to WGS84
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(4326)  # EPSG code for WGS84
+    out_dataset.SetProjection(srs.ExportToWkt())
+
+    # Ensure the TIFFTAG_SOFTWARE tag matches what might be expected in the .dae file
+    out_dataset.SetMetadataItem('TIFFTAG_SOFTWARE', 'Blender 3.6.0')
 
     # Add GPS metadata
     out_dataset.SetMetadataItem('LATITUDES', str(lat_grid))
@@ -104,6 +133,12 @@ if __name__ == "__main__":
     image_path = sys.argv[1]
     center_lat = float(sys.argv[2])
     center_lon = float(sys.argv[3])
-    output_path = 'output_with_gps.tiff'
+
+    # Generate the output filename as geo_<input_file_name>.tif
+    input_basename = os.path.basename(image_path)
+    input_filename, input_ext = os.path.splitext(input_basename)
+    output_filename = f"geo_{input_filename}.tif"
+    input_dir = os.path.abspath(os.path.dirname(image_path))
+    output_path = os.path.join(input_dir, output_filename)
 
     add_gps_metadata(image_path, output_path, center_lat, center_lon)
