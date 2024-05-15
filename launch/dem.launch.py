@@ -14,12 +14,26 @@ def generate_launch_description():
 
     # gz node
     model_name = {'gz_model_name': 'x500_d435'}
-    world_name = {'gz_world': 'dem_world'}
+    # for original dem use
+    # world_name = {'gz_world': 'dem_world'}
+    # for Taif DEM use
+    # world_name = {'gz_world': 'taif_world'}
+    world_name = {'gz_world': 'taif_world'}
     autostart_id = {'px4_autostart_id': '4020'}
     instance_id = {'instance_id': '0'}
-    xpos = {'xpos': '0.0'}
-    ypos = {'ypos': '200.0'}
-    zpos = {'zpos': '900.0'}
+    # for taif DEM use
+    # xpos = {'xpos': '135.0'}
+    # ypos = {'ypos': '100.0'}
+    # zpos = {'zpos': '2000.0'}
+
+    # For original DEM use
+    # xpos = {'xpos': '0.0'}
+    # ypos = {'ypos': '200.0'}
+    # zpos = {'zpos': '900.0'}
+    
+    xpos = {'xpos': '135.0'}
+    ypos = {'ypos': '100.0'}
+    zpos = {'zpos': '2000.0'}
     headless= {'headless' : '0'}
 
     # Namespace
