@@ -175,7 +175,7 @@ def generate_launch_description():
     ld.add_action(gz_launch)
     ld.add_action(map2pose_tf_node)
     ld.add_action(mavros_launch)
-    ld.add_action(random_trajectories_node)
+    # ld.add_action(random_trajectories_node)
     ld.add_action(gimbal_node)
 
     ld.add_action(ros_gz_bridge)
