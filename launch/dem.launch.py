@@ -13,14 +13,16 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # gz node
-    model_name = {'gz_model_name': 'x500_d435'}
-    # for original dem use
-    # world_name = {'gz_world': 'dem_world'}
-    # for Taif DEM use
-    # world_name = {'gz_world': 'taif_world'}
-    world_name = {'gz_world': 'taif_world'}
-    autostart_id = {'px4_autostart_id': '4020'}
-    instance_id = {'instance_id': '0'}
+    m_name = 'x500_d435_3d_lidar'
+    model_name = {'gz_model_name': m_name}
+    m_id=0
+    # for original dem use dem_world
+    # for Taif DEM use taif_world
+    # For empty world use default
+    w_name='taif_world'
+    world_name = {'gz_world': w_name}
+    autostart_id = {'px4_autostart_id': '4022'}
+    instance_id = {'instance_id': f'{m_id}'}
     # for taif DEM use
     # xpos = {'xpos': '135.0'}
     # ypos = {'ypos': '100.0'}
@@ -34,6 +36,9 @@ def generate_launch_description():
     xpos = {'xpos': '135.0'}
     ypos = {'ypos': '100.0'}
     zpos = {'zpos': '2000.0'}
+    # xpos = {'xpos': '0.0'}
+    # ypos = {'ypos': '0.0'}
+    # zpos = {'zpos': '0.1'}
     headless= {'headless' : '0'}
 
     # Namespace
@@ -95,6 +100,17 @@ def generate_launch_description():
         arguments=[str(xpos['xpos']), str(ypos['ypos']), '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
     )
 
+    # Static TF target/base_link to lidar link
+    # The valuse are taken from the model.sdf of x500_d435_3d_lidar
+    base_frame = 'target/base_link'
+    lidar_frame= 'lidar_link'
+    base2lidar_tf_node = Node(
+        package='tf2_ros',
+        name='base2lidar_'+ns+'_tf_node',
+        executable='static_transform_publisher',
+        arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
+    )
+
     # Transport rgb and depth images from GZ topics to ROS topics    
     ros_gz_bridge = Node(
         package='ros_gz_bridge',
@@ -104,15 +120,16 @@ def generate_launch_description():
                    '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
                    '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
                    '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
-                   '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                   '/lidar/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
 
                    '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/imu_gimbal@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-                   '--ros-args', '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/image:='+ns+'/mono_camera',
-                   '-r', '/world/default/model/x500_d435_0/link/pitch_link/sensor/camera/camera_info:='+ns+'/mono_info'
+                   '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/mono_camera',
+                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/mono_info'
 
                    ],
     )    
@@ -171,12 +188,24 @@ def generate_launch_description():
         output='screen',
          )
 
+    rviz_file_name = 'dem.rviz'
+    package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
+    rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
+    rviz_node = Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', rviz_file_path],
+        )
+
 
     ld.add_action(gz_launch)
     ld.add_action(map2pose_tf_node)
+    ld.add_action(base2lidar_tf_node)
     ld.add_action(mavros_launch)
     # ld.add_action(random_trajectories_node)
     ld.add_action(gimbal_node)
-
     ld.add_action(ros_gz_bridge)
+    ld.add_action(rviz_node)
     return ld

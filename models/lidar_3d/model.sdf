@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="lidar_3d">
+    <link name="lidar3d_link">
+      <pose>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0.03585 0 0 0</pose>
+        <!-- <mass>0.83</mass> -->
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0009080594249999999</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0009080594249999999</iyy>
+          <iyz>0</iyz>
+          <izz>0.0011049624</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <pose>0 0 0.03585 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.0516</radius>
+            <length>0.0717</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://lidar_3d/meshes/lidar_3d_v1.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <sensor name='gpu_lidar' type='gpu_lidar'>"
+        <topic>lidar</topic>
+        <update_rate>10</update_rate>
+        <enable_metrics>false</enable_metrics>
+        <visualize>true</visualize>
+        <always_on>true</always_on>
+        <!-- <frame_id>lidar_link</frame_id> -->
+        <gz_frame_id>lidar_link</gz_frame_id>
+        <lidar>
+          <!-- <visibility_mask>4294967295</visibility_mask> -->
+          <scan>
+            <horizontal>
+              <samples>720</samples>
+              <resolution>0.01</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>50</samples> 
+              <min_angle>-0.122173</min_angle>
+              <max_angle>0.907571</max_angle>
+              <resolution>0.01</resolution>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.5</min>
+            <max>250.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </lidar>
+      </sensor>
+
+    </link>
+  </model>
+</sdf>
