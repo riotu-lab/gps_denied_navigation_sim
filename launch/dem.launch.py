@@ -13,7 +13,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # gz node
-    m_name = 'x500_d435_3d_lidar'
+    m_name = 'x500_mono_cam_3d_lidar'
     model_name = {'gz_model_name': m_name}
     m_id=0
     # for original dem use dem_world
@@ -123,13 +123,17 @@ def generate_launch_description():
                    '/lidar/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
                    '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
                    '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                   '/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                   '/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
 
                    '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/imu_gimbal@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-                   '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/mono_camera',
-                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/mono_info'
+                   '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/gimbal/camera',
+                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
+                   '-r', '/camera:='+ns+'/camera',
+                   '-r', '/camera_info:='+ns+'/camera_info',
 
                    ],
     )    

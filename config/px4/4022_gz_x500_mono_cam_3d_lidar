@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @name Gazebo x500 d435
+# @name Gazebo x500 with mono static cam with 3D Lidar
 #
 # @type Quadrotor
 #
@@ -9,7 +9,7 @@
 
 PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
 PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
-PX4_SIM_MODEL=${PX4_SIM_MODEL:=x500_d435_3d_lidar}
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=x500_mono_cam_3d_lidar}
 
 param set-default SIM_GZ_EN 1
 
