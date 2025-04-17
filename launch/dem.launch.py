@@ -125,6 +125,7 @@ def generate_launch_description():
                    '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                    '/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
                    '/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                   '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
 
                    '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
                    '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
@@ -134,6 +135,7 @@ def generate_launch_description():
                    '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
                    '-r', '/camera:='+ns+'/camera',
                    '-r', '/camera_info:='+ns+'/camera_info',
+                   '-r', '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
 
                    ],
     )    
