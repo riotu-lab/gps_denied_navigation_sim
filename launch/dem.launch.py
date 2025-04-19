@@ -33,7 +33,7 @@ def generate_launch_description():
     # ypos = {'ypos': '200.0'}
     # zpos = {'zpos': '900.0'}
     
-    xpos = {'xpos': '135.0'}
+    xpos = {'xpos': '50.0'}
     ypos = {'ypos': '100.0'}
     zpos = {'zpos': '2000.0'}
     # xpos = {'xpos': '0.0'}

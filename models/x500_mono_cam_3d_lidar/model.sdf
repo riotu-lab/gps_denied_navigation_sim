@@ -17,13 +17,13 @@
     <!-- Mono Fixed Camera -not on a gimbal- -->
     <include merge='true'>
       <uri>model://mono_camera</uri>
-      <pose degrees="true">-0.02 0.0 0.1 0 90 0</pose>
+      <pose degrees="true">0.15 0.0 0.1 0 10 0</pose>
 
     </include>
     <joint name="MonoCamJoint" type="fixed">
       <parent>base_link</parent>
       <child>mono_camera/base_link</child>
-      <pose relative_to="base_link" degrees="true">0.05 0.0 0.12 0 90 0</pose>
+      <pose degrees="true">0.15 0.0 0.1 0 10 0</pose>
     </joint>
     
     <!-- 3D Lidar-->
