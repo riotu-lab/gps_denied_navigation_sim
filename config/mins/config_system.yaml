@@ -11,6 +11,6 @@ sys:
   save_prints: false
   exp_id: 0
 
-  path_bag: "/media/wl/RPNG_FLASH_9/dataset/kaist/urban35.bag"
+  path_bag: ""
   bag_start: 0
   bag_durr: -1

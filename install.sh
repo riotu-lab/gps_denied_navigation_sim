@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# This script sets up the D2DTracker simulation environment
+# This script sets up the gps_denied_navigation simulation environment
 
 if [ -z "${DEV_DIR}" ]; then
   echo "Error: DEV_DIR environment variable is not set. Set it using export DEV_DIR=<DEV_DIR_deirectory_that_should_contain_PX4-Autopilot_and_ros2_ws>"

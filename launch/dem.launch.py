@@ -19,8 +19,8 @@ def generate_launch_description():
     # for original dem use dem_world
     # for Taif DEM use taif_world
     # For empty world use default
-    # w_name='taif_world'
-    w_name='tugbot_depot'
+    w_name='taif_world'
+    # w_name='tugbot_depot'
     world_name = {'gz_world': w_name}
     autostart_id = {'px4_autostart_id': '4022'}
     instance_id = {'instance_id': f'{m_id}'}
@@ -34,12 +34,14 @@ def generate_launch_description():
     # ypos = {'ypos': '200.0'}
     # zpos = {'zpos': '900.0'}
     
-    # xpos = {'xpos': '-50.0'}
-    # ypos = {'ypos': '100.0'}
-    # zpos = {'zpos': '2000.0'}
-    xpos = {'xpos': '0.0'}
-    ypos = {'ypos': '0.0'}
-    zpos = {'zpos': '0.1'}
+    # for taif DEM use
+    xpos = {'xpos': '-50.0'}
+    ypos = {'ypos': '100.0'}
+    zpos = {'zpos': '2000.0'}
+    # for tugbot_depot DEM use
+    # xpos = {'xpos': '0.0'}
+    # ypos = {'ypos': '0.0'}
+    # zpos = {'zpos': '0.1'}
     headless= {'headless' : '0'}
 
     # Namespace
