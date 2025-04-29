@@ -1,38 +1,90 @@
 %YAML:1.0 # need to specify the file type at the top!
 
+# General LiDAR parameters
 lidar:
   enabled: true
   max_n: 1
-  do_calib_dt: false
+  use_lidar: true
   do_calib_ext: true
-  init_cov_dt: 1e-4
-  init_cov_ex_o: 1e-6
-  init_cov_ex_p: 1e-6
-  max_range: 300.0
-  min_range: 0.5
-  chi2_mult: 1
+  do_calib_dt: false
+  init_cov_dt: 0.1
+  init_cov_ex_o: 0.1
+  init_cov_ex_p: 0.1
+  min_range: 0.1
+  max_range: 100.0
   raw_do_downsample: true
-  raw_downsample_size: 0.3
+  raw_downsample_size: 0.1
+  raw_remove_motion_blur: true
+  raw_point_dt: 0.01
   raw_noise: 0.01
-  raw_remove_motion_blur: false
-  raw_point_dt: 1e-6
-  map_do_downsample: true
-  map_downsample_size: 0.3
   map_noise: 0.01
-  map_ngbr_num: 15
-  map_ngbr_max_d: 15.0
-  map_decay_time: 120
-  map_decay_dist: 100
+  map_ngbr_num: 20
+  map_ngbr_max_d: 1.0
+  map_downsample_size: 0.1
+  map_do_downsample: true
+  map_decay_time: 1.0
+  map_decay_dist: 1.0
   map_use_icp: true
-  map_icp_dist: 50
-  plane_max_p2pd: 0.2
-  plane_max_condi: 300.0
+  map_icp_dist: 1.0
+  plane_max_condi: 100.0
+  plane_max_p2pd: 0.1
 
+  # Type of LiDAR data we have
+  lidar_type: "fast_lio" # "fast_lio", "fast_lio_sam"
+  slam_lidar_type: "fast_lio"
+
+  # Downsample features
+  downsample: true
+  downsample_size: 0.1
+
+  # Buffer settings (increase for stability)
+  time_buffer_size: 12.0     # Increased from default
+  max_lidar_buffer_size: 120  # Increased from default
+
+  # LiDAR data statistics
+  sigma_l: 0.2
+  chi2_mult: 1.0 
+  
+  # The max distance a features needs to be away from frame
+  max_dist: 75.0     # Reduced to be more conservative
+
+  # Feature masking and scoring parameters
+  max_features: 1000  # Reduced total feature count for stability
+  buckets_x: 10
+  buckets_y: 10
+  buckets_z: 10
+  
+  # Feature init parameters (more conservative)
+  feats_init_min_obs: 2
+  feat_representation: "GLOBAL_3D"
+  feat_init_max_sigma: 10.0   # More conservative sigma threshold
+  
+  # Sampling parameters (more samples)
+  sample_lidar_poses: true    # Make sure we're sampling sufficiently
+  lidar_map_save_hz: 5.0      # More frequent map saves
+  
+  # LIDAR extrinsics qLtoI and pLinI
+  use_fixed_covar: true
+  fixed_cov: [0.1, 0.1, 0.1, 0.01, 0.01, 0.01]
+
+  # Extrinsics time offset (calibrated between IMU and LIDAR)
+  do_calib_ext_rot: true    # Whether to calibrate rotation
+  do_calib_ext_pos: true    # Whether to calibrate position
+  
+  # Time calibration
+  do_calib_dt: false        # Set to false for more stability
+  calib_dt_min: -0.1
+  calib_dt_max: 0.1
+  
+  # Time offset (LIDAR time = IMU time + dt)
+  dt: 0.0
+
+# Specific LiDAR sensor configuration
 lidar0:
   timeoffset: 0.0
+  topic: "/lidar/points"
   T_imu_lidar:
     - [0.0, -1.0, 0.0, 0.0]
     - [0.0, 0.0, -1.0, 0.0]
     - [1.0, 0.0, 0.0, 0.12]
     - [0.0, 0.0, 0.0, 1.0]
-  topic: "/lidar/points"

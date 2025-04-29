@@ -68,18 +68,25 @@ def generate_launch_description():
         default_value='0.2'
     )
 
-    cmd1_str="cd {} && ".format(PX4_DIR)
-    cmd2_str="PX4_SYS_AUTOSTART={} PX4_GZ_MODEL={} PX4_MICRODDS_NS={} PX4_GZ_MODEL_POSE='{},{},{}' ./build/px4_sitl_default/bin/px4 -i {}".format(px4_autostart_id, gz_model_name, namespace, xpos,ypos,zpos, instance_id)
-    cmd_str = cmd1_str+cmd2_str
+    # Update PX4 launch command with more verbose output and pre-flight checks
     px4_sim_process = ExecuteProcess(
         cmd=[[
-            'cd ',PX4_DIR ,' && ',
+            'echo "Starting PX4 with the following parameters:" && ',
+            'echo "PX4_DIR: ', PX4_DIR, '" && ',
+            'echo "Model: ', gz_model_name, '" && ',
+            'echo "Autostart ID: ', px4_autostart_id, '" && ',
+            'cd ', PX4_DIR, ' && ',
+            'if [ ! -f ./build/px4_sitl_default/bin/px4 ]; then echo "ERROR: PX4 binary not found. Did you build PX4?"; exit 1; fi && ',
+            'if [ ! -d ./ROMFS/px4fmu_common/init.d-posix/airframes ]; then echo "ERROR: PX4 airframes directory not found"; exit 1; fi && ',
+            'echo "Running PX4 with simulation parameters..." && ',
+            'PX4_SIM_SPEED_FACTOR=1 ',
             'PX4_SYS_AUTOSTART=', px4_autostart_id,
             ' PX4_GZ_MODEL=', gz_model_name,
-            ' PX4_UXRCE_DDS_NS=',namespace,
-            " PX4_GZ_MODEL_POSE='",xpos,',',ypos,',',zpos,"'",
+            ' PX4_UXRCE_DDS_NS=', namespace,
+            " PX4_GZ_MODEL_POSE='", xpos, ',', ypos, ',', zpos, "'",
             ' PX4_GZ_WORLD=', gz_world,
-            ' ./build/px4_sitl_default/bin/px4 -i ', instance_id
+            ' ./build/px4_sitl_default/bin/px4 -i ', instance_id,
+            ' -d'  # Add debug flag
         ]],
         shell=True
     )
