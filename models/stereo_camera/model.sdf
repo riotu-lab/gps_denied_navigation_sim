@@ -130,5 +130,8 @@
       <gravity>true</gravity>
       <velocity_decay/>
     </link>
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
+      <render_engine>ogre2</render_engine>
+    </plugin>
   </model>
 </sdf> 

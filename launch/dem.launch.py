@@ -248,10 +248,10 @@ def launch_setup(context, *args, **kwargs):
         gimbal_node,
         ros_gz_bridge,
         rviz_node,
-        mins_node,
+        # mins_node,
         map2global_tf_node,
-        lidar_link2lidar0_tf_node,
-        imu2base_link_tf_node,
+        # lidar_link2lidar0_tf_node,
+        # imu2base_link_tf_node,
     ]
 
 def generate_launch_description():

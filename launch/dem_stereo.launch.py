@@ -27,9 +27,9 @@ def launch_setup(context, *args, **kwargs):
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     if localization_model == 'ov':
-        rviz_file_name = 'dem_ov.rviz'
+        rviz_file_name = 'dem_stereo_ov.rviz'
     else:
-        rviz_file_name = 'dem_mins.rviz'
+        rviz_file_name = 'dem_stereo_mins.rviz'
     rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
 
     # gz node
@@ -62,7 +62,8 @@ def launch_setup(context, *args, **kwargs):
             'instance_id': f'{m_id}',
             'xpos': xpos,
             'ypos': ypos,
-            'zpos': zpos
+            'zpos': zpos,
+            'verbose': 'true'
         }.items()
     )
 
@@ -124,11 +125,9 @@ def launch_setup(context, *args, **kwargs):
                    '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
                    '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                    
-                   # Bridge for left and right stereo camera topics
-                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                   # Bridge for left and right stereo camera topics - updated with actual topic names
+                   '/left_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                   '/right_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
                    
                    '/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
                    '/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
@@ -141,30 +140,51 @@ def launch_setup(context, *args, **kwargs):
                    '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/gimbal/camera',
                    '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
                    
-                   # Remappings for left and right stereo camera topics
-                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/left_camera_sensor/image:='+ns+'/stereo/left/image_raw',
-                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/right_camera_sensor/image:='+ns+'/stereo/right/image_raw',
-                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/left_camera_sensor/camera_info:='+ns+'/stereo/left/camera_info',
-                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/stereo_camera/base_link/sensor/right_camera_sensor/camera_info:='+ns+'/stereo/right/camera_info',
+                   # Remappings for left and right stereo camera topics - updated with actual topic names
+                   '-r', '/left_camera:='+ns+'/stereo/left/image_raw',
+                   '-r', '/right_camera:='+ns+'/stereo/right/image_raw',
                    
                    '-r', '/camera:='+ns+'/camera',
                    '-r', '/camera_info:='+ns+'/camera_info',
                    '-r', '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
 
                    ],
+        parameters=[
+            {'verbose': True}
+        ],
     )
    
     # Add stereo_image_proc node for stereo processing
     stereo_image_proc_node = Node(
         package='stereo_image_proc',
-        executable='stereo_image_proc',
+        executable='disparity_node',
+        name='stereo_image_proc',
         namespace=f'{ns}/stereo',
+        remappings=[
+            ('left/image_rect', 'left/image_raw'),
+            ('left/camera_info', 'left/camera_info'),
+            ('right/image_rect', 'right/image_raw'),
+            ('right/camera_info', 'right/camera_info'),
+            ('disparity', 'disparity')
+        ],
         parameters=[
-            {'queue_size': 10},
             {'approximate_sync': True}
         ]
     )
-
+    
+    # Add camera info publishers for stereo cameras
+    camera_info_publisher = Node(
+        package='gps_denied_navigation_sim',
+        executable='camera_info_publisher',
+        name='camera_info_publisher',
+        namespace=f'{ns}',
+        parameters=[
+            {'left_camera_topic': f'stereo/left/camera_info'},
+            {'right_camera_topic': f'stereo/right/camera_info'},
+            {'frame_rate': 30.0}
+        ]
+    )
+    
     random_trajectories_node = Node(
         package='gps_denied_navigation_sim',
         executable='execute_random_trajectories',
@@ -204,42 +224,6 @@ def launch_setup(context, *args, **kwargs):
             output='screen',
             arguments=['-d', rviz_file_path],
         )
-    
-    # Add MINS node
-    mins_node = Node(
-        package='mins',
-        executable='mins',
-        name='mins_node',
-        output='screen',
-        # Add any parameters if needed
-        parameters=[
-            {'config_path': 'ros2_ws/src/gps_denied_navigation_sim/config/mins/config.yaml'}
-        ]
-    )
-
-    # Add static identity transform between map and global
-    map2global_tf_node = Node(
-        package='tf2_ros',
-        name='map2global_tf_node',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
-    )
-
-    # Add static transform between lidar_link and lidar0
-    lidar_link2lidar0_tf_node = Node(
-        package='tf2_ros',
-        name='lidar_link2lidar0_tf_node',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'lidar_link', 'lidar0'],
-    )
-
-    # Add static transform between imu and target/base_link
-    imu2base_link_tf_node = Node(
-        package='tf2_ros',
-        name='imu2base_link_tf_node',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'imu', 'target/base_link'],
-    )
 
     # Define nodes that should be included based on localization_model
     if localization_model == 'mins':
@@ -252,11 +236,8 @@ def launch_setup(context, *args, **kwargs):
             gimbal_node,
             ros_gz_bridge,
             stereo_image_proc_node,
+            camera_info_publisher,
             rviz_node,
-            mins_node,
-            map2global_tf_node,
-            lidar_link2lidar0_tf_node,
-            imu2base_link_tf_node
         ]
     elif localization_model == 'ov':
         return [
@@ -268,6 +249,7 @@ def launch_setup(context, *args, **kwargs):
             gimbal_node,
             ros_gz_bridge,
             stereo_image_proc_node,
+            camera_info_publisher,
             rviz_node
         ]
     else:
@@ -280,6 +262,7 @@ def launch_setup(context, *args, **kwargs):
             gimbal_node,
             ros_gz_bridge,
             stereo_image_proc_node,
+            camera_info_publisher,
             rviz_node
         ]
 
