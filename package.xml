@@ -11,6 +11,9 @@
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>tf2_ros_py</depend>
+
+  <depend>mins</depend>
+
   
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

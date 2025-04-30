@@ -11,7 +11,7 @@ lidar:
   init_cov_ex_o: 0.1
   init_cov_ex_p: 0.1
   min_range: 0.1
-  max_range: 100.0
+  max_range: 250.0
   raw_do_downsample: true
   raw_downsample_size: 0.1
   raw_remove_motion_blur: true
@@ -49,13 +49,13 @@ lidar:
   max_dist: 75.0     # Reduced to be more conservative
 
   # Feature masking and scoring parameters
-  max_features: 1000  # Reduced total feature count for stability
+  max_features: 10000  # Reduced total feature count for stability
   buckets_x: 10
   buckets_y: 10
   buckets_z: 10
   
   # Feature init parameters (more conservative)
-  feats_init_min_obs: 2
+  feats_init_min_obs: 1
   feat_representation: "GLOBAL_3D"
   feat_init_max_sigma: 10.0   # More conservative sigma threshold
   

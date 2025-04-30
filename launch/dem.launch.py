@@ -201,6 +201,42 @@ def launch_setup(context, *args, **kwargs):
             output='screen',
             arguments=['-d', rviz_file_path],
         )
+    
+    # Add MINS node
+    mins_node = Node(
+        package='mins',
+        executable='mins',
+        name='mins_node',
+        output='screen',
+        # Add any parameters if needed
+        parameters=[
+            {'config_path': 'ros2_ws/src/gps_denied_navigation_sim/config/mins/config.yaml'}
+        ]
+    )
+
+    # Add static identity transform between map and global
+    map2global_tf_node = Node(
+        package='tf2_ros',
+        name='map2global_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
+    )
+
+    # Add static transform between lidar_link and lidar0
+    lidar_link2lidar0_tf_node = Node(
+        package='tf2_ros',
+        name='lidar_link2lidar0_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'lidar_link', 'lidar0'],
+    )
+
+    # Add static transform between imu and target/base_link
+    imu2base_link_tf_node = Node(
+        package='tf2_ros',
+        name='imu2base_link_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'imu', 'target/base_link'],
+    )
 
     # Add all your actions to a list and return
     return [
@@ -212,6 +248,10 @@ def launch_setup(context, *args, **kwargs):
         gimbal_node,
         ros_gz_bridge,
         rviz_node,
+        mins_node,
+        map2global_tf_node,
+        lidar_link2lidar0_tf_node,
+        imu2base_link_tf_node,
     ]
 
 def generate_launch_description():
