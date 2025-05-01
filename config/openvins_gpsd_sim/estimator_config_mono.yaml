@@ -4,8 +4,8 @@ verbosity: "INFO" # ALL, DEBUG, INFO, WARNING, ERROR, SILENT
 
 use_fej: true # if first-estimate Jacobians should be used (enable for good consistency)
 integration: "rk4" # discrete, rk4, analytical (if rk4 or analytical used then analytical covariance propagation is used)
-use_stereo: true # if we have more than 1 camera, if we should try to track stereo constraints
-max_cameras: 2 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
+use_stereo: false # if we have more than 1 camera, if we should try to track stereo constraints
+max_cameras: 1 # how many cameras we have 1 = mono, 2 = stereo, >2 = binocular (all mono tracking)
 
 calib_cam_extrinsics: true # if the transform between camera and IMU should be optimized R_ItoC, p_CinI
 calib_cam_intrinsics: true # if camera intrinsics should be optimized (focal, center, distortion)
@@ -78,9 +78,9 @@ filepath_gt: "/tmp/ov_groundtruth.txt"
 use_klt: true
 num_pts: 250
 fast_threshold: 15
-grid_x: 20
-grid_y: 20
-min_px_dist: 15
+grid_x: 15
+grid_y: 15
+min_px_dist: 5
 knn_ratio: 0.70
 track_frequency: 21.0
 downsample_cameras: false
