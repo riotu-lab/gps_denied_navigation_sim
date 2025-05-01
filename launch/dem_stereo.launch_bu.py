@@ -158,11 +158,11 @@ def launch_setup(context, *args, **kwargs):
                    '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/gimbal/camera',
                    '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
                    
-                   # Remappings for left and right stereo camera topics - updated with actual topic names
+                   # Remappings for left and right stereo camera topics
                    '-r', '/left_camera:='+ns+'/stereo/left/image_raw',
                    '-r', '/right_camera:='+ns+'/stereo/right/image_raw',
-                   '-r', '/left_camera_info:='+ns+'/stereo/left/camera_info',
-                   '-r', '/right_camera_info:='+ns+'/stereo/right/camera_info',
+                   '-r', '/left_camera_info:='+ns+'/stereo/left/camera_info_gz',
+                   '-r', '/right_camera_info:='+ns+'/stereo/right/camera_info_gz',
                    
                    '-r', '/camera:='+ns+'/camera',
                    '-r', '/camera_info:='+ns+'/camera_info',
@@ -174,38 +174,42 @@ def launch_setup(context, *args, **kwargs):
         ],
     )
    
-    # Create a specific instance of the disparity_node
-    stereo_image_proc_node = Node(
-        package='stereo_image_proc',
-        executable='disparity_node',
-        name='stereo_image_proc',
-        namespace=f'{ns}/stereo',
-        output='screen',  # Keep this as screen for now to see any errors
-        remappings=[
-            # Use image_raw directly since we don't have rectified images
-            ('left/image_rect', f'/{ns}/stereo/left/image_raw'),
-            ('right/image_rect', f'/{ns}/stereo/right/image_raw'),
-            ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
-            ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
-            # Explicitly set output topic
-            ('disparity', f'/{ns}/stereo/disparity')
-        ],
-        parameters=[
-            {'approximate_sync': True},
-            {'queue_size': 10},
-            {'stereo_algorithm': 0},  # Use simpler StereoBM algorithm
-            {'prefilter_size': 9},
-            {'prefilter_cap': 31},
-            {'correlation_window_size': 15},
-            {'min_disparity': 0},
-            {'disparity_range': 64},
-            {'uniqueness_ratio': 15.0},
-            {'speckle_size': 100},
-            {'speckle_range': 4},
-            {'use_first_valid_frame': True}  # Use the first valid frame we receive
-        ]
-    )
-    
+    # Try to use stereo_image_proc node if available, wrapped in try-except
+    try:
+        stereo_image_proc_node = Node(
+            package='stereo_image_proc',
+            executable='disparity_node',
+            name='stereo_image_proc',
+            namespace=f'{ns}/stereo',
+            output='log',
+            remappings=[
+                # Use image_raw directly for both input and expected rectified image
+                ('left/image_rect', f'/{ns}/stereo/left/image_raw'),
+                ('right/image_rect', f'/{ns}/stereo/right/image_raw'),
+                ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
+                ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
+                # Explicitly set output topic
+                ('disparity', f'/{ns}/stereo/disparity')
+            ],
+            parameters=[
+                {'approximate_sync': True},
+                {'queue_size': 20},
+                {'stereo_algorithm': 0},  # Use simpler StereoBM algorithm
+                {'prefilter_size': 9},
+                {'prefilter_cap': 31},
+                {'correlation_window_size': 15},
+                {'min_disparity': 0},
+                {'disparity_range': 64},
+                {'uniqueness_ratio': 15.0},
+                {'use_raw_for_rect': True}  # Use raw images directly instead of requiring rectified ones
+            ]
+        )
+        use_fallback = False
+    except:
+        # If we can't create the stereo_image_proc node, we'll use our fallback
+        stereo_image_proc_node = None
+        use_fallback = True
+
     # Add camera info publishers for stereo cameras
     camera_info_publisher = Node(
         package='gps_denied_navigation_sim',
@@ -279,7 +283,7 @@ def launch_setup(context, *args, **kwargs):
 
     # Define nodes that should be included based on localization_model
     if localization_model == 'mins':
-        return [
+        nodes = [
             gz_launch,
             map2pose_tf_node,
             base2lidar_tf_node,
@@ -289,13 +293,16 @@ def launch_setup(context, *args, **kwargs):
             # random_trajectories_node,  # Uncomment if you want this node
             gimbal_node,
             ros_gz_bridge,
-            # camera_info_publisher,
-            stereo_image_proc_node,  # Add stereo node directly
+            camera_info_publisher,
             debug_node,
             rviz_node,
         ]
+        # Only add stereo_image_proc if it's available
+        if stereo_image_proc_node is not None:
+            nodes.insert(-2, stereo_image_proc_node)
+        return nodes
     elif localization_model == 'ov':
-        return [
+        nodes = [
             gz_launch,
             map2pose_tf_node,
             base2lidar_tf_node,
@@ -305,13 +312,16 @@ def launch_setup(context, *args, **kwargs):
             # random_trajectories_node,  # Uncomment if you want this node
             gimbal_node,
             ros_gz_bridge,
-            # camera_info_publisher,
-            stereo_image_proc_node,  # Add stereo node directly
+            camera_info_publisher,
             debug_node,
             rviz_node
         ]
+        # Only add stereo_image_proc if it's available
+        if stereo_image_proc_node is not None:
+            nodes.insert(-2, stereo_image_proc_node)
+        return nodes
     else:
-        return [
+        nodes = [
             gz_launch,
             map2pose_tf_node,
             base2lidar_tf_node,
@@ -321,11 +331,14 @@ def launch_setup(context, *args, **kwargs):
             # random_trajectories_node,  # Uncomment if you want this node
             gimbal_node,
             ros_gz_bridge,
-            # camera_info_publisher,
-            stereo_image_proc_node,  # Add stereo node directly
+            camera_info_publisher,
             debug_node,
             rviz_node
         ]
+        # Only add stereo_image_proc if it's available
+        if stereo_image_proc_node is not None:
+            nodes.insert(-2, stereo_image_proc_node)
+        return nodes
 
 def generate_launch_description():
     return LaunchDescription([

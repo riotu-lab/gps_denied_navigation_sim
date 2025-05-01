@@ -33,13 +33,13 @@
       <visual name='visual'>
         <geometry>
           <box>
-            <size>0.030000000000000001 0.030000000000000001 0.030000000000001</size>
+            <size>0.030000000000000001 0.030000000000000001 0.030000000000000001</size>
           </box>
         </geometry>
       </visual>
       <sensor name='gpu_lidar' type='gpu_lidar'>
         <pose>0 0 0 0 0 0</pose>
-        <topic>lidar/points</topic>
+        <topic>scan</topic>
         <update_rate>10</update_rate>
         <enable_metrics>false</enable_metrics>
         <lidar>

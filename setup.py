@@ -28,6 +28,7 @@ setup(
             'execute_random_trajectories = gps_denied_navigation_sim.execute_random_trajectories_node:main',
             'data_sync_recorder = gps_denied_navigation_sim.data_sync_recorder:main',
             'camera_info_publisher = gps_denied_navigation_sim.camera_info_publisher:main',
+            'test_stereo = gps_denied_navigation_sim.test_stereo:main',
         ],
     },
 )
