@@ -111,17 +111,17 @@ class StereoMonitor(Node):
             10)
             
         # Add subscribers for Gazebo camera info topics
-        self.create_subscription(
-            CameraInfo, 
-            '/target/stereo/left/camera_info_gz', 
-            self.left_info_gz_callback, 
-            10)
+        # self.create_subscription(
+        #     CameraInfo, 
+        #     '/target/stereo/left/camera_info_gz', 
+        #     self.left_info_gz_callback, 
+        #     10)
             
-        self.create_subscription(
-            CameraInfo, 
-            '/target/stereo/right/camera_info_gz', 
-            self.right_info_gz_callback, 
-            10)
+        # self.create_subscription(
+        #     CameraInfo, 
+        #     '/target/stereo/right/camera_info_gz', 
+        #     self.right_info_gz_callback, 
+        #     10)
             
         self.create_subscription(
             DisparityImage, 
@@ -161,15 +161,15 @@ class StereoMonitor(Node):
             self.right_info = msg
             self.right_info_count += 1
             
-    def left_info_gz_callback(self, msg):
-        with self.left_lock:
-            self.left_info_gz = msg
-            self.left_info_gz_count += 1
+    # def left_info_gz_callback(self, msg):
+    #     with self.left_lock:
+    #         self.left_info_gz = msg
+    #         self.left_info_gz_count += 1
             
-    def right_info_gz_callback(self, msg):
-        with self.right_lock:
-            self.right_info_gz = msg
-            self.right_info_gz_count += 1
+    # def right_info_gz_callback(self, msg):
+    #     with self.right_lock:
+    #         self.right_info_gz = msg
+    #         self.right_info_gz_count += 1
             
     def disparity_callback(self, msg):
         with self.disparity_lock:

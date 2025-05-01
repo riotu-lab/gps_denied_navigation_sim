@@ -206,51 +206,6 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
     
-    # Add camera info publishers for stereo cameras
-    camera_info_publisher = Node(
-        package='gps_denied_navigation_sim',
-        executable='camera_info_publisher',
-        name='camera_info_publisher',
-        namespace=f'{ns}',
-        output='log',
-        parameters=[
-            {'left_camera_topic': f'stereo/left/camera_info'},
-            {'right_camera_topic': f'stereo/right/camera_info'},
-            {'frame_rate': 30.0},
-            {'baseline': 0.1},  # Stereo camera baseline in meters (distance between cameras)
-            {'image_width': 752},  # Update to match your actual camera resolution
-            {'image_height': 480},  # Update to match your actual camera resolution
-            {'focal_length': 450.0},  # Approximate focal length in pixels
-            {'left_frame_id': f'{ns}/stereo/left_camera_optical_frame'},
-            {'right_frame_id': f'{ns}/stereo/right_camera_optical_frame'}
-        ]
-    )
-    
-    random_trajectories_node = Node(
-        package='gps_denied_navigation_sim',
-        executable='execute_random_trajectories',
-        output='screen',
-        name='execute_random_trajectories',
-        namespace=ns,
-        parameters=[{'system_id': 1},
-                    {'radius_bounds': [100.0, 2500.0]},
-                    {'omega_bounds': [1.0,2.0]},
-                    {'xyz_bound_min': [-100.0, -100.0, 1000.0]},
-                    {'xyz_bound_max': [100.0, 100.0, 1500.0]},
-                    {'num_traj': 5},
-                    {'traj_2D': False},
-                    {'traj_directory': '/home/user/shared_volume/gazebo_trajectories/'},
-                    {'file_name': 'gazebo_trajectory2D'},
-                    {'rgb_image_directory': '/home/user/shared_volume/gazebo_trajectories/rbg_images'}
-
-        ],
-        remappings=[
-            ('mavros/state', 'mavros/state'),
-            ('mavros/local_position/odom', 'mavros/local_position/odom'),
-            ('mavros/setpoint_raw/local', 'mavros/setpoint_raw/local')
-        ]
-    )
-    
     gimbal_node = Node(
         package='gps_denied_navigation_sim',
         executable='gimbal_stabilizer',
@@ -262,9 +217,19 @@ def launch_setup(context, *args, **kwargs):
             package='rviz2',
             executable='rviz2',
             name='rviz2',
-            output='log',
+            output='screen',  # Change from 'log' to 'screen' to see any errors
             arguments=['-d', rviz_file_path],
+            parameters=[],  # Empty parameters list
+            ros_arguments=['--log-level', 'error']  # Set ROS log level properly
         )
+    
+    # Add static identity transform between map and global
+    map2global_tf_node = Node(
+        package='tf2_ros',
+        name='map2global_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
+    )
 
     # Add a debug node to print ROS topics for monitoring
     debug_node = Node(
@@ -286,13 +251,12 @@ def launch_setup(context, *args, **kwargs):
             base2left_cam_tf_node,
             base2right_cam_tf_node,
             mavros_launch,
-            # random_trajectories_node,  # Uncomment if you want this node
             gimbal_node,
             ros_gz_bridge,
-            # camera_info_publisher,
             stereo_image_proc_node,  # Add stereo node directly
             debug_node,
             rviz_node,
+            map2global_tf_node,
         ]
     elif localization_model == 'ov':
         return [
@@ -302,13 +266,12 @@ def launch_setup(context, *args, **kwargs):
             base2left_cam_tf_node,
             base2right_cam_tf_node,
             mavros_launch,
-            # random_trajectories_node,  # Uncomment if you want this node
             gimbal_node,
             ros_gz_bridge,
-            # camera_info_publisher,
             stereo_image_proc_node,  # Add stereo node directly
             debug_node,
-            rviz_node
+            rviz_node,
+            map2global_tf_node,
         ]
     else:
         return [
@@ -318,13 +281,12 @@ def launch_setup(context, *args, **kwargs):
             base2left_cam_tf_node,
             base2right_cam_tf_node,
             mavros_launch,
-            # random_trajectories_node,  # Uncomment if you want this node
             gimbal_node,
             ros_gz_bridge,
-            # camera_info_publisher,
             stereo_image_proc_node,  # Add stereo node directly
             debug_node,
-            rviz_node
+            rviz_node,
+            map2global_tf_node,
         ]
 
 def generate_launch_description():
