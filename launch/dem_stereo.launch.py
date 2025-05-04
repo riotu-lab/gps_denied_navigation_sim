@@ -112,98 +112,149 @@ def launch_setup(context, *args, **kwargs):
         arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
     )
     
-    # Static TF for stereo cameras
+    # Static TF for stereo cameras - Make sure the transformations match those in kalibr_imucam_chain.yaml
     base2left_cam_tf_node = Node(
         package='tf2_ros',
         name='base2left_stereo_tf_node',
         executable='static_transform_publisher',
-        arguments=['0.1', '-0.05', '0.0', '0', '0', '0', base_frame, f'{ns}/stereo/left_camera_optical_frame'],
+        # Position: 0.10 in x, -0.05 in y, 0.0 in z
+        # Orientation: Camera optical frame has x forward, y to left, z up while base link has x forward, y right, z up
+        # So we need a rotation that maps:
+        # x_base -> z_cam, y_base -> -x_cam, z_base -> -y_cam
+        # This is a 90 degree rotation around x followed by 90 degrees around the resulting z
+        arguments=['0.10', '-0.05', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/left_camera_optical_frame'],
     )
     
     base2right_cam_tf_node = Node(
         package='tf2_ros',
         name='base2right_stereo_tf_node',
         executable='static_transform_publisher',
-        arguments=['0.1', '0.05', '0.0', '0', '0', '0', base_frame, f'{ns}/stereo/right_camera_optical_frame'],
+        # Position: 0.10 in x, 0.05 in y, 0.0 in z (just position change compared to left camera)
+        arguments=['0.10', '0.05', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/right_camera_optical_frame'],
     )
-
+    
     # Transport rgb and depth images from GZ topics to ROS topics    
     ros_gz_bridge = Node(
         package='ros_gz_bridge',
         name='ros_bridge_node_depthcam',
         executable='parameter_bridge',
         arguments=[
-                   '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
-                   '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
-                   '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
-                   '/lidar/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
-                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                   
-                   # Bridge for left and right stereo camera topics - updated with actual topic names
-                   '/left_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/right_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   # Add camera info bridges even though we're generating our own
-                   '/left_camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                   '/right_camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                   
-                   '/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
-                   '/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                   '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+                  '/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock',
+                  '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
+                  '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                  '/lidar/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                  '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  
+                  # Bridge for left and right stereo camera topics - updated with actual topic names
+                  '/left_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  '/right_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  # Add camera info bridges even though we're generating our own
+                  '/left_camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  '/right_camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  
+                  '/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  '/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
 
-                   '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
-                   '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
-                   '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
-                   '/imu_gimbal@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-                   '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/gimbal/camera',
-                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
-                   
-                   # Remappings for left and right stereo camera topics - updated with actual topic names
-                   '-r', '/left_camera:='+ns+'/stereo/left/image_raw',
-                   '-r', '/right_camera:='+ns+'/stereo/right/image_raw',
-                   '-r', '/left_camera_info:='+ns+'/stereo/left/camera_info',
-                   '-r', '/right_camera_info:='+ns+'/stereo/right/camera_info',
-                   
-                   '-r', '/camera:='+ns+'/camera',
-                   '-r', '/camera_info:='+ns+'/camera_info',
-                   '-r', '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
+                  '/gimbal/cmd_yaw@std_msgs/msg/Float64]ignition.msgs.Double',
+                  '/gimbal/cmd_roll@std_msgs/msg/Float64]ignition.msgs.Double',
+                  '/gimbal/cmd_pitch@std_msgs/msg/Float64]ignition.msgs.Double',
+                  '/imu_gimbal@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+                  '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/gimbal/camera',
+                  '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
+                  
+                  # Remappings for left and right stereo camera topics - updated with actual topic names
+                  '-r', '/left_camera:='+ns+'/stereo/left/image_raw',
+                  '-r', '/right_camera:='+ns+'/stereo/right/image_raw',
+                  '-r', '/left_camera_info:='+ns+'/stereo/left/camera_info',
+                  '-r', '/right_camera_info:='+ns+'/stereo/right/camera_info',
+                  
+                  '-r', '/camera:='+ns+'/camera',
+                  '-r', '/camera_info:='+ns+'/camera_info',
+                  '-r', '/world/'+w_name+'/model/'+m_name+f'_{m_id}' +'/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
 
-                   ],
+                  ],
         parameters=[
             {'verbose': False}
         ],
     )
    
-    # Create a specific instance of the disparity_node
+    # Add stereo_image_proc disparity node for synchronized stereo processing
     stereo_image_proc_node = Node(
         package='stereo_image_proc',
         executable='disparity_node',
         name='stereo_image_proc',
         namespace=f'{ns}/stereo',
-        output='screen',  # Keep this as screen for now to see any errors
-        remappings=[
-            # Use image_raw directly since we don't have rectified images
-            ('left/image_rect', f'/{ns}/stereo/left/image_raw'),
-            ('right/image_rect', f'/{ns}/stereo/right/image_raw'),
-            ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
-            ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
-            # Explicitly set output topic
-            ('disparity', f'/{ns}/stereo/disparity')
-        ],
         parameters=[
             {'approximate_sync': True},
             {'queue_size': 10},
-            {'stereo_algorithm': 0},  # Use simpler StereoBM algorithm
-            {'prefilter_size': 9},
-            {'prefilter_cap': 31},
-            {'correlation_window_size': 15},
-            {'min_disparity': 0},
-            {'disparity_range': 64},
-            {'uniqueness_ratio': 15.0},
-            {'speckle_size': 100},
-            {'speckle_range': 4},
-            {'use_first_valid_frame': True}  # Use the first valid frame we receive
+            {'use_color': False}
+        ],
+        remappings=[
+            ('left/image_raw', f'/{ns}/stereo/left/image_raw'),
+            ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
+            ('right/image_raw', f'/{ns}/stereo/right/image_raw'),
+            ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
+        ],
+        output='screen',
+    )
+    
+    # Add stereo_image_proc point cloud node for 3D reconstruction
+    stereo_point_cloud_node = Node(
+        package='stereo_image_proc',
+        executable='point_cloud_node',
+        name='stereo_point_cloud',
+        namespace=f'{ns}/stereo',
+        parameters=[
+            {'approximate_sync': True},
+            {'queue_size': 10}
+        ],
+        remappings=[
+            ('left/image_rect', f'/{ns}/stereo/left/image_raw'),
+            ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
+            ('right/image_rect', f'/{ns}/stereo/right/image_raw'),
+            ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
+            ('disparity', f'/{ns}/stereo/disparity'),
+            ('points2', f'/{ns}/stereo/points2')
+        ],
+        output='screen',
+    )
+    
+    # Add a debug node to print ROS topics for monitoring
+    debug_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='test_stereo',
+        name='stereo_monitor',
+        output='screen',
+        parameters=[
+            {'do_stereo_processing': False}  # Disable OpenCV processing to avoid NumPy errors
         ]
+    )
+    
+    # Enhanced camera_info_publisher with improved parameters to match kalibr calibration
+    camera_info_publisher = Node(
+        package='gps_denied_navigation_sim',
+        executable='camera_info_publisher',
+        name='camera_info_publisher',
+        parameters=[
+            {'robot_name': ns},
+            {'camera_frame_id': f'{ns}/stereo/left_camera_optical_frame'},
+            {'camera_frame_id_right': f'{ns}/stereo/right_camera_optical_frame'},
+            {'camera_topic_left': f'/{ns}/stereo/left/image_raw'},
+            {'camera_topic_right': f'/{ns}/stereo/right/image_raw'},
+            {'camera_info_topic_left': f'/{ns}/stereo/left/camera_info'},
+            {'camera_info_topic_right': f'/{ns}/stereo/right/camera_info'},
+            {'publish_image_as_both': True},  # This will republish raw images to both topics
+            {'stereo_camera': True},
+            {'baseline': 0.1},  # 10cm baseline matches calibration
+            {'image_width': 752},  # Matches calibration
+            {'image_height': 480},  # Matches calibration
+            {'focal_length': 450.0},  # Matches calibration
+            {'left_frame_id': f'{ns}/stereo/left_camera_optical_frame'},
+            {'right_frame_id': f'{ns}/stereo/right_camera_optical_frame'}
+        ],
+        output='screen',
     )
     
     gimbal_node = Node(
@@ -231,17 +282,6 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
     )
 
-    # Add a debug node to print ROS topics for monitoring
-    debug_node = Node(
-        package='gps_denied_navigation_sim',
-        executable='test_stereo',
-        name='stereo_monitor',
-        output='screen',
-        parameters=[
-            {'do_stereo_processing': False}  # Disable OpenCV processing to avoid NumPy errors
-        ]
-    )
-
     # Define nodes that should be included based on localization_model
     if localization_model == 'mins':
         return [
@@ -253,7 +293,9 @@ def launch_setup(context, *args, **kwargs):
             mavros_launch,
             gimbal_node,
             ros_gz_bridge,
-            stereo_image_proc_node,  # Add stereo node directly
+            stereo_image_proc_node,
+            stereo_point_cloud_node,
+            camera_info_publisher,
             debug_node,
             rviz_node,
             map2global_tf_node,
@@ -268,7 +310,9 @@ def launch_setup(context, *args, **kwargs):
             mavros_launch,
             gimbal_node,
             ros_gz_bridge,
-            stereo_image_proc_node,  # Add stereo node directly
+            stereo_image_proc_node,
+            stereo_point_cloud_node,
+            camera_info_publisher,
             debug_node,
             rviz_node,
             map2global_tf_node,
@@ -283,7 +327,9 @@ def launch_setup(context, *args, **kwargs):
             mavros_launch,
             gimbal_node,
             ros_gz_bridge,
-            stereo_image_proc_node,  # Add stereo node directly
+            stereo_image_proc_node,
+            stereo_point_cloud_node,
+            camera_info_publisher,
             debug_node,
             rviz_node,
             map2global_tf_node,
@@ -293,11 +339,13 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'world_type',
-            default_value='default',
-            description='Gazebo world to use'),
+            default_value='taif_world',
+            description='Type of world to launch (taif_world, dem_world, tugbot_depot)'
+        ),
         DeclareLaunchArgument(
             'localization_model',
-            default_value='none',
-            description='Localization model to use (mins, ov, or none)'),
+            default_value='mins',
+            description='Localization model to use (mins, ov)'
+        ),
         OpaqueFunction(function=launch_setup)
     ]) 

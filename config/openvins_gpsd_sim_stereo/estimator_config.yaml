@@ -1,6 +1,6 @@
 %YAML:1.0 # need to specify the file type at the top!
 
-verbosity: "DEBUG" # ALL, DEBUG, INFO, WARNING, ERROR, SILENT
+verbosity: "ALL" # ALL, DEBUG, INFO, WARNING, ERROR, SILENT
 
 use_fej: true # if first-estimate Jacobians should be used (enable for good consistency)
 integration: "rk4" # discrete, rk4, analytical (if rk4 or analytical used then analytical covariance propagation is used)
@@ -14,10 +14,10 @@ calib_imu_intrinsics: false # if imu intrinsics should be calibrated
 calib_imu_g_sensitivity: false # if gyroscope gravity sensitivity should be calibrated
 
 max_clones: 11 # how many clones in the sliding window
-max_slam: 50 # number of features in our state vector
-max_slam_in_update: 25 # update can be split into sequential updates of batches, how many in a batch
-max_msckf_in_update: 40 # how many MSCKF features to use in the update
-dt_slam_delay: 1 # delay before initializing (helps with stability from bad initialization...)
+max_slam: 75 # number of features in our state vector - increased from 50 for better feature tracking
+max_slam_in_update: 40 # update can be split into sequential updates of batches - increased from 25
+max_msckf_in_update: 50 # how many MSCKF features to use in the update - increased from 40
+dt_slam_delay: 0.5 # delay before initializing (helps with stability) - reduced from 1.0
 
 gravity_mag: 9.81 # magnitude of gravity in this location
 
@@ -37,24 +37,26 @@ zupt_only_at_beginning: true
 # ==================================================================
 # ==================================================================
 
-init_window_time: 1.0  # Reduced from 2.0 to 1.0 for faster initialization
-init_imu_thresh: 0.05  # Reduced from 0.1 to 0.05 for easier initialization
-init_max_disparity: 1.5
-init_max_features: 15
+# Initialization parameters - updated for numerical stability during optimization
+init_window_time: 1.5       # Longer window for more stable initialization
+init_imu_thresh: 0.001      # Less strict IMU motion threshold
+init_max_disparity: 2.0     # Increased for better feature disparity
+init_max_features: 50       # Increased feature count for optimization stability
 
-init_dyn_use: true # if dynamic initialization should be used
-init_dyn_mle_opt_calib: false # if we should optimize calibration during intialization (not recommended)
-init_dyn_mle_max_iter: 50 # how many iterations the MLE refinement should use (zero to skip the MLE)
-init_dyn_mle_max_time: 0.5 # how many seconds the MLE should be completed in
-init_dyn_mle_max_threads: 6 # how many threads the MLE should use
-init_dyn_num_pose: 6 # number of poses to use within our window time (evenly spaced)
-init_dyn_min_deg: 3.0  # Reduced from 5.0 to 3.0 - orientation change needed to try to init
+init_dyn_use: true          # Use dynamic initialization
+init_dyn_mle_opt_calib: false  # Don't optimize calibration during initialization
+init_dyn_mle_max_iter: 50   # Increased max iterations to allow convergence
+init_dyn_mle_max_time: 1.0  # Increased max time for optimization
+init_dyn_mle_max_threads: 6 # Thread count for optimization
+init_dyn_num_pose: 6        # Increased from 5 for better constraints
+init_dyn_min_deg: 0.025     # More relaxed rotation threshold
 
-init_dyn_inflation_ori: 10 # what to inflate the recovered q_GtoI covariance by
-init_dyn_inflation_vel: 100 # what to inflate the recovered v_IinG covariance by
-init_dyn_inflation_bg: 10 # what to inflate the recovered bias_g covariance by
-init_dyn_inflation_ba: 100 # what to inflate the recovered bias_a covariance by
-init_dyn_min_rec_cond: 1e-12 # reciprocal condition number thresh for info inversion
+# These are crucial for numerical stability
+init_dyn_inflation_ori: 10    # Reduced inflation for better numerical stability
+init_dyn_inflation_vel: 10    # Reduced inflation for better numerical stability
+init_dyn_inflation_bg: 10     # Reduced inflation for better numerical stability  
+init_dyn_inflation_ba: 10     # Reduced inflation for better numerical stability
+init_dyn_min_rec_cond: 1e-8   # Improved reciprocal condition threshold
 
 init_dyn_bias_g: [ 0.0, 0.0, 0.0 ] # initial gyroscope bias guess
 init_dyn_bias_a: [ 0.0, 0.0, 0.0 ] # initial accelerometer bias guess
@@ -75,19 +77,18 @@ filepath_gt: "/tmp/ov_groundtruth.txt"
 # ==================================================================
 # ==================================================================
 
-# our front-end feature tracking parameters
-# we have a KLT and descriptor based (KLT is better implemented...)
+# our front-end feature tracking parameters - optimized for eigenvalue issues
 use_klt: true # if true we will use KLT, otherwise use a ORB descriptor + robust matching
-num_pts: 100 # number of points (per camera) we will extract and try to track - reduced for better stereo performance
-fast_threshold: 8 # threshold for fast extraction (warning: lower threshs can be expensive) - reduced for better stereo detection
-grid_x: 5 # extraction sub-grid count for horizontal direction (uniform tracking)
-grid_y: 5 # extraction sub-grid count for vertical direction (uniform tracking)
-min_px_dist: 10 # distance between features (features near each other provide less information)
-knn_ratio: 0.70 # descriptor knn threshold for the top two descriptor matches
-track_frequency: 21.0 # frequency we will perform feature tracking at (in frames per second / hertz)
+num_pts: 300 # number of points (per camera)
+fast_threshold: 5 # Increased from 1 for better corner quality
+grid_x: 10 # Reduced from 15 for fewer but better features
+grid_y: 10 # Reduced from 15 for fewer but better features
+min_px_dist: 8 # Increased from 2 for better feature separation
+knn_ratio: 0.70 # Reduced from 0.90 for stricter matching
+track_frequency: 20.0 # Reduced to capture fewer but more distinct frames
 downsample_cameras: false # will downsample image in half if true
 num_opencv_threads: 4 # -1: auto, 0-1: serial, >1: number of threads
-histogram_method: "HISTOGRAM" # NONE, HISTOGRAM, CLAHE
+histogram_method: "HISTOGRAM" # Changed from CLAHE to HISTOGRAM for better feature consistency
 
 # aruco tag tracker for the system
 # DICT_6X6_1000 from https://chev.me/arucogen/
@@ -120,6 +121,78 @@ max_slam_age: 60.0         # How old a slam landmark can be in seconds
 max_msckf_age: 60.0        # How old a msckf feature can be in seconds
 # Max time offset allowed
 max_time_offset: 1.0       # How much time offset we allow as an initial guess
+
+# ==================================================================
+# ==================================================================
+# Core algorithm parameters
+
+# If we should use fej or msckf (if not msckf, then it is fej)
+use_fej: true
+
+# If we should use imu message averaging or not
+use_imu_average: true
+
+# If we should use exactly the imu timing to integrate over
+imu_integration_sigma: 1.0e-8
+
+# Should we reject MSC KF features that fail a mahalanobis distance check?
+use_kf_mahalanobis: false
+# Chi squared threshold multiplier for this check
+kf_mahalanobis_thresh: 16.812
+
+# Noise values
+gyroscope_noise_density: 1.0e-3            # 1.6968e-04
+accelerometer_noise_density: 1.0e-3       # 2.0000e-3
+gyroscope_random_walk: 1.0e-5              # 1.9393e-05
+accelerometer_random_walk: 1.0e-4          # 3.0000e-3
+
+# EKF observation buffer current size
+ekf_buffer_max_size: 10000
+
+# EKF processing plane
+use_plane: false
+plane_constraint: [0.0, 0.0, 1.0, 0.0]
+
+# ==================================================================
+# ==================================================================
+# Feature tracking settings
+
+quality_min: 0.001                # Minimum quality of KLT points
+quality_max: 0.5                  # Maximum quality of KLT points (lower is better)
+min_px_dist: 2                    # Minimum distance between tracked points (pixels)
+max_fts: 200                      # How many points we want to track at each frame (split between all cameras)
+
+# Feature gridding
+feat_gridding: true               # If true, will enforce features are tracked on a grid
+grid_x: 12                        # Grid x size, 10 would mean 10 boxes
+grid_y: 10                        # Grid y size, 10 would mean 10 boxes
+grid_num_max: 3                   # Max number of features to track per grid location
+grid_min_feature_per_grid: 0      # Min number of features before we try to add new features per grid (0 = empty has n)
+
+# FAST detector settings
+fast_threshold: 8                 # Fast corner detector threshold
+fast_nms_min: 5                   # Fast non-max suppression size (smaller is more dense detections)
+
+# KLT Tracker settings
+win_size: [15, 15]                # KLT window size, default [21,21]
+fast_threshold_delta: 5           # Threshold delta on re-detection if we have fewer than X% of max features
+pyr_lvl: 3                        # How many pyramid levels to track on (5 = multi-scale tracking)
+
+# Feature histogram equalization before tracking
+histogram_method: "HISTOGRAM"     # NONE, HISTOGRAM, CLAHE
+histogram_clahe_clip: 5.0         # CLAHE clip limit
+histogram_clahe_grid: 2           # CLAHE grid size
+
+# Affine tracking, if we should check for affine deformations
+track_frequency: 1                # How often to track features? Min 1, max 10
+max_templates: 1                  # Maximum number of templates to check
+
+# KLT Tracker settings for stereo cam
+win_size_stereo: [15, 15]         # KLT window size for stereo tracking, default [21,21]
+pyr_lvl_stereo: 3                 # How many pyramid levels for stereo
+
+# ==================================================================
+# ==================================================================
 
 
 

@@ -1,7 +1,9 @@
 %YAML:1.0
 
 cam0:
-# IMPORTANT, after transforming from the IMU link to the camera bse (ROS convention), you need to transform to camera optical link (ROS convention)  
+# Extrinsics that match the TF static transforms in the launch file
+# In the launch file: [0.10, -0.05, 0.0, 1.57079632679, 0, 1.57079632679]
+# Converting to T_imu_cam (camera in IMU frame)
   T_imu_cam: #rotation from camera to IMU R_CtoI, position of camera in IMU p_CinI
     - [  0.0000,  0.0000,  1.0000, 0.10 ]
     - [ -1.0000,  0.0000,  0.0000, -0.05 ]
@@ -14,7 +16,12 @@ cam0:
   intrinsics: [450.0, 450.0, 376.0, 240.0]
   resolution: [752, 480]
   rostopic: "/target/stereo/left/image_raw"
+  timeshift_cam_imu: 0.0  # Timeshift between camera and IMU
+
 cam1:
+# Extrinsics that match the TF static transforms in the launch file
+# In the launch file: [0.10, 0.05, 0.0, 1.57079632679, 0, 1.57079632679]
+# Converting to T_imu_cam (camera in IMU frame)
   T_imu_cam: #rotation from camera to IMU R_CtoI, position of camera in IMU p_CinI
     - [  0.0000,  0.0000,  1.0000, 0.10 ]
     - [ -1.0000,  0.0000,  0.0000, 0.05 ]
@@ -27,3 +34,4 @@ cam1:
   intrinsics: [450.0, 450.0, 376.0, 240.0]
   resolution: [752, 480]
   rostopic: "/target/stereo/right/image_raw"
+  timeshift_cam_imu: 0.0  # Timeshift between camera and IMU
