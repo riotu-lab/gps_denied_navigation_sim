@@ -41,7 +41,10 @@ zupt_only_at_beginning: true
 init_window_time: 1.5       # Longer window for more stable initialization
 init_imu_thresh: 0.001      # Less strict IMU motion threshold
 init_max_disparity: 2.0     # Increased for better feature disparity
-init_max_features: 50       # Increased feature count for optimization stability
+init_max_features: 50       # Match to the available 24 features (reduced from 50)
+
+# This setting is crucial - add it to lower the minimum feature threshold
+init_min_features: 20       # Minimum feature threshold (reduced from 48 default)
 
 init_dyn_use: true          # Use dynamic initialization
 init_dyn_mle_opt_calib: false  # Don't optimize calibration during initialization
@@ -77,18 +80,18 @@ filepath_gt: "/tmp/ov_groundtruth.txt"
 # ==================================================================
 # ==================================================================
 
-# our front-end feature tracking parameters - optimized for eigenvalue issues
+# our front-end feature tracking parameters
 use_klt: true # if true we will use KLT, otherwise use a ORB descriptor + robust matching
 num_pts: 300 # number of points (per camera)
-fast_threshold: 5 # Increased from 1 for better corner quality
-grid_x: 10 # Reduced from 15 for fewer but better features
-grid_y: 10 # Reduced from 15 for fewer but better features
-min_px_dist: 8 # Increased from 2 for better feature separation
-knn_ratio: 0.70 # Reduced from 0.90 for stricter matching
-track_frequency: 20.0 # Reduced to capture fewer but more distinct frames
+fast_threshold: 3 # Reduced for better feature detection
+grid_x: 8 # Reduced grid size for denser features
+grid_y: 8 # Reduced grid size for denser features
+min_px_dist: 4 # Minimum pixel distance between features
+knn_ratio: 0.80 # KNN ratio for feature matching
+track_frequency: 10.0 # Track every 10 frames
 downsample_cameras: false # will downsample image in half if true
 num_opencv_threads: 4 # -1: auto, 0-1: serial, >1: number of threads
-histogram_method: "HISTOGRAM" # Changed from CLAHE to HISTOGRAM for better feature consistency
+histogram_method: "CLAHE" # Use CLAHE for better feature detection
 
 # aruco tag tracker for the system
 # DICT_6X6_1000 from https://chev.me/arucogen/
@@ -193,6 +196,10 @@ pyr_lvl_stereo: 3                 # How many pyramid levels for stereo
 
 # ==================================================================
 # ==================================================================
+
+# Histogram equalization parameters for better feature detection
+clahe_clip: 2.0 # Clip limit for the CLAHE algorithm
+clahe_grid_size: 8 # Size of the grid for CLAHE (higher = more local contrast)
 
 
 

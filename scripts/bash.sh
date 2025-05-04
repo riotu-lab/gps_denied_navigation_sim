@@ -9,10 +9,10 @@ alias sss='source install/setup.bash'
 alias qgc='cd ~/shared_volume && ./QGroundControl.AppImage'
 
 #Launch
-alias mono_dem_mins_tug='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot localization_model:=mins'
-alias stereo_dem_mins_tug='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=tugbot_depot localization_model:=mins'
-alias mono_dem_ov_tug='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot localization_model:=ov'
-alias stereo_dem_ov_tug='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=tugbot_depot localization_model:=ov'
+alias mono_tug_dem_mins='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot localization_model:=mins'
+alias stereo_tug_dem_mins_tug='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=tugbot_depot localization_model:=mins'
+alias mono_tug_dem_ov='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot localization_model:=ov'
+alias stereo_tug_dem_ov='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=tugbot_depot localization_model:=ov'
 alias mono_taif_dem_mins='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_world localization_model:=mins'
 alias stereo_taif_dem_mins='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif_world localization_model:=mins'
 alias mono_taif_dem_ov='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_world localization_model:=ov'
@@ -31,11 +31,9 @@ alias cbspark='cd ~/shared_volume/ros2_ws && colcon build --packages-select spar
 ################# ROS #################
 
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
-export ROS_DOMAIN_ID=
+export ROS_DOMAIN_ID=71
 
 ################# Github Repos #################
 
-export GIT_USER=
-export GIT_TOKEN=
-
-echo 'source ~/shared_volume/ros2_ws/src/gps_denied_navigation_sim/scripts/bash.sh' >> ~/.bashrc
+export GIT_USER=asmbatati
+export GIT_TOKEN=8092c3ad65eb251ed9f31a8a14addba38a2ea767
