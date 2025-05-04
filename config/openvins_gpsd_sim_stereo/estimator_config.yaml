@@ -13,9 +13,9 @@ use_stereo: true                  # Enable stereo constraints
 max_cameras: 2                    # Number of cameras: 2 for stereo
 
 # Calibration options (what to optimize online)
-calib_cam_extrinsics: true        # Optimize camera-to-IMU transform
-calib_cam_intrinsics: true        # Optimize camera intrinsics
-calib_cam_timeoffset: true        # Optimize camera-IMU time offset
+calib_cam_extrinsics: false       # Don't optimize camera-to-IMU transform (more stable)
+calib_cam_intrinsics: false       # Don't optimize camera intrinsics (more stable)
+calib_cam_timeoffset: false       # Don't optimize camera-IMU time offset (more stable)
 calib_imu_intrinsics: false       # Don't optimize IMU intrinsics
 calib_imu_g_sensitivity: false    # Don't optimize gyro gravity sensitivity
 
@@ -37,13 +37,13 @@ feat_rep_aruco: "GLOBAL_3D"       # ArUco feature representation
 # =============================================================================
 
 # Feature initialization thresholds
-init_min_features: 15             # Minimum features for initialization (key param)
+init_min_features: 10             # Reduced: Minimum features for initialization
 init_max_features: 30             # Maximum features to use
-init_max_disparity: 2.0           # Maximum feature disparity
-init_window_time: 1.5             # Time window for initialization
+init_max_disparity: 3.0           # Increased: Maximum feature disparity 
+init_window_time: 2.0             # Increased: Time window for initialization
 
 # Motion thresholds
-init_imu_thresh: 0.05             # Minimum IMU motion required
+init_imu_thresh: 0.04             # Reduced: Minimum IMU motion required
 
 # Dynamic initialization options (MLE-based)
 init_dyn_use: true                # Use dynamic initialization
@@ -51,15 +51,15 @@ init_dyn_mle_opt_calib: false     # Don't optimize calibration during init
 init_dyn_mle_max_iter: 20         # Max iterations for initialization
 init_dyn_mle_max_time: 0.5        # Max seconds for initialization
 init_dyn_mle_max_threads: 4       # Number of threads to use
-init_dyn_num_pose: 6              # Number of poses needed
-init_dyn_min_deg: 0.1             # Minimum motion in degrees
+init_dyn_num_pose: 4              # Reduced: Number of poses needed
+init_dyn_min_deg: 0.08            # Reduced: Minimum motion in degrees
 
 # Numerical stability parameters
-init_dyn_inflation_ori: 5         # Orientation inflation
-init_dyn_inflation_vel: 5         # Velocity inflation
-init_dyn_inflation_bg: 5          # Gyro bias inflation
-init_dyn_inflation_ba: 5          # Accel bias inflation
-init_dyn_min_rec_cond: 1e-7       # Minimum reciprocal condition
+init_dyn_inflation_ori: 10        # Increased: Orientation inflation
+init_dyn_inflation_vel: 10        # Increased: Velocity inflation
+init_dyn_inflation_bg: 10        # Increased: Gyro bias inflation
+init_dyn_inflation_ba: 10        # Increased: Accel bias inflation
+init_dyn_min_rec_cond: 1e-6       # Increased: Minimum reciprocal condition
 
 # Initial biases
 init_dyn_bias_g: [0.0, 0.0, 0.0]  # Initial gyro bias
@@ -71,12 +71,12 @@ init_dyn_bias_a: [0.0, 0.0, 0.0]  # Initial accel bias
 
 # Tracking method and point count
 use_klt: true                     # Use KLT tracker
-num_pts: 150                      # Points to track per camera
+num_pts: 200                      # Increased: Points to track per camera
 downsample_cameras: false         # Don't downsample images
 num_opencv_threads: 4             # OpenCV threads
 
 # Feature detection params
-fast_threshold: 10                # FAST corner threshold
+fast_threshold: 8                 # Reduced: FAST corner threshold for more features
 grid_x: 8                         # Grid size X
 grid_y: 8                         # Grid size Y
 min_px_dist: 10                   # Minimum pixel distance
@@ -90,21 +90,21 @@ histogram_method: "HISTOGRAM"     # Image enhancement: NONE, HISTOGRAM, CLAHE
 # Noise and threshold parameters
 # =============================================================================
 
-# Sensor noise values
-gyroscope_noise_density: 1.0e-2   # Gyroscope white noise
-accelerometer_noise_density: 1.0e-2  # Accelerometer white noise
-gyroscope_random_walk: 1.0e-4     # Gyroscope random walk
-accelerometer_random_walk: 1.0e-3  # Accelerometer random walk
+# Sensor noise values - increased for more robustness
+gyroscope_noise_density: 2.0e-2   # Increased: Gyroscope white noise
+accelerometer_noise_density: 2.0e-2  # Increased: Accelerometer white noise
+gyroscope_random_walk: 2.0e-4     # Increased: Gyroscope random walk
+accelerometer_random_walk: 2.0e-3  # Increased: Accelerometer random walk
 
-# Outlier rejection
+# Outlier rejection - increased thresholds for more robustness
 use_kf_mahalanobis: true          # Use Mahalanobis distance for outlier rejection
-kf_mahalanobis_thresh: 16.0       # Mahalanobis distance threshold
-up_msckf_sigma_px: 1.5            # MSCKF feature noise (pixels)
-up_msckf_chi2_multipler: 1.5      # MSCKF chi-squared multiplier
-up_slam_sigma_px: 1.5             # SLAM feature noise (pixels)
-up_slam_chi2_multipler: 1.5       # SLAM chi-squared multiplier
-up_aruco_sigma_px: 1.0            # ArUco feature noise (pixels)
-up_aruco_chi2_multipler: 1.0      # ArUco chi-squared multiplier
+kf_mahalanobis_thresh: 25.0       # Increased: Mahalanobis distance threshold
+up_msckf_sigma_px: 3.0            # Increased: MSCKF feature noise (pixels)
+up_msckf_chi2_multipler: 2.0      # Increased: MSCKF chi-squared multiplier
+up_slam_sigma_px: 3.0             # Increased: SLAM feature noise (pixels)
+up_slam_chi2_multipler: 2.0       # Increased: SLAM chi-squared multiplier
+up_aruco_sigma_px: 2.0            # Increased: ArUco feature noise (pixels)
+up_aruco_chi2_multipler: 2.0      # Increased: ArUco chi-squared multiplier
 
 # Zero velocity detection (disabled for stability)
 try_zupt: false                   # Disable zero velocity detection
@@ -126,7 +126,7 @@ max_time_offset: 0.5             # Maximum sensor time offset
 
 # IMU integration
 use_imu_average: true            # Average IMU measurements
-imu_integration_sigma: 1.0e-8    # IMU integration sigma
+imu_integration_sigma: 1.0e-7    # IMU integration sigma
 
 # =============================================================================
 # Config file references

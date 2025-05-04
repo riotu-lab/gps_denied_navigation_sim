@@ -117,20 +117,20 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='base2left_stereo_tf_node',
         executable='static_transform_publisher',
-        # Position: 0.10 in x, -0.05 in y, 0.0 in z
+        # Position: Camera is positioned on the stereo_camera_link with 0.15 offset in y
         # Orientation: Camera optical frame has x forward, y to left, z up while base link has x forward, y right, z up
         # So we need a rotation that maps:
         # x_base -> z_cam, y_base -> -x_cam, z_base -> -y_cam
         # This is a 90 degree rotation around x followed by 90 degrees around the resulting z
-        arguments=['0.10', '-0.05', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/left_camera_optical_frame'],
+        arguments=['0.1', '-0.15', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/left_camera_optical_frame'],
     )
     
     base2right_cam_tf_node = Node(
         package='tf2_ros',
         name='base2right_stereo_tf_node',
         executable='static_transform_publisher',
-        # Position: 0.10 in x, 0.05 in y, 0.0 in z (just position change compared to left camera)
-        arguments=['0.10', '0.05', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/right_camera_optical_frame'],
+        # Position: Camera is positioned on the stereo_camera_link with 0.15 offset in y
+        arguments=['0.1', '0.15', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/right_camera_optical_frame'],
     )
     
     # Transport rgb and depth images from GZ topics to ROS topics    
