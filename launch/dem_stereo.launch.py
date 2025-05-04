@@ -146,12 +146,11 @@ def launch_setup(context, *args, **kwargs):
                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image@sensor_msgs/msg/Image[ignition.msgs.Image',
                   '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' + '/link/pitch_link/sensor/camera/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                   
-                  # Bridge for left and right stereo camera topics - updated with actual topic names
-                  '/left_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  '/right_camera@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  # Add camera info bridges even though we're generating our own
-                  '/left_camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                  '/right_camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  # Bridge for left and right stereo camera topics
+                  '/left/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  '/right/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  '/left/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  '/right/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                   
                   '/camera@sensor_msgs/msg/Image[ignition.msgs.Image',
                   '/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
@@ -164,11 +163,11 @@ def launch_setup(context, *args, **kwargs):
                   '--ros-args', '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/image:='+ns+'/gimbal/camera',
                   '-r', '/world/'+w_name+'/model/'+ m_name +f'_{m_id}' +'/link/pitch_link/sensor/camera/camera_info:='+ns+'/gimbal/camera_info',
                   
-                  # Remappings for left and right stereo camera topics - updated with actual topic names
-                  '-r', '/left_camera:='+ns+'/stereo/left/image_raw',
-                  '-r', '/right_camera:='+ns+'/stereo/right/image_raw',
-                  '-r', '/left_camera_info:='+ns+'/stereo/left/camera_info',
-                  '-r', '/right_camera_info:='+ns+'/stereo/right/camera_info',
+                  # Remappings for left and right stereo camera topics
+                  '-r', '/left/camera:='+ns+'/stereo/left/image_raw',
+                  '-r', '/right/camera:='+ns+'/stereo/right/image_raw',
+                  '-r', '/left/camera_info:='+ns+'/stereo/left/camera_info',
+                  '-r', '/right/camera_info:='+ns+'/stereo/right/camera_info',
                   
                   '-r', '/camera:='+ns+'/camera',
                   '-r', '/camera_info:='+ns+'/camera_info',
@@ -178,83 +177,6 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
             {'verbose': False}
         ],
-    )
-   
-    # Add stereo_image_proc disparity node for synchronized stereo processing
-    stereo_image_proc_node = Node(
-        package='stereo_image_proc',
-        executable='disparity_node',
-        name='stereo_image_proc',
-        namespace=f'{ns}/stereo',
-        parameters=[
-            {'approximate_sync': True},
-            {'queue_size': 10},
-            {'use_color': False}
-        ],
-        remappings=[
-            ('left/image_raw', f'/{ns}/stereo/left/image_raw'),
-            ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
-            ('right/image_raw', f'/{ns}/stereo/right/image_raw'),
-            ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
-        ],
-        output='screen',
-    )
-    
-    # Add stereo_image_proc point cloud node for 3D reconstruction
-    stereo_point_cloud_node = Node(
-        package='stereo_image_proc',
-        executable='point_cloud_node',
-        name='stereo_point_cloud',
-        namespace=f'{ns}/stereo',
-        parameters=[
-            {'approximate_sync': True},
-            {'queue_size': 10}
-        ],
-        remappings=[
-            ('left/image_rect', f'/{ns}/stereo/left/image_raw'),
-            ('left/camera_info', f'/{ns}/stereo/left/camera_info'),
-            ('right/image_rect', f'/{ns}/stereo/right/image_raw'),
-            ('right/camera_info', f'/{ns}/stereo/right/camera_info'),
-            ('disparity', f'/{ns}/stereo/disparity'),
-            ('points2', f'/{ns}/stereo/points2')
-        ],
-        output='screen',
-    )
-    
-    # Add a debug node to print ROS topics for monitoring
-    debug_node = Node(
-        package='gps_denied_navigation_sim',
-        executable='test_stereo',
-        name='stereo_monitor',
-        output='screen',
-        parameters=[
-            {'do_stereo_processing': False}  # Disable OpenCV processing to avoid NumPy errors
-        ]
-    )
-    
-    # Enhanced camera_info_publisher with improved parameters to match kalibr calibration
-    camera_info_publisher = Node(
-        package='gps_denied_navigation_sim',
-        executable='camera_info_publisher',
-        name='camera_info_publisher',
-        parameters=[
-            {'robot_name': ns},
-            {'camera_frame_id': f'{ns}/stereo/left_camera_optical_frame'},
-            {'camera_frame_id_right': f'{ns}/stereo/right_camera_optical_frame'},
-            {'camera_topic_left': f'/{ns}/stereo/left/image_raw'},
-            {'camera_topic_right': f'/{ns}/stereo/right/image_raw'},
-            {'camera_info_topic_left': f'/{ns}/stereo/left/camera_info'},
-            {'camera_info_topic_right': f'/{ns}/stereo/right/camera_info'},
-            {'publish_image_as_both': True},  # This will republish raw images to both topics
-            {'stereo_camera': True},
-            {'baseline': 0.1},  # 10cm baseline matches calibration
-            {'image_width': 752},  # Matches calibration
-            {'image_height': 480},  # Matches calibration
-            {'focal_length': 450.0},  # Matches calibration
-            {'left_frame_id': f'{ns}/stereo/left_camera_optical_frame'},
-            {'right_frame_id': f'{ns}/stereo/right_camera_optical_frame'}
-        ],
-        output='screen',
     )
     
     gimbal_node = Node(
@@ -282,58 +204,22 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
     )
 
-    # Define nodes that should be included based on localization_model
-    if localization_model == 'mins':
-        return [
-            gz_launch,
-            map2pose_tf_node,
-            base2lidar_tf_node,
-            base2left_cam_tf_node,
-            base2right_cam_tf_node,
-            mavros_launch,
-            gimbal_node,
-            ros_gz_bridge,
-            stereo_image_proc_node,
-            stereo_point_cloud_node,
-            camera_info_publisher,
-            debug_node,
-            rviz_node,
-            map2global_tf_node,
-        ]
-    elif localization_model == 'ov':
-        return [
-            gz_launch,
-            map2pose_tf_node,
-            base2lidar_tf_node,
-            base2left_cam_tf_node,
-            base2right_cam_tf_node,
-            mavros_launch,
-            gimbal_node,
-            ros_gz_bridge,
-            stereo_image_proc_node,
-            stereo_point_cloud_node,
-            camera_info_publisher,
-            debug_node,
-            rviz_node,
-            map2global_tf_node,
-        ]
-    else:
-        return [
-            gz_launch,
-            map2pose_tf_node,
-            base2lidar_tf_node,
-            base2left_cam_tf_node,
-            base2right_cam_tf_node,
-            mavros_launch,
-            gimbal_node,
-            ros_gz_bridge,
-            stereo_image_proc_node,
-            stereo_point_cloud_node,
-            camera_info_publisher,
-            debug_node,
-            rviz_node,
-            map2global_tf_node,
-        ]
+    return [
+        gz_launch,
+        map2pose_tf_node,
+        base2lidar_tf_node,
+        base2left_cam_tf_node,
+        base2right_cam_tf_node,
+        mavros_launch,
+        gimbal_node,
+        ros_gz_bridge,
+        # stereo_image_proc_node,
+        # stereo_point_cloud_node,
+        # camera_info_publisher,
+        # debug_node,
+        rviz_node,
+        map2global_tf_node,
+    ]
 
 def generate_launch_description():
     return LaunchDescription([

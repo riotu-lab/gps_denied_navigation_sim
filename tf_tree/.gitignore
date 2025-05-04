@@ -1,0 +1,9 @@
+# Ignore Graphviz files
+*.gv 
+*.pdf
+*.png
+*.dot
+*.svg
+*.html
+*.txt
+*.md

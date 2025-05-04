@@ -35,5 +35,7 @@ export ROS_DOMAIN_ID=71
 
 ################# Github Repos #################
 
-export GIT_USER=asmbatati
-export GIT_TOKEN=8092c3ad65eb251ed9f31a8a14addba38a2ea767
+export GIT_USER=
+export GIT_TOKEN=
+
+echo 'source ~/shared_volume/ros2_ws/src/gps_denied_navigation_sim/scripts/bash.sh' >> ~/.bashrc

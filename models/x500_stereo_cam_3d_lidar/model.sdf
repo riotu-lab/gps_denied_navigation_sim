@@ -21,7 +21,7 @@
     </include>
     <joint name="StereoCamJoint" type="fixed">
       <parent>base_link</parent>
-      <child>stereo_camera/base_link</child>
+      <child>stereo_camera_link</child>
       <pose degrees="true">0.20 0.0 0.1 0 10 0</pose>
     </joint>
     
@@ -68,9 +68,9 @@
         </axis>
       </joint>
 
-    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
+    <!-- <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'>
       <render_engine>ogre2</render_engine>
-    </plugin>
+    </plugin> -->
 
   </model>
 </sdf> 
