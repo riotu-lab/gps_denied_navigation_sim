@@ -30,8 +30,8 @@ lidar:
   plane_max_p2pd: 0.1
 
   # Type of LiDAR data we have
-  lidar_type: "fast_lio" # "fast_lio", "fast_lio_sam"
-  slam_lidar_type: "fast_lio"
+  lidar_type: "fast_lio_sam" # "fast_lio", "fast_lio_sam"
+  slam_lidar_type: "fast_lio_sam"
 
   # Downsample features
   downsample: true

@@ -112,27 +112,6 @@ def launch_setup(context, *args, **kwargs):
         arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
     )
     
-    # Static TF for stereo cameras - Make sure the transformations match those in kalibr_imucam_chain.yaml
-    base2left_cam_tf_node = Node(
-        package='tf2_ros',
-        name='base2left_stereo_tf_node',
-        executable='static_transform_publisher',
-        # Position: Camera is positioned on the stereo_camera_link with 0.15 offset in y
-        # Orientation: Camera optical frame has x forward, y to left, z up while base link has x forward, y right, z up
-        # So we need a rotation that maps:
-        # x_base -> z_cam, y_base -> -x_cam, z_base -> -y_cam
-        # This is a 90 degree rotation around x followed by 90 degrees around the resulting z
-        arguments=['0.1', '-0.15', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/left_camera_optical_frame'],
-    )
-    
-    base2right_cam_tf_node = Node(
-        package='tf2_ros',
-        name='base2right_stereo_tf_node',
-        executable='static_transform_publisher',
-        # Position: Camera is positioned on the stereo_camera_link with 0.15 offset in y
-        arguments=['0.1', '0.15', '0.0', '1.57079632679', '0', '1.57079632679', base_frame, f'{ns}/stereo/right_camera_optical_frame'],
-    )
-    
     # Transport rgb and depth images from GZ topics to ROS topics    
     ros_gz_bridge = Node(
         package='ros_gz_bridge',
@@ -208,15 +187,9 @@ def launch_setup(context, *args, **kwargs):
         gz_launch,
         map2pose_tf_node,
         base2lidar_tf_node,
-        base2left_cam_tf_node,
-        base2right_cam_tf_node,
         mavros_launch,
         gimbal_node,
         ros_gz_bridge,
-        # stereo_image_proc_node,
-        # stereo_point_cloud_node,
-        # camera_info_publisher,
-        # debug_node,
         rviz_node,
         map2global_tf_node,
     ]

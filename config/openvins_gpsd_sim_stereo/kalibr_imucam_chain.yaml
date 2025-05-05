@@ -1,9 +1,8 @@
 %YAML:1.0
 
 cam0:
-# Extrinsics that match the TF static transforms in the launch file
-# In the launch file: [0.10, -0.05, 0.0, 1.57079632679, 0, 1.57079632679]
-# Converting to T_imu_cam (camera in IMU frame)
+# Extrinsics that match the stereo camera model and TF static transforms
+# Stereo cameras separation is 0.3 units (left camera at -0.15, right at +0.15)
   T_imu_cam0:
     - [-0.9848, -0.1736, -0.0000,  0.200]
     - [ 0.0000, -0.0000, -1.0000, -0.150]
@@ -20,9 +19,8 @@ cam0:
   timeshift_cam_imu: 0.0  # Timeshift between camera and IMU
 
 cam1:
-# Extrinsics that match the TF static transforms in the launch file
-# In the launch file: [0.10, 0.05, 0.0, 1.57079632679, 0, 1.57079632679]
-# Converting to T_imu_cam (camera in IMU frame)
+# Extrinsics that match the stereo camera model and TF static transforms
+# Stereo cameras separation is 0.3 units (left camera at -0.15, right at +0.15)
   T_imu_cam1:
     - [-0.9848, -0.1736, -0.0000,  0.200]
     - [ 0.0000, -0.0000, -1.0000,  0.150]
