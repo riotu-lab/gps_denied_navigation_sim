@@ -19,7 +19,8 @@ alias mono_taif_dem_ov='ros2 launch gps_denied_navigation_sim dem.launch.py worl
 alias stereo_taif_dem_ov='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif_world localization_model:=ov'
 alias mono_ov='ros2 launch ov_msckf subscribe.launch.py config:=openvins_gpsd_sim_mono use_stereo:=false max_cameras:=1'
 alias stereo_ov='ros2 launch ov_msckf subscribe.launch.py config:=openvins_gpsd_sim_stereo use_stereo:=true max_cameras:=2 verbosity:=DEBUG'
-alias mins='cd ~/shared_volume && ros2 run mins subscribe ros2_ws/src/gps_denied_navigation_sim/config/mins/config.yaml'
+alias mins_mono='cd ~/shared_volume && ros2 run mins subscribe ros2_ws/src/gps_denied_navigation_sim/config/mins_mono/config.yaml'
+alias mins_stereo='cd ~/shared_volume && ros2 run mins subscribe ros2_ws/src/gps_denied_navigation_sim/config/mins_stereo/config.yaml'
 alias spark='ros2 launch spark_fast_lio mapping_dem_sim.launch.py'
 
 #Build

@@ -1,69 +1,20 @@
 %YAML:1.0 # need to specify the file type at the top!
 
-init:
-  do_calib_imu: true
-  gravity_mag: 9.81
-  window_size: 20
-  num_poses: 1
-  init_window_time: 2.0
-  imu_avg_num: 20
-
 est:
-  # Noise 
-  sigma_a: 0.05
-  sigma_w: 0.005
-  sigma_ab: 0.00001
-  sigma_wb: 0.00001
-  init_sigma_bg: 0.05
-  init_sigma_ba: 0.5
-
-  # Thresholds - more conservative
-  gravity_norm_factor_valid: 0.10       # Increased for more stability
-  gravity_norm_factor_invalid: 0.30     # Increased for more stability
-  redundancy_fej_update_dist_threshold: 5.0  # Reduced to be more conservative
-
-  # Quality of life options
-  do_print_timing: true
-  do_print_info: true
-
-  # Feature options
-  feat_rep: "GLOBAL_3D"                     
-  max_slam: 50                       # Reduced for stability
-  max_slam_in_update: 30             # Reduced for stability
-  max_msckf: 40                      # Reduced for stability
-  max_msckf_in_update: 40            # Reduced for stability
-
-  # Use lidar-camera fusion
-  use_lidar: true
-  use_camera: true
-
-  # FEJ options
-  use_fej: true
-  do_fej_for_camera_failure: true
-
-  # Marginalization options
-  use_partial_update: true
-  partial_update_nullspace_threshold: 0.95   # Slightly lower threshold
-  max_clone_age: 30.0                        # Shorter clone age for faster updates
-  
-  # Camera fusion options
-  num_tracks_to_remove_feature: 3
-  use_stereo: false
-
-  # Missing parameters that MINS is looking for
   gravity_mag: 9.81
+  clone_freq: 20
+  window_size: 1.0
+  intr_order: 3
+  intr_error_mlt: 1.00
+  intr_error_ori_thr: 0.007
+  intr_error_pos_thr: 0.003
+  intr_error_thr_mlt: 1.0
+  dt_extrapolation: 0.01
+
   use_imu_res: true
   use_imu_cov: false
   use_pol_cov: true
-  window_size: 1.0
-  clone_freq: 5
-  dt_extrapolation: 0.01
-  intr_order: 3
-  dynamic_cloning: true
-  intr_error_mlt: 3
-  intr_error_ori_thr: 0.02   # Increased threshold
-  intr_error_pos_thr: 0.02   # Increased threshold
-  intr_error_thr_mlt: 0.8    # Increased multiplier
+  dynamic_cloning: false
 
 # Slope of the polynomial pose interpolation error based on acceleration
 # order: 1 3 5 7 9
