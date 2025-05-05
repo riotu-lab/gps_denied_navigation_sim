@@ -12,7 +12,7 @@ imu0:
   gyroscope_random_walk: 1.9e-5        # Reduced to more typical value
   rostopic: /target/mavros/imu/data_raw
   time_offset: 0.0
-  update_rate: 200.0  # Increased from 50.0 to match expected PX4 rate
+  update_rate: 50.0  # Increased from 50.0 to match expected PX4 rate
   # three different modes supported:
   # "calibrated" (same as "kalibr"), "kalibr", "rpng"
   model: "kalibr"
