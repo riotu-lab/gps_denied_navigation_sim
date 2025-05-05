@@ -154,7 +154,7 @@ def launch_setup(context, *args, **kwargs):
 
                   ],
         parameters=[
-            {'verbose': False}
+            {'verbose': True}
         ],
     )
     
@@ -172,7 +172,7 @@ def launch_setup(context, *args, **kwargs):
             output='screen',  # Change from 'log' to 'screen' to see any errors
             arguments=['-d', rviz_file_path],
             parameters=[],  # Empty parameters list
-            ros_arguments=['--log-level', 'error']  # Set ROS log level properly
+            # ros_arguments=['--log-level', 'error']  # Set ROS log level properly
         )
     
     # Add static identity transform between map and global
