@@ -27,7 +27,7 @@
     </link>
     
     <link name="left_camera_link">
-      <pose relative_to="stereo_camera_link">0 -0.15 0 0 0 0</pose>
+      <pose relative_to="stereo_camera_link">0 0.15 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.050</mass>
@@ -101,7 +101,7 @@
     </link>
     
     <link name="right_camera_link">
-      <pose relative_to="stereo_camera_link">0 0.15 0 0 0 0</pose>
+      <pose relative_to="stereo_camera_link">0 -0.15 0 0 0 0</pose>
       <inertial>
         <pose>0 0 0 0 0 0</pose>
         <mass>0.050</mass>
