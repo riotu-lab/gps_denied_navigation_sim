@@ -31,7 +31,9 @@ alias cbspark='cd ~/shared_volume/ros2_ws && colcon build --packages-select spar
 
 ################# ROS #################
 
-export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+# export RMW_IMPLEMENTATION=rmw_zenoh_cpp
+# export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 export ROS_DOMAIN_ID=71
 
 ################# Github Repos #################

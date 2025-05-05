@@ -1,7 +1,7 @@
 %YAML:1.0 # need to specify the file type at the top!
 
 lidar:
-  enabled: false
+  enabled: true
   max_n: 1
   do_calib_dt: false
   do_calib_ext: false
