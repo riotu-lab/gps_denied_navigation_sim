@@ -3,8 +3,8 @@
 lidar:
   enabled: true
   max_n: 1
-  do_calib_dt: false
-  do_calib_ext: false
+  do_calib_dt: true
+  do_calib_ext: true
   init_cov_dt: 1e-4
   init_cov_ex_o: 1e-6
   init_cov_ex_p: 1e-6
@@ -34,7 +34,7 @@ lidar0:
   topic: "/lidar/points"
   frame_id: "lidar_link"
   T_imu_lidar:
-    - [-0.094, -0.978, 0.188, 2.130]
-    - [0.053, -0.194, -0.980, 0.210]
-    - [0.994, -0.082, 0.071, 1.258]
-    - [0.000, 0.000, 0.000, 1.000]
+    - [0.0, 0.0, 1.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [-1.0, 0.0, 0.0, 0.12]
+    - [0.0, 0.0, 0.0, 1.0]
