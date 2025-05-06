@@ -91,6 +91,14 @@ def launch_setup(context, *args, **kwargs):
         }.items()
     )    
 
+    # Add static identity transform between map and global
+    map2global_tf_node = Node(
+        package='tf2_ros',
+        name='map2global_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
+    )
+
     # Static TF map(or world) -> local_pose_ENU
     map_frame = 'map'
     odom_frame= 'odom'
@@ -110,6 +118,22 @@ def launch_setup(context, *args, **kwargs):
         name='base2lidar_'+ns+'_tf_node',
         executable='static_transform_publisher',
         arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
+    )
+
+    # Static TF base_link -> left_camera_link
+    left_camera_tf_node = Node(
+        package='tf2_ros',
+        name='base_to_left_camera_tf',
+        executable='static_transform_publisher',
+        arguments=['0.20', '0.15', '0.10', '0', '0.0872', '0', '0.9962', base_frame, 'left_camera_link'],
+    )
+
+    # Static TF base_link -> right_camera_link
+    right_camera_tf_node = Node(
+        package='tf2_ros',
+        name='base_to_right_camera_tf',
+        executable='static_transform_publisher',
+        arguments=['0.20', '-0.15', '0.10', '0', '0.0872', '0', '0.9962', base_frame, 'right_camera_link'],
     )
     
     # Transport rgb and depth images from GZ topics to ROS topics    
@@ -174,19 +198,13 @@ def launch_setup(context, *args, **kwargs):
             parameters=[],  # Empty parameters list
             # ros_arguments=['--log-level', 'error']  # Set ROS log level properly
         )
-    
-    # Add static identity transform between map and global
-    map2global_tf_node = Node(
-        package='tf2_ros',
-        name='map2global_tf_node',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
-    )
 
     return [
         gz_launch,
         map2pose_tf_node,
         base2lidar_tf_node,
+        left_camera_tf_node,
+        right_camera_tf_node,
         mavros_launch,
         gimbal_node,
         ros_gz_bridge,
