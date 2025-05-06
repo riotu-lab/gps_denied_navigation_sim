@@ -5,5 +5,5 @@ imu:
   accel_bias: 3.0e-3   # [ m / s^3 / sqrt(Hz) ].  ( accel bias diffusion )
   gyro_noise: 1.6e-4     # [ rad / s / sqrt(Hz) ]   ( gyro "white noise" )
   gyro_bias: 1.9e-5       # [ rad / s^2 / sqrt(Hz) ] ( gyro bias diffusion )
-  topic: "/target/imu"
+  topic: "/target/mavros/imu/data_raw"
   
