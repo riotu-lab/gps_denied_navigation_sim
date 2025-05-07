@@ -14,6 +14,7 @@ setup(
         (os.path.join('share', package_name), glob('launch/*launch.[pxy][yma]*')),
         (os.path.join('share', package_name), glob('config/mavros/*.yaml')),
         (os.path.join('share', package_name), glob('rviz/*.rviz')),
+        (os.path.join('share', package_name), glob('models/x500_stereo_cam_3d_lidar/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

@@ -112,7 +112,7 @@ def launch_setup(context, *args, **kwargs):
     # Static TF target/base_link to lidar link
     # The valuse are taken from the model.sdf of x500_d435_3d_lidar
     base_frame = 'target/base_link'
-    lidar_frame= 'lidar_link'
+    lidar_frame= 'lidar3d_link'
     base2lidar_tf_node = Node(
         package='tf2_ros',
         name='base2lidar_'+ns+'_tf_node',
@@ -134,6 +134,21 @@ def launch_setup(context, *args, **kwargs):
         name='base_to_right_camera_tf',
         executable='static_transform_publisher',
         arguments=['0.20', '-0.15', '0.10', '0', '0.0872', '0', '0.9962', base_frame, 'right_camera_link'],
+    )
+
+    # Load the robot model (URDF or SDF)
+    model_path = os.path.join(package_share_directory, 'model.sdf')
+    with open(model_path, 'r') as file:
+        robot_description_content = file.read()
+
+    # Robot State Publisher to publish the URDF model
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{'robot_description': robot_description_content}],
+        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]
     )
     
     # Transport rgb and depth images from GZ topics to ROS topics    
@@ -205,11 +220,12 @@ def launch_setup(context, *args, **kwargs):
         base2lidar_tf_node,
         left_camera_tf_node,
         right_camera_tf_node,
+        map2global_tf_node,
+        # robot_state_publisher,
         mavros_launch,
         gimbal_node,
         ros_gz_bridge,
         rviz_node,
-        map2global_tf_node,
     ]
 
 def generate_launch_description():

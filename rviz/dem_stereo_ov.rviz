@@ -6,9 +6,10 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /OpenVINS1
+        - /TF1/Frames1
+        - /RobotModel1
       Splitter Ratio: 0.5
-    Tree Height: 959
+    Tree Height: 609
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -20,6 +21,7 @@ Panels:
   - Class: rviz_common/Views
     Expanded:
       - /Current View1
+      - /Current View1/Focal Point1
     Name: Views
     Splitter Ratio: 0.5
   - Class: rviz_common/Time
@@ -49,7 +51,7 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz_default_plugins/Image
-      Enabled: false
+      Enabled: true
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -61,9 +63,9 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /target/stereo/left/image_raw
-      Value: false
+      Value: true
     - Class: rviz_default_plugins/Image
-      Enabled: false
+      Enabled: true
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -75,81 +77,35 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /target/stereo/right/image_raw
-      Value: false
+      Value: true
     - Class: rviz_default_plugins/TF
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
-        cam0:
-          Value: true
-        cam1:
-          Value: true
-        global:
-          Value: true
-        imu:
-          Value: true
-        lidar_link:
-          Value: true
-        map:
-          Value: true
-        map_ned:
-          Value: true
-        target/base_link:
-          Value: true
-        target/base_link_frd:
-          Value: true
-        target/odom:
-          Value: true
-        target/odom_ned:
-          Value: true
-        target/stereo/left_camera_optical_frame:
-          Value: true
-        target/stereo/right_camera_optical_frame:
-          Value: true
+        All Enabled: false
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        global:
-          imu:
-            cam0:
-              {}
-            cam1:
-              {}
-          map:
-            map_ned:
-              {}
-            target/odom:
-              target/base_link:
-                lidar_link:
-                  {}
-                target/base_link_frd:
-                  {}
-                target/stereo/left_camera_optical_frame:
-                  {}
-                target/stereo/right_camera_optical_frame:
-                  {}
-              target/odom_ned:
-                {}
+        {}
       Update Interval: 0
       Value: true
     - Class: rviz_default_plugins/Image
-      Enabled: false
+      Enabled: true
       Max Value: 1
       Median window: 5
       Min Value: 0
-      Name: Image
+      Name: OpenVINS Image
       Normalize Range: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /mins/cam0/track_img
-      Value: false
+        Value: /ov_msckf/tracking_image
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -165,14 +121,14 @@ Visualization Manager:
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 0
+      Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: PointCloud2
       Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.029999999329447746
+      Size (m): 0.009999999776482582
       Style: Flat Squares
       Topic:
         Depth: 5
@@ -180,24 +136,64 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /lidar/points
+        Value: /ov_msckf/points_msckf
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Class: rviz_default_plugins/Image
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 25; 255; 0
       Enabled: true
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: OpenVINS
-      Normalize Range: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
       Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /ov_msckf/pathimu
+      Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /ov_msckf/trackhist
+        Value: /robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: RobotModel
+      TF Prefix: ""
+      Update Interval: 0
       Value: true
+      Visual Enabled: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -207,7 +203,6 @@ Visualization Manager:
   Tools:
     - Class: rviz_default_plugins/Interact
       Hide Inactive Objects: true
-    - Class: rviz_default_plugins/MoveCamera
     - Class: rviz_default_plugins/Select
     - Class: rviz_default_plugins/FocusCamera
     - Class: rviz_default_plugins/Measure
@@ -244,25 +239,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 10.420818328857422
+      Distance: 9.235397338867188
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.4189145863056183
-        Y: 0.4132048189640045
-        Z: 0.43008953332901
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.720398485660553
+      Pitch: 0.5247966051101685
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.620398223400116
+      Yaw: 1.7900927066802979
     Saved: ~
 Window Geometry:
   Displays:
