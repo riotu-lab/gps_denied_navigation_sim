@@ -9,15 +9,15 @@ lidar:
   init_cov_ex_o: 1e-5
   init_cov_ex_p: 1e-5
   max_range: 300.0
-  min_range: 45.0
+  min_range: 10.0
   chi2_mult: 3.0
   raw_do_downsample: true
-  raw_downsample_size: 5.0
+  raw_downsample_size: 2.0
   raw_noise: 0.05
   raw_remove_motion_blur: false # required to set v_angles and h_angles correctly
   raw_point_dt: 1e-6
   map_do_downsample: true
-  map_downsample_size: 5.0
+  map_downsample_size: 2.0
   map_noise: 0.05
   map_ngbr_num: 6
   map_ngbr_max_d: 100.0
@@ -33,9 +33,9 @@ lidar0:
   timeoffset: 0.0
   topic: "/lidar/points"
   T_imu_lidar:
-    - [0.0, 0.0, 1.0, 0.0]
+    - [0.7071067811865476, 0.0, 0.7071067811865475, 0.2]
     - [0.0, 1.0, 0.0, 0.0]
-    - [-1.0, 0.0, 0.0, -0.12]
+    - [-0.7071067811865475, 0.0, 0.7071067811865476, -0.15]
     - [0.0, 0.0, 0.0, 1.0]
   v_angles: [-6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 
             1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 
