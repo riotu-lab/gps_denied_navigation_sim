@@ -8,6 +8,7 @@ from ament_index_python import get_package_share_directory
 from launch_ros.substitutions import FindPackageShare
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+import math
 
 def launch_setup(context, *args, **kwargs):
     world_type = LaunchConfiguration('world_type').perform(context)
@@ -97,6 +98,9 @@ def launch_setup(context, *args, **kwargs):
         name='map2global_tf_node',
         executable='static_transform_publisher',
         arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
+        parameters=[
+                {"use_sim_time": True},
+        ]
     )
 
     # Static TF map(or world) -> local_pose_ENU
@@ -107,17 +111,23 @@ def launch_setup(context, *args, **kwargs):
         name='map2px4_'+ns+'_tf_node',
         executable='static_transform_publisher',
         arguments=[xpos, ypos, '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
+        parameters=[
+                {"use_sim_time": True},
+        ]
     )
 
     # Static TF target/base_link to lidar link
     # The valuse are taken from the model.sdf of x500_d435_3d_lidar
     base_frame = 'target/base_link'
-    lidar_frame= 'lidar3d_link'
+    lidar_frame= 'lidar_link'
     base2lidar_tf_node = Node(
         package='tf2_ros',
         name='base2lidar_'+ns+'_tf_node',
         executable='static_transform_publisher',
-        arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
+        arguments=[str(0), str(0), '-0.12', '0', str(45*math.pi/180.), '0', base_frame, lidar_frame],
+        parameters=[
+                {"use_sim_time": True},
+        ]
     )
 
     # Static TF base_link -> left_camera_link
@@ -125,7 +135,10 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='base_to_left_camera_tf',
         executable='static_transform_publisher',
-        arguments=['0.20', '0.15', '0.10', '0', '0.0872', '0', '0.9962', base_frame, 'left_camera_link'],
+        arguments=['0.20', '0.15', '-0.10', '0', '0.0872', '0', '0.9962', base_frame, 'left_camera_link'],
+        parameters=[
+                {"use_sim_time": True},
+        ]
     )
 
     # Static TF base_link -> right_camera_link
@@ -133,7 +146,10 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='base_to_right_camera_tf',
         executable='static_transform_publisher',
-        arguments=['0.20', '-0.15', '0.10', '0', '0.0872', '0', '0.9962', base_frame, 'right_camera_link'],
+        arguments=['0.20', '-0.15', '-0.10', '0', '0.0872', '0', '0.9962', base_frame, 'right_camera_link'],
+        parameters=[
+                {"use_sim_time": True},
+        ]
     )
 
     # Load the robot model (URDF or SDF)
@@ -218,8 +234,8 @@ def launch_setup(context, *args, **kwargs):
         gz_launch,
         map2pose_tf_node,
         base2lidar_tf_node,
-        left_camera_tf_node,
-        right_camera_tf_node,
+        # left_camera_tf_node,
+        # right_camera_tf_node,
         map2global_tf_node,
         # robot_state_publisher,
         mavros_launch,
