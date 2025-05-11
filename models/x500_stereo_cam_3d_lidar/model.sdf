@@ -17,36 +17,36 @@
     <!-- Stereo Camera -not on a gimbal- -->
     <include merge='true'>
       <uri>model://stereo_camera</uri>
-      <pose degrees="true">0.20 0.0 0.1 0 10 0</pose>
+      <pose relative_to="base_link" degrees="true">0.20 0.0 -0.1 0 10 0</pose>
     </include>
     <joint name="StereoCamJoint" type="fixed">
       <parent>base_link</parent>
       <child>stereo_camera_link</child>
-      <pose degrees="true">0.20 0.0 0.1 0 10 0</pose>
+      <pose relative_to="base_link" degrees="true">0.20 0.0 -0.1 0 10 0</pose>
     </joint>
     
     <!-- 3D Lidar-->
     <include merge='true'>
-      <uri>model://lidar_3d</uri>
-      <pose degrees="true">0.0 0.0 0.12 0 90 0</pose>
+      <uri>model://velodyne_16</uri>
+      <pose relative_to="base_link" degrees="true">0.20 0.0 -0.15 0 45 0</pose>
     </include>
     <joint name="LidarJoint3D" type="fixed">
       <parent>base_link</parent>
       <child>lidar3d_link</child>
-      <pose relative_to="base_link" degrees="true">0.0 0.0 0.12 0 90 0</pose>
+      <pose relative_to="base_link" degrees="true">0.20 0.0 -0.15 0 45 0</pose>
     </joint>
 
     <!-- 1D Lidar-->
-    <include merge='true'>
+    <!-- <pose>0.1 0 0.9055 0 1.0 3.1400000000000001</pose> -->
+    <!-- <include merge='true'>
       <uri>model://lidar</uri>
-      <!-- <pose>0.1 0 0.9055 0 1.0 3.1400000000000001</pose> -->
       <pose degrees="true">0.16 0.0 0.12 0 90 0</pose>
-    </include>
-    <joint name="LidarJoint" type="fixed">
+    </include> -->
+    <!-- <joint name="LidarJoint" type="fixed">
       <parent>pitch_link</parent>
       <child>lidar_link</child>
       <pose relative_to="base_link" degrees="true">0.16 0.0 0.12 0 90 0</pose>
-    </joint>
+    </joint> -->
 
       <include merge='true'>
         <uri>model://gimbal_small_3d</uri>
