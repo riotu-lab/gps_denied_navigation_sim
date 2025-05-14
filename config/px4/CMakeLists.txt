@@ -86,6 +86,7 @@ px4_add_romfs_files(
 	4021_gz_x3_uav
 	4022_gz_x500_mono_cam_3d_lidar
 	4023_gz_x500_stereo_cam_3d_lidar
+	4024_gz_x500_twin_stereo_twin_velodyne
 
 	6011_gazebo-classic_typhoon_h480
 	6011_gazebo-classic_typhoon_h480.post
