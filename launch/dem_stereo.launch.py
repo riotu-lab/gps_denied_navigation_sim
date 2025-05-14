@@ -34,7 +34,7 @@ def launch_setup(context, *args, **kwargs):
     rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
 
     # gz node
-    m_name = 'x500_stereo_cam_3d_lidar'
+    m_name = 'x500_twin_stereo_twin_velodyne'
     model_name = {'gz_model_name': m_name}
     m_id=0
     # for original dem use dem_world
@@ -59,7 +59,7 @@ def launch_setup(context, *args, **kwargs):
             'headless': headless['headless'],
             'gz_model_name': model_name['gz_model_name'],
             'gz_world': w_name,
-            'px4_autostart_id': '4023',
+            'px4_autostart_id': '4024',
             'instance_id': f'{m_id}',
             'xpos': xpos,
             'ypos': ypos,
@@ -178,48 +178,48 @@ def launch_setup(context, *args, **kwargs):
                   '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
                   
                   # Bridge for front and rear lidar topics
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
                   
                   # Bridge for front stereo camera topics
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                   
                   # Bridge for rear stereo camera topics
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                   
                   # Bridge for IMU and other sensors
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/x500/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/x500/link/base_link/sensor/air_pressure_sensor/air_pressure@sensor_msgs/msg/FluidPressure[ignition.msgs.FluidPressure',
-                  f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/x500/link/base_link/sensor/navsat_sensor/navsat@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat',
+                  f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+                  f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/air_pressure_sensor/air_pressure@sensor_msgs/msg/FluidPressure[ignition.msgs.FluidPressure',
+                  f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/navsat_sensor/navsat@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat',
                   
                   '--ros-args',
                   # Remappings for front lidar
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/front_lidar/points',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/front_lidar/points',
                   # Remappings for rear lidar
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/rear_lidar/points',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/rear_lidar/points',
                   
                   # Remappings for front stereo camera
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/front_stereo/left_cam/image_raw',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/front_stereo/right_cam/image_raw',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/front_stereo/left_cam/camera_info',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/front_stereo/right_cam/camera_info',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/front_stereo/left_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/front_stereo/right_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/front_stereo/left_cam/camera_info',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/front_stereo/right_cam/camera_info',
                   
                   # Remappings for rear stereo camera
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/rear_stereo/left_cam/image_raw',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/rear_stereo/right_cam/image_raw',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/rear_stereo/left_cam/camera_info',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/rear_stereo/right_cam/camera_info',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/rear_stereo/left_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/rear_stereo/right_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/rear_stereo/left_cam/camera_info',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/rear_stereo/right_cam/camera_info',
                   
                   # Remappings for IMU and other sensors
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/x500/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/x500/link/base_link/sensor/air_pressure_sensor/air_pressure:='+ns+'/air_pressure',
-                  '-r', f'/world/{w_name}/model/x500_stereo_cam_3d_lidar_0/model/x500/link/base_link/sensor/navsat_sensor/navsat:='+ns+'/gps',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/air_pressure_sensor/air_pressure:='+ns+'/air_pressure',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/navsat_sensor/navsat:='+ns+'/gps',
                   ],
         parameters=[
             {'verbose': True}

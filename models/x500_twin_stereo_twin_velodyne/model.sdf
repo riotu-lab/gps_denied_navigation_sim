@@ -10,24 +10,24 @@
     <include>
       <name>front_stereo</name>
       <uri>/home/user/shared_volume/PX4-Autopilot/Tools/simulation/gz/models/stereo_camera/model.sdf</uri>
-      <pose relative_to="base_link" degrees="true">0.15 0.0 -0.01 0 10 0</pose>
+      <pose relative_to="base_link" degrees="true">0.15 0.0 -0.01 0 20 0</pose>
     </include>
     <joint name="FrontStereoCamJoint" type="fixed">
       <parent>base_link</parent>
       <child>front_stereo::stereo_camera_link</child>
-      <pose relative_to="base_link" degrees="true">0.15 0.0 -0.01 0 10 0</pose>
+      <pose relative_to="base_link" degrees="true">0.15 0.0 -0.01 0 20 0</pose>
     </joint>
 
     <!-- Rear Stereo Camera -->
     <include>
       <name>rear_stereo</name>
       <uri>/home/user/shared_volume/PX4-Autopilot/Tools/simulation/gz/models/stereo_camera/model.sdf</uri>
-      <pose relative_to="base_link" degrees="true">-0.15 0.0 -0.01 0 10 180</pose>
+      <pose relative_to="base_link" degrees="true">-0.15 0.0 -0.01 0 20 180</pose>
     </include>
     <joint name="RearStereoCamJoint" type="fixed">
       <parent>base_link</parent>
       <child>rear_stereo::stereo_camera_link</child>
-      <pose relative_to="base_link" degrees="true">-0.15 0.0 -0.01 0 10 180</pose>
+      <pose relative_to="base_link" degrees="true">-0.15 0.0 -0.01 0 20 180</pose>
     </joint>
     
     <!-- Front Lidar-->
