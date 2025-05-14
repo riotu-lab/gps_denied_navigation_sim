@@ -13,6 +13,12 @@
   <depend>tf2_ros_py</depend>
   <depend>image_proc</depend>
   <depend>stereo_image_proc</depend>
+  <depend>nav_msgs</depend>
+  <depend>tf2_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>python3-numpy</depend>
+  <depend>python3-yaml</depend>
+  <depend>python3-opencv</depend>
   
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

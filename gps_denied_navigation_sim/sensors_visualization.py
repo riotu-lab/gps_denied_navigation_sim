@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import cv2
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
@@ -10,11 +9,21 @@ from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 from geometry_msgs.msg import TransformStamped, PoseStamped
 from nav_msgs.msg import Path, Odometry
 from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
 import yaml
 import os
 from tf2_msgs.msg import TFMessage
 from ament_index_python.packages import get_package_share_directory
+
+# Try to import OpenCV, but continue if it fails
+CV_AVAILABLE = False
+try:
+    import cv2
+    from cv_bridge import CvBridge
+    CV_AVAILABLE = True
+except ImportError:
+    print("WARNING: OpenCV (cv2) or cv_bridge not available. Image combining will be disabled.")
+except Exception as e:
+    print(f"WARNING: Error importing OpenCV: {e}. Image combining will be disabled.")
 
 
 class SensorsVisualizationNode(Node):
@@ -43,40 +52,47 @@ class SensorsVisualizationNode(Node):
         self.cam_config = self.load_yaml(cam_config)
         self.lidar_config = self.load_yaml(lidar_config)
         
-        # Set up Subscribers
+        # Set up QoS
         qos = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=10
         )
         
-        # Subscribe to camera images
-        self.front_left_sub = self.create_subscription(
-            Image, '/target/front_stereo/left_cam/image_raw', self.front_left_callback, qos)
-        self.front_right_sub = self.create_subscription(
-            Image, '/target/front_stereo/right_cam/image_raw', self.front_right_callback, qos)
-        self.rear_left_sub = self.create_subscription(
-            Image, '/target/rear_stereo/left_cam/image_raw', self.rear_left_callback, qos)
-        self.rear_right_sub = self.create_subscription(
-            Image, '/target/rear_stereo/right_cam/image_raw', self.rear_right_callback, qos)
-        
         # Subscribe to odometry for ground truth path
         self.odom_sub = self.create_subscription(
             Odometry, '/target/mavros/odometry/out', self.odom_callback, qos)
         
+        # Set up image processing only if OpenCV is available
+        if CV_AVAILABLE:
+            self.get_logger().info("OpenCV is available. Image combining enabled.")
+            # Subscribe to camera images
+            self.front_left_sub = self.create_subscription(
+                Image, '/target/front_stereo/left_cam/image_raw', self.front_left_callback, qos)
+            self.front_right_sub = self.create_subscription(
+                Image, '/target/front_stereo/right_cam/image_raw', self.front_right_callback, qos)
+            self.rear_left_sub = self.create_subscription(
+                Image, '/target/rear_stereo/left_cam/image_raw', self.rear_left_callback, qos)
+            self.rear_right_sub = self.create_subscription(
+                Image, '/target/rear_stereo/right_cam/image_raw', self.rear_right_callback, qos)
+            
+            # Publishers for images
+            self.combined_image_pub = self.create_publisher(Image, '/target/combined_stereo/image', qos)
+            
+            # Store the images
+            self.front_left_img = None
+            self.front_right_img = None
+            self.rear_left_img = None
+            self.rear_right_img = None
+            self.bridge = CvBridge()
+        else:
+            self.get_logger().warn("OpenCV not available. Image combining disabled.")
+        
         # Publishers
-        self.combined_image_pub = self.create_publisher(Image, '/target/combined_stereo/image', qos)
         self.path_pub = self.create_publisher(Path, '/target/gt_path', qos)
         
         # TF Broadcaster for sensor transforms visualization
         self.tf_broadcaster = StaticTransformBroadcaster(self)
-        
-        # Store the images
-        self.front_left_img = None
-        self.front_right_img = None
-        self.rear_left_img = None
-        self.rear_right_img = None
-        self.bridge = CvBridge()
         
         # Ground truth path
         self.path = Path()
@@ -100,17 +116,46 @@ class SensorsVisualizationNode(Node):
                 file.seek(0)  # If it doesn't start with %YAML, go back to beginning
             return yaml.safe_load(file)
     
-    def front_left_callback(self, msg):
-        self.front_left_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-    
-    def front_right_callback(self, msg):
-        self.front_right_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-    
-    def rear_left_callback(self, msg):
-        self.rear_left_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-    
-    def rear_right_callback(self, msg):
-        self.rear_right_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+    # Only define these methods if OpenCV is available
+    if CV_AVAILABLE:
+        def front_left_callback(self, msg):
+            self.front_left_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        
+        def front_right_callback(self, msg):
+            self.front_right_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        
+        def rear_left_callback(self, msg):
+            self.rear_left_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        
+        def rear_right_callback(self, msg):
+            self.rear_right_img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        
+        def combine_images(self):
+            # Check if we have all images
+            if None in [self.front_left_img, self.front_right_img, self.rear_left_img, self.rear_right_img]:
+                self.get_logger().warn('Not all camera images received yet')
+                return None
+            
+            # Resize images to ensure they're all the same size
+            height, width = self.front_left_img.shape[:2]
+            front_left = cv2.resize(self.front_left_img, (width, height))
+            front_right = cv2.resize(self.front_right_img, (width, height))
+            rear_left = cv2.resize(self.rear_left_img, (width, height))
+            rear_right = cv2.resize(self.rear_right_img, (width, height))
+            
+            # Add text labels to each image
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(front_left, 'Front Left', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(front_right, 'Front Right', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(rear_left, 'Rear Left', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(rear_right, 'Rear Right', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            
+            # Combine images in a 2x2 grid
+            top_row = np.hstack((front_left, front_right))
+            bottom_row = np.hstack((rear_left, rear_right))
+            combined = np.vstack((top_row, bottom_row))
+            
+            return combined
     
     def odom_callback(self, msg):
         # Add to path
@@ -219,41 +264,18 @@ class SensorsVisualizationNode(Node):
             self.tf_broadcaster.sendTransform(transforms)
             self.get_logger().info(f'Published {len(transforms)} sensor transforms')
     
-    def combine_images(self):
-        # Check if we have all images
-        if None in [self.front_left_img, self.front_right_img, self.rear_left_img, self.rear_right_img]:
-            self.get_logger().warn('Not all camera images received yet')
-            return None
-        
-        # Resize images to ensure they're all the same size
-        height, width = self.front_left_img.shape[:2]
-        front_left = cv2.resize(self.front_left_img, (width, height))
-        front_right = cv2.resize(self.front_right_img, (width, height))
-        rear_left = cv2.resize(self.rear_left_img, (width, height))
-        rear_right = cv2.resize(self.rear_right_img, (width, height))
-        
-        # Add text labels to each image
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(front_left, 'Front Left', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(front_right, 'Front Right', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(rear_left, 'Rear Left', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(rear_right, 'Rear Right', (10, 30), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-        
-        # Combine images in a 2x2 grid
-        top_row = np.hstack((front_left, front_right))
-        bottom_row = np.hstack((rear_left, rear_right))
-        combined = np.vstack((top_row, bottom_row))
-        
-        return combined
-    
     def timer_callback(self):
-        # Publish combined camera image
-        combined_img = self.combine_images()
-        if combined_img is not None:
-            msg = self.bridge.cv2_to_imgmsg(combined_img, encoding='bgr8')
-            msg.header.stamp = self.get_clock().now().to_msg()
-            msg.header.frame_id = "target/base_link"
-            self.combined_image_pub.publish(msg)
+        # Publish combined camera image only if OpenCV is available
+        if CV_AVAILABLE:
+            try:
+                combined_img = self.combine_images()
+                if combined_img is not None:
+                    msg = self.bridge.cv2_to_imgmsg(combined_img, encoding='bgr8')
+                    msg.header.stamp = self.get_clock().now().to_msg()
+                    msg.header.frame_id = "target/base_link"
+                    self.combined_image_pub.publish(msg)
+            except Exception as e:
+                self.get_logger().error(f"Error in image combining: {e}")
             
         # Re-publish sensor transforms periodically
         if hasattr(self, 'sensor_transform_counter'):
@@ -267,13 +289,14 @@ class SensorsVisualizationNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = SensorsVisualizationNode()
     try:
+        node = SensorsVisualizationNode()
         rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
+    except Exception as e:
+        print(f"Error in sensors_visualization node: {e}")
+        import traceback
+        traceback.print_exc()
     finally:
-        node.destroy_node()
         rclpy.shutdown()
 
 

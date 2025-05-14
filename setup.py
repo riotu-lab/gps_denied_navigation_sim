@@ -3,18 +3,24 @@ from glob import glob
 from setuptools import setup
 package_name = 'gps_denied_navigation_sim'
 
+def recursive_data_files(directory):
+    return [
+        (os.path.join('share', package_name, root), [os.path.join(root, file) for file in files])
+        for root, _, files in os.walk(directory) if files
+    ]
+
 setup(
     name=package_name,
     version='0.0.0',
     packages=[package_name],
     data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
+        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name), glob('launch/*launch.[pxy][yma]*')),
-        (os.path.join('share', package_name), glob('config/mavros/*.yaml')),
-        (os.path.join('share', package_name), glob('rviz/*.rviz')),
-        (os.path.join('share', package_name), glob('models/x500_stereo_cam_3d_lidar/*')),
+        *recursive_data_files('config'),
+        *recursive_data_files('models'),
+        *recursive_data_files('launch'),
+        (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
+        *([(os.path.join('share', package_name, 'worlds'), glob('worlds/*'))] if os.path.exists('worlds') and glob('worlds/*') else []),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
