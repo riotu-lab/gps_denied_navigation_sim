@@ -7,6 +7,7 @@ alias src='source ~/.bashrc'
 alias zenoh='ros2 run rmw_zenoh_cpp rmw_zenohd'
 alias sss='source install/setup.bash'
 alias qgc='cd ~/shared_volume && ./QGroundControl.AppImage'
+alias px4='cd ~/shared_volume/PX4-Autopilot && make px4_sitl gz_x500_stereo_cam_3d_lidar'
 
 #Launch
 ## Stereo
