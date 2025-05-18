@@ -31,7 +31,7 @@ def launch_setup(context, *args, **kwargs):
         rviz_file_name = 'dem_stereo_ov.rviz'
     else:
         rviz_file_name = 'dem_stereo_mins.rviz'
-    rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
+    rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
     m_name = 'x500_twin_stereo_twin_velodyne'
@@ -51,6 +51,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('gps_denied_navigation_sim'),
+                'launch',
                 'gz_sim.launch.py'
             ])
         ]),
@@ -77,6 +78,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('gps_denied_navigation_sim'),
+                'launch',
                 'mavros.launch.py'
             ])
         ]),
@@ -153,19 +155,19 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # Load the robot model (URDF or SDF)
-    model_path = os.path.join(package_share_directory, 'model.sdf')
-    with open(model_path, 'r') as file:
-        robot_description_content = file.read()
+    # model_path = os.path.join(package_share_directory, 'model.sdf')
+    # with open(model_path, 'r') as file:
+    #     robot_description_content = file.read()
 
     # Robot State Publisher to publish the URDF model
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='screen',
-        parameters=[{'robot_description': robot_description_content}],
-        remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]
-    )
+    # robot_state_publisher = Node(
+    #     package='robot_state_publisher',
+    #     executable='robot_state_publisher',
+    #     name='robot_state_publisher',
+    #     output='screen',
+    #     parameters=[{'robot_description': robot_description_content}],
+    #     remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]
+    # )
     
     # Transport rgb and depth images from GZ topics to ROS topics    
     ros_gz_bridge = Node(

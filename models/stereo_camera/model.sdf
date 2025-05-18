@@ -76,6 +76,7 @@
         <update_rate>30</update_rate>
         <visualize>true</visualize>
         <!-- <topic>left_camera</topic> -->
+        <frame_name>left_camera_optical_link</frame_name>
         <camera>
           <horizontal_fov>1.74</horizontal_fov>
           <image>
@@ -99,7 +100,22 @@
       <gravity>true</gravity>
       <velocity_decay/>
     </link>
-    
+    <link name="left_camera_optical_link">
+      <pose relative_to="left_camera_link">0 0 0 -1.5707963267948966 0 -1.5707963267948966</pose>
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.00000001</ixx>
+          <iyy>0.00000001</iyy>
+          <izz>0.00000001</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name="left_camera_optical_joint" type="fixed">
+      <parent>left_camera_link</parent>
+      <child>left_camera_optical_link</child>
+    </joint>
+
     <link name="right_camera_link">
       <pose relative_to="stereo_camera_link">0 -0.09 0 0 0 0</pose>
       <inertial>
@@ -150,6 +166,7 @@
         <update_rate>30</update_rate>
         <visualize>true</visualize>
         <!-- <topic>right_camera</topic> -->
+        <frame_name>right_camera_optical_link</frame_name>
         <camera>
           <horizontal_fov>1.74</horizontal_fov>
           <image>
@@ -174,7 +191,22 @@
       <gravity>true</gravity>
       <velocity_decay/>
     </link>
-    
+    <link name="right_camera_optical_link">
+      <pose relative_to="right_camera_link">0 0 0 -1.5707963267948966 0 -1.5707963267948966</pose>
+      <inertial>
+        <mass>0.001</mass>
+        <inertia>
+          <ixx>0.00000001</ixx>
+          <iyy>0.00000001</iyy>
+          <izz>0.00000001</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name="right_camera_optical_joint" type="fixed">
+      <parent>right_camera_link</parent>
+      <child>right_camera_optical_link</child>
+    </joint>
+
     <joint name="left_camera_joint" type="fixed">
       <parent>stereo_camera_link</parent>
       <child>left_camera_link</child>
