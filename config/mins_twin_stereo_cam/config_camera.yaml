@@ -1,7 +1,7 @@
 %YAML:1.0 # need to specify the file type at the top!
 
 cam:
-  enabled: true
+  enabled: false
   max_n: 4
   use_stereo: true
   stereo_pair: [0, 1, 2, 3]

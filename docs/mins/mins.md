@@ -1,12 +1,17 @@
 # MINS Setup
-* Clone MINS repo inside the `~/shared_volume/ros2_ws/src` **inside the contianer**
+https://github.com/mzahana/mins/tree/ros2
+* Make MINS worksapace 
+```bash
+cd ~/shared_volume && mkdir mins_ws
+```
+* Clone MINS repo inside the `~/shared_volume/mins_ws/src` **inside the contianer**
 
 ```bash
 
 git clone -b ros2 https://github.com/mzahana/mins.git
 ```
 
-* Navigate to the `~/shared_volume/ros2_ws`, then execute the following commands in order to build the `mins` package.
+* Navigate to the `~/shared_volume/mins_ws`, then execute the following commands in order to build the `mins` package.
 ```bash
 source /opt/ros/humble/setup.bash
 colcon build --paths src/mins/thirdparty/*
