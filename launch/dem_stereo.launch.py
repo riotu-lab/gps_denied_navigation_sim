@@ -105,6 +105,18 @@ def launch_setup(context, *args, **kwargs):
         ]
     )
 
+    # Add map to map_frd transform (FRD = Forward-Right-Down)
+    # This is a 90-degree rotation around X to convert from ENU to FRD
+    map2map_frd_tf_node = Node(
+        package='tf2_ros',
+        name='map2map_frd_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '1.5708', '0', '1.5708', 'map', 'map_frd'],
+        parameters=[
+                {"use_sim_time": True},
+        ]
+    )
+
     # Static TF map(or world) -> local_pose_ENU
     map_frame = 'map'
     odom_frame= 'odom'
@@ -112,21 +124,45 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='map2px4_'+ns+'_tf_node',
         executable='static_transform_publisher',
-        arguments=[xpos, ypos, '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
+        arguments=['0', '0', '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
         parameters=[
                 {"use_sim_time": True},
         ]
     )
 
-    # Static TF target/base_link to lidar link
-    # The valuse are taken from the model.sdf of x500_d435_3d_lidar
+    # Dynamic transform from target/odom to target/base_link using our custom tf_relay node
+    odom2base_tf_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='tf_relay',
+        name='odom2base_tf_relay',
+        parameters=[
+            {'use_sim_time': True},
+            {'source_topic': f'/{ns}/mavros/local_position/pose'},
+            {'target_frame_id': f'{ns}/odom'},
+            {'child_frame_id': f'{ns}/base_link'}
+        ]
+    )
+
+    # From SDF - Front lidar transform from base_link
+    # <pose relative_to="base_link" degrees="true">0.05 0.0 -0.17 0 45 0</pose>
     base_frame = 'target/base_link'
-    lidar_frame= 'lidar_link'
-    base2lidar_tf_node = Node(
+    front_lidar_tf_node = Node(
         package='tf2_ros',
-        name='base2lidar_'+ns+'_tf_node',
+        name='front_lidar_tf_node',
         executable='static_transform_publisher',
-        arguments=[str(0), str(0), '-0.12', '0', str(45*math.pi/180.), '0', base_frame, lidar_frame],
+        arguments=['0.05', '0.0', '-0.17', '0', str(45*math.pi/180.), '0', base_frame, 'front_lidar_link'],
+        parameters=[
+                {"use_sim_time": True},
+        ]
+    )
+
+    # From SDF - Rear lidar transform from base_link
+    # <pose relative_to="base_link" degrees="true">-0.05 0.0 -0.17 0 45 180</pose>
+    rear_lidar_tf_node = Node(
+        package='tf2_ros',
+        name='rear_lidar_tf_node',
+        executable='static_transform_publisher',
+        arguments=['-0.05', '0.0', '-0.17', '0', str(45*math.pi/180.), str(180*math.pi/180.), base_frame, 'rear_lidar_link'],
         parameters=[
                 {"use_sim_time": True},
         ]
@@ -206,6 +242,11 @@ def launch_setup(context, *args, **kwargs):
                   # Remappings for rear lidar
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/rear_lidar/points',
                   
+                  # Set frame IDs for the point clouds to match our TF tree
+                  '--params-file', '/tmp/dummy',  # This is just a placeholder
+                  '-p', f'front_lidar/points.frame_id:=front_lidar_link',  # Match our TF tree frame
+                  '-p', f'rear_lidar/points.frame_id:=rear_lidar_link',   # Match our TF tree frame
+                  
                   # Remappings for front stereo camera
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/front_stereo/left_cam/image_raw',
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/front_stereo/right_cam/image_raw',
@@ -248,10 +289,13 @@ def launch_setup(context, *args, **kwargs):
     return [
         gz_launch,
         map2pose_tf_node,
-        base2lidar_tf_node,
+        odom2base_tf_node,  # Add dynamic transform from odom to base_link
+        front_lidar_tf_node,  # Front lidar directly from base_link
+        rear_lidar_tf_node,   # Rear lidar directly from base_link 
         # left_camera_tf_node,
         # right_camera_tf_node,
         map2global_tf_node,
+        map2map_frd_tf_node,  # Add the map to map_frd transform
         # robot_state_publisher,
         mavros_launch,
         gimbal_node,

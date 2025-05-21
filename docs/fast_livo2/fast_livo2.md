@@ -19,6 +19,10 @@ cd ws_livox/src/livox_ros_driver2 && ./build.sh humble
 ```bash
 cd ~/shared_volume && mkdir livo2_ws
 ```
+/media/asmbatati/UbuntuBackup/Docker/docker_shared_volumes/gpsdnav_shared_volume/livo2_ws/src/vikit_ros/package.xml
+rmove line 3
+
+
 * Clone FAST_LIVO2 repo inside the `~/shared_volume/livo2_ws/src` **inside the contianer**
 
 ```bash
