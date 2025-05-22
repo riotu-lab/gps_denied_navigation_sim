@@ -117,6 +117,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
                 {"use_sim_time": True},
         ],
+        output='log',  # Redirect output to log file
     )
 
     # Add map to map_frd transform (FRD = Forward-Right-Down)
@@ -129,6 +130,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
                 {"use_sim_time": True},
         ],
+        output='log',  # Redirect output to log file
     )
 
     # Static TF map(or world) -> local_pose_ENU
@@ -142,6 +144,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
                 {"use_sim_time": True},
         ],
+        output='log',  # Redirect output to log file
     )
 
     # Dynamic transform from target/odom to target/base_link using our custom tf_relay node
@@ -157,6 +160,7 @@ def launch_setup(context, *args, **kwargs):
             {'queue_size': 50},  # Larger queue size for more reliable transformation
             {'publish_rate': 50.0}  # Higher publish rate (Hz) for smoother motion
         ],
+        output='log',  # Redirect output to log file
     )
 
     # From SDF - Front lidar transform from base_link
@@ -176,6 +180,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
                 {"use_sim_time": True},
         ],
+        output='log',  # Redirect output to log file
     )
 
     # Connect the Gazebo lidar frame to our TF tree for front lidar
@@ -187,6 +192,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
                 {"use_sim_time": True},
         ],
+        output='log',  # Redirect output to log file
     )
 
     # From SDF - Rear lidar transform from base_link
@@ -203,6 +209,7 @@ def launch_setup(context, *args, **kwargs):
             base_frame, 'rear_lidar_link'               # parent, child
         ],
         parameters=[{"use_sim_time": True}],
+        output='log',  # Redirect output to log file
     )
 
     # Connect the Gazebo lidar frame to our TF tree for rear lidar
@@ -214,6 +221,7 @@ def launch_setup(context, *args, **kwargs):
         parameters=[
                 {"use_sim_time": True},
         ],
+        output='log',  # Redirect output to log file
     )
 
     # Static TF base_link -> left_camera_link
@@ -294,8 +302,9 @@ def launch_setup(context, *args, **kwargs):
                   ],
         parameters=[
             {'use_sim_time': True},
-            {'verbose': True}
+            {'verbose': False}  # Disable verbose output
         ],
+        output='log',  # Redirect output to log file
     )
     
     gimbal_node = Node(
@@ -343,14 +352,14 @@ def launch_setup(context, *args, **kwargs):
             package='rviz2',
             executable='rviz2',
             name='rviz2',
-            output='screen',  # Change from 'log' to 'screen' to see any errors
+            output='log',  # Change from 'screen' to 'log' to reduce terminal spam
             arguments=['-d', rviz_file_path],
             parameters=[
                 {'use_sim_time': True},
-                {'tf_buffer_cache_time_ms': 30000},  # Increased to 30 seconds
+                {'tf_buffer_cache_time_ms': 60000},  # Increased to 60 seconds
                 {'default_display_update_rate': 10.0},  # Lower update rate to reduce CPU load
-                {'transform_tolerance': 2.0},  # Increased tolerance to 2 seconds
-                {'message_filter_queue_size': 100},  # Larger message queue for TF lookups
+                {'transform_tolerance': 5.0},  # Increased tolerance to 5 seconds
+                {'message_filter_queue_size': 200},  # Larger message queue for TF lookups
                 {'synchronize_time': True}  # Try to synchronize time between nodes
             ],
     )
