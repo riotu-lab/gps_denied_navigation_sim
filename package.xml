@@ -10,7 +10,8 @@
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>tf2_ros_py</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf_transformations</depend>
   <depend>image_proc</depend>
   <depend>stereo_image_proc</depend>
   <depend>nav_msgs</depend>

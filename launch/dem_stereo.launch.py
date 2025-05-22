@@ -2,7 +2,7 @@
 
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, OpaqueFunction
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, OpaqueFunction, SetEnvironmentVariable
 from launch_ros.actions import Node
 from ament_index_python import get_package_share_directory
 from launch_ros.substitutions import FindPackageShare
@@ -28,9 +28,9 @@ def launch_setup(context, *args, **kwargs):
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     if localization_model == 'ov':
-        rviz_file_name = 'dem_stereo_ov.rviz'
+        rviz_file_name = 'dem.rviz'
     else:
-        rviz_file_name = 'dem_stereo_mins.rviz'
+        rviz_file_name = 'dem.rviz'
     rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
@@ -65,8 +65,21 @@ def launch_setup(context, *args, **kwargs):
             'xpos': xpos,
             'ypos': ypos,
             'zpos': zpos,
-            'verbose': 'true'
+            'verbose': 'true',
+            'use_sim_time': 'true'
         }.items()
+    )
+
+    # # Environment variable for ROS domain ID to ensure all nodes are on the same domain
+    # ros_domain_id = SetEnvironmentVariable(
+    #     name='ROS_DOMAIN_ID',
+    #     value='71'
+    # )
+
+    # Set use_sim_time for all ROS nodes
+    use_sim_time_env = SetEnvironmentVariable(
+        name='ROS_PARAM_use_sim_time',
+        value='true'
     )
 
     # MAVROS
@@ -90,7 +103,8 @@ def launch_setup(context, *args, **kwargs):
             'config_yaml': config_file_path,
             'base_link_frame': 'target/base_link',
             'odom_frame': 'target/odom',
-            'map_frame': 'map'
+            'map_frame': 'map',
+            'use_sim_time': 'true'
         }.items()
     )    
 
@@ -102,7 +116,7 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
     )
 
     # Add map to map_frd transform (FRD = Forward-Right-Down)
@@ -114,7 +128,7 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '1.5708', '0', '1.5708', 'map', 'map_frd'],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
     )
 
     # Static TF map(or world) -> local_pose_ENU
@@ -127,7 +141,7 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
     )
 
     # Dynamic transform from target/odom to target/base_link using our custom tf_relay node
@@ -139,8 +153,10 @@ def launch_setup(context, *args, **kwargs):
             {'use_sim_time': True},
             {'source_topic': f'/{ns}/mavros/local_position/pose'},
             {'target_frame_id': f'{ns}/odom'},
-            {'child_frame_id': f'{ns}/base_link'}
-        ]
+            {'child_frame_id': f'{ns}/base_link'},
+            {'queue_size': 50},  # Larger queue size for more reliable transformation
+            {'publish_rate': 50.0}  # Higher publish rate (Hz) for smoother motion
+        ],
     )
 
     # From SDF - Front lidar transform from base_link
@@ -150,22 +166,54 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='front_lidar_tf_node',
         executable='static_transform_publisher',
-        arguments=['0.05', '0.0', '-0.17', '0', str(45*math.pi/180.), '0', base_frame, 'front_lidar_link'],
+        arguments=[
+            '0.05', '0.0', '-0.17',                      # x y z (translation)
+            str(math.radians(0)),                      # yaw
+            str(math.radians(45)),                       # pitch
+            str(math.radians(0)),                        # roll
+            base_frame, 'front_lidar_link'               # parent, child
+        ],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
+    )
+
+    # Connect the Gazebo lidar frame to our TF tree for front lidar
+    front_lidar2gazebo_tf_node = Node(
+        package='tf2_ros',
+        name='front_lidar2gazebo_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'front_lidar_link', 'x500_twin_stereo_twin_velodyne_0/front_lidar/lidar3d_link/velodyne_16'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
     )
 
     # From SDF - Rear lidar transform from base_link
     # <pose relative_to="base_link" degrees="true">-0.05 0.0 -0.17 0 45 180</pose>
     rear_lidar_tf_node = Node(
         package='tf2_ros',
-        name='rear_lidar_tf_node',
         executable='static_transform_publisher',
-        arguments=['-0.05', '0.0', '-0.17', '0', str(45*math.pi/180.), str(180*math.pi/180.), base_frame, 'rear_lidar_link'],
+        name='rear_lidar_tf_node',
+        arguments=[
+            '-0.05', '0.0', '-0.17',                      # x y z (translation)
+            str(math.radians(180)),                      # yaw
+            str(math.radians(45)),                       # pitch
+            str(math.radians(0)),                        # roll
+            base_frame, 'rear_lidar_link'               # parent, child
+        ],
+        parameters=[{"use_sim_time": True}],
+    )
+
+    # Connect the Gazebo lidar frame to our TF tree for rear lidar
+    rear_lidar2gazebo_tf_node = Node(
+        package='tf2_ros',
+        name='rear_lidar2gazebo_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'rear_lidar_link', 'x500_twin_stereo_twin_velodyne_0/rear_lidar/lidar3d_link/velodyne_16'],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
     )
 
     # Static TF base_link -> left_camera_link
@@ -176,7 +224,7 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0.20', '0.15', '-0.10', '0', '0.0872', '0', '0.9962', base_frame, 'left_camera_link'],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
     )
 
     # Static TF base_link -> right_camera_link
@@ -187,23 +235,8 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0.20', '-0.15', '-0.10', '0', '0.0872', '0', '0.9962', base_frame, 'right_camera_link'],
         parameters=[
                 {"use_sim_time": True},
-        ]
+        ],
     )
-
-    # Load the robot model (URDF or SDF)
-    # model_path = os.path.join(package_share_directory, 'model.sdf')
-    # with open(model_path, 'r') as file:
-    #     robot_description_content = file.read()
-
-    # Robot State Publisher to publish the URDF model
-    # robot_state_publisher = Node(
-    #     package='robot_state_publisher',
-    #     executable='robot_state_publisher',
-    #     name='robot_state_publisher',
-    #     output='screen',
-    #     parameters=[{'robot_description': robot_description_content}],
-    #     remappings=[('/tf', 'tf'), ('/tf_static', 'tf_static')]
-    # )
     
     # Transport rgb and depth images from GZ topics to ROS topics    
     ros_gz_bridge = Node(
@@ -242,11 +275,6 @@ def launch_setup(context, *args, **kwargs):
                   # Remappings for rear lidar
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/rear_lidar/points',
                   
-                  # Set frame IDs for the point clouds to match our TF tree
-                  '--params-file', '/tmp/dummy',  # This is just a placeholder
-                  '-p', f'front_lidar/points.frame_id:=front_lidar_link',  # Match our TF tree frame
-                  '-p', f'rear_lidar/points.frame_id:=rear_lidar_link',   # Match our TF tree frame
-                  
                   # Remappings for front stereo camera
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/front_stereo/left_cam/image_raw',
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/front_stereo/right_cam/image_raw',
@@ -265,6 +293,7 @@ def launch_setup(context, *args, **kwargs):
                   '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/navsat_sensor/navsat:='+ns+'/gps',
                   ],
         parameters=[
+            {'use_sim_time': True},
             {'verbose': True}
         ],
     )
@@ -274,32 +303,94 @@ def launch_setup(context, *args, **kwargs):
         executable='gimbal_stabilizer',
         name='gimbal_stabilizer',
         output='log',
+        parameters=[
+            {'use_sim_time': True}
+        ],
     )
 
+    # Image monitor node for camera feeds
+    image_stitcher_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='image_stitcher',
+        name='image_stitcher',
+        parameters=[
+            {'use_sim_time': True},
+            {'front_left_topic': f'/{ns}/front_stereo/left_cam/image_raw'},
+            {'front_right_topic': f'/{ns}/front_stereo/right_cam/image_raw'},
+            {'rear_left_topic': f'/{ns}/rear_stereo/left_cam/image_raw'},
+            {'rear_right_topic': f'/{ns}/rear_stereo/right_cam/image_raw'},
+            {'verbose': False}  # Disable debug messages
+        ],
+        output='log',  # Redirect output to log file instead of terminal
+    )
+
+    trajectory_publisher_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='trajectory_publisher',
+        name='trajectory_publisher',
+        parameters=[
+            {'use_sim_time': True},
+            {'pose_topic': f'/{ns}/mavros/local_position/pose'},
+            {'path_topic': f'/{ns}/gt_path'},
+            {'max_path_length': 5000},
+            {'verbose': False}  # Disable debug messages
+        ],
+        output='log',  # Redirect output to log file instead of terminal
+    )
+    
+    # Buffer size configuration for RViz2 to handle transforms better
     rviz_node = Node(
             package='rviz2',
             executable='rviz2',
             name='rviz2',
             output='screen',  # Change from 'log' to 'screen' to see any errors
             arguments=['-d', rviz_file_path],
-            parameters=[],  # Empty parameters list
-            # ros_arguments=['--log-level', 'error']  # Set ROS log level properly
-        )
+            parameters=[
+                {'use_sim_time': True},
+                {'tf_buffer_cache_time_ms': 30000},  # Increased to 30 seconds
+                {'default_display_update_rate': 10.0},  # Lower update rate to reduce CPU load
+                {'transform_tolerance': 2.0},  # Increased tolerance to 2 seconds
+                {'message_filter_queue_size': 100},  # Larger message queue for TF lookups
+                {'synchronize_time': True}  # Try to synchronize time between nodes
+            ],
+    )
 
     return [
+        # Environment variables
+        # ros_domain_id,
+        use_sim_time_env,
+        
+        # Gazebo and PX4
         gz_launch,
-        map2pose_tf_node,
-        odom2base_tf_node,  # Add dynamic transform from odom to base_link
-        front_lidar_tf_node,  # Front lidar directly from base_link
-        rear_lidar_tf_node,   # Rear lidar directly from base_link 
-        # left_camera_tf_node,
-        # right_camera_tf_node,
-        map2global_tf_node,
-        map2map_frd_tf_node,  # Add the map to map_frd transform
-        # robot_state_publisher,
+        
+        # MAVROS node should be launched early to establish connection
         mavros_launch,
-        gimbal_node,
+        
+        # TF tree setup - static transforms
+        map2global_tf_node,
+        map2map_frd_tf_node,
+        map2pose_tf_node,
+        
+        # Dynamic transform for the drone position
+        odom2base_tf_node, 
+        
+        # Lidar transforms
+        front_lidar_tf_node,
+        front_lidar2gazebo_tf_node,
+        rear_lidar_tf_node,
+        rear_lidar2gazebo_tf_node,
+        
+        # Bridge for sensor data from Gazebo
         ros_gz_bridge,
+
+        # Other nodes
+        # gimbal_node,
+        
+        # Camera and trajectory visualization
+        image_stitcher_node,
+        trajectory_publisher_node,
+        
+        # RViz should be started last, after all transforms are established
         rviz_node,
     ]
 
@@ -314,6 +405,11 @@ def generate_launch_description():
             'localization_model',
             default_value='mins',
             description='Localization model to use (mins, ov)'
+        ),
+        DeclareLaunchArgument(
+            'use_sim_time',
+            default_value='true',
+            description='Use simulation time'
         ),
         OpaqueFunction(function=launch_setup)
     ]) 

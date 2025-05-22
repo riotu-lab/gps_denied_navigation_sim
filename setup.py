@@ -36,8 +36,9 @@ setup(
             'data_sync_recorder = gps_denied_navigation_sim.data_sync_recorder:main',
             'camera_info_publisher = gps_denied_navigation_sim.camera_info_publisher:main',
             'test_stereo = gps_denied_navigation_sim.test_stereo:main',
-            'sensors_visualization = gps_denied_navigation_sim.publish_sensors_readings:main',
             'tf_relay = gps_denied_navigation_sim.tf_relay:main',
+            'image_stitcher = gps_denied_navigation_sim.image_stitcher:main',
+            'trajectory_publisher = gps_denied_navigation_sim.gt_trajectory_publisher:main',
         ],
     },
 )
