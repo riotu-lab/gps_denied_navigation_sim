@@ -2,19 +2,19 @@
 
 est:
   gravity_mag: 9.81
-  clone_freq: 15
-  window_size: 2.0
+  clone_freq: 20
+  window_size: 1.0
   intr_order: 3
-  intr_error_mlt: 3
+  intr_error_mlt: 1.00
   intr_error_ori_thr: 0.007
   intr_error_pos_thr: 0.003
-  intr_error_thr_mlt: 0.5
-  dt_extrapolation: 0.15
+  intr_error_thr_mlt: 1.0
+  dt_extrapolation: 0.01
 
   use_imu_res: true
   use_imu_cov: false
   use_pol_cov: true
-  dynamic_cloning: true
+  dynamic_cloning: false
 
 # Slope of the polynomial pose interpolation error based on acceleration
 # order: 1 3 5 7 9

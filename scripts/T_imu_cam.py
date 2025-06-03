@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-pose2openvins_matrix_stereo.py
+T_imu_cam.py
 -------------------------------------------------
 Given the pose of a stereo camera frame described in an SDF (<pose>x y z R P Y</pose>)
 and the separation between cameras, this script produces the 4×4 homogeneous matrices 
@@ -16,7 +16,7 @@ Conventions
 * Camera body frame     = FLU  (same as the stereo camera frame)
 * Camera optical frame  = RDF  (+X right, +Y down, +Z forward)
   - A fixed rotation is applied to transform the camera body frame to the camera optical frame:
-    R_optical = Rz(180°) · Rx(‑90°)
+    R_optical from SDF: roll=-90°, pitch=0°, yaw=-90°
 
 Transformation Calculation
 ---------------------------
@@ -28,7 +28,13 @@ T_imu_cam = T_imu_stereo * T_stereo_cam
    - Right Camera: offset by -0.5 * separation along the Y-axis.
 3. T_stereo_cam applies the camera's optical frame transformation (R_optical).
 
-Implementation
+Usage
+----
+python3 T_imu_cam.py 0.20 0.0 -0.1 0 10 0 0.18
+
+where 0.20 0.0 -0.1 is the translation of the stereo camera frame relative to the IMU frame
+and 0 10 0 is the rotation of the stereo camera frame relative to the IMU frame
+and 0.12 is the separation between the two cameras
 ---------------
 """
 import math, argparse, sys
@@ -44,8 +50,8 @@ def Rz(a): c, s = math.cos(a), math.sin(a); return np.array([[c,-s,0],[s,c,0],[0
 def rpy2R(roll_deg, pitch_deg, yaw_deg):
     return Rz(yaw_deg*D2R) @ Ry(pitch_deg*D2R) @ Rx(roll_deg*D2R)
 
-# fixed FLU ➜ RDF rotation
-R_OPTICAL = Rz(math.pi) @ Rx(-math.pi/2)
+# Fixed rotation from camera body frame to optical frame (from SDF: -90°, 0°, -90°)
+R_OPTICAL = rpy2R(-90, 0, -90)
 
 def stereo2cam(offset_y):
     """Return (translation in *stereo body* axes) ∘ (optical rotation)."""

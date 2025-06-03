@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-pose2openvins_matrix_lidar.py
+T_imu_lidar.py
 -------------------------------------------------
 Given the pose of a LiDAR frame described in an SDF (<pose>x y z R P Y</pose>),
 this script produces the 4×4 homogeneous matrix T_imu_lidar for insertion
@@ -22,7 +22,12 @@ T_imu_lidar = T_imu_base * T_base_lidar
 1. T_imu_base is calculated based on the SDF pose of the IMU.
 2. T_base_lidar is calculated based on the SDF pose of the LiDAR relative to the base.
 
-Implementation
+Usage
+----
+python3 T_imu_lidar.py 0.0 0.0 -0.12 0 90 0
+
+where 0.0 0.0 -0.12 is the translation of the LiDAR frame relative to the IMU frame
+and 0 90 0 is the rotation of the LiDAR frame relative to the IMU frame
 ---------------
 """
 import math, argparse, sys

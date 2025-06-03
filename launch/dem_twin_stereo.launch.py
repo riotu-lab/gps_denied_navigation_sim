@@ -28,13 +28,13 @@ def launch_setup(context, *args, **kwargs):
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     if localization_model == 'ov':
-        rviz_file_name = 'dem_stereo_only_ov.rviz'
+        rviz_file_name = 'dem.rviz'
     else:
-        rviz_file_name = 'dem_stereo_only_mins.rviz'
+        rviz_file_name = 'dem.rviz'
     rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
-    m_name = 'x500_stereo_cam_3d_lidar'
+    m_name = 'x500_twin_stereo_twin_velodyne'
     model_name = {'gz_model_name': m_name}
     m_id=0
     # for original dem use dem_world
@@ -60,7 +60,7 @@ def launch_setup(context, *args, **kwargs):
             'headless': headless['headless'],
             'gz_model_name': model_name['gz_model_name'],
             'gz_world': w_name,
-            'px4_autostart_id': '4023',
+            'px4_autostart_id': '4024',
             'instance_id': f'{m_id}',
             'xpos': xpos,
             'ypos': ypos,
@@ -171,9 +171,9 @@ def launch_setup(context, *args, **kwargs):
         name='front_lidar_tf_node',
         executable='static_transform_publisher',
         arguments=[
-            '0.0', '0.0', '-0.12',                      # x y z (translation)
+            '0.05', '0.0', '-0.17',                      # x y z (translation)
             str(math.radians(0)),                      # yaw
-            str(math.radians(90)),                       # pitch
+            str(math.radians(45)),                       # pitch
             str(math.radians(0)),                        # roll
             base_frame, 'front_lidar_link'               # parent, child
         ],
@@ -188,7 +188,36 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='front_lidar2gazebo_tf_node',
         executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'front_lidar_link', 'x500_stereo_cam_3d_lidar_0/lidar3d_link/velodyne_16'],
+        arguments=['0', '0', '0', '0', '0', '0', 'front_lidar_link', 'x500_twin_stereo_twin_velodyne_0/front_lidar/lidar3d_link/velodyne_16'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
+        output='log',  # Redirect output to log file
+    )
+
+    # From SDF - Rear lidar transform from base_link
+    # <pose relative_to="base_link" degrees="true">-0.05 0.0 -0.17 0 45 180</pose>
+    rear_lidar_tf_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='rear_lidar_tf_node',
+        arguments=[
+            '-0.05', '0.0', '-0.17',                      # x y z (translation)
+            str(math.radians(180)),                      # yaw
+            str(math.radians(45)),                       # pitch
+            str(math.radians(0)),                        # roll
+            base_frame, 'rear_lidar_link'               # parent, child
+        ],
+        parameters=[{"use_sim_time": True}],
+        output='log',  # Redirect output to log file
+    )
+
+    # Connect the Gazebo lidar frame to our TF tree for rear lidar
+    rear_lidar2gazebo_tf_node = Node(
+        package='tf2_ros',
+        name='rear_lidar2gazebo_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'rear_lidar_link', 'x500_twin_stereo_twin_velodyne_0/rear_lidar/lidar3d_link/velodyne_16'],
         parameters=[
                 {"use_sim_time": True},
         ],
@@ -227,34 +256,49 @@ def launch_setup(context, *args, **kwargs):
                   '/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan',
                   '/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
                   
-                  # Bridge for lidar topic
-                  f'/world/{w_name}/model/{m_name}_0/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
-
-                  # Bridge for stereo camera topics
-                  f'/world/{w_name}/model/{m_name}_0/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  f'/world/{w_name}/model/{m_name}_0/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
-                  f'/world/{w_name}/model/{m_name}_0/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
-                  f'/world/{w_name}/model/{m_name}_0/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  # Bridge for front and rear lidar topics
+                  f'/world/{w_name}/model/{m_name}_0/model/front_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points@sensor_msgs/msg/PointCloud2[ignition.msgs.PointCloudPacked',
+                  
+                  # Bridge for front stereo camera topics
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  
+                  # Bridge for rear stereo camera topics
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/image@sensor_msgs/msg/Image[ignition.msgs.Image',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
+                  f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info@sensor_msgs/msg/CameraInfo[ignition.msgs.CameraInfo',
                   
                   # Bridge for IMU and other sensors
-                  f'/world/{w_name}/model/{m_name}_0/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
-                  f'/world/{w_name}/model/{m_name}_0/link/base_link/sensor/air_pressure_sensor/air_pressure@sensor_msgs/msg/FluidPressure[ignition.msgs.FluidPressure',
-                  f'/world/{w_name}/model/{m_name}_0/link/base_link/sensor/navsat_sensor/navsat@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat',
+                  f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU',
+                  f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/air_pressure_sensor/air_pressure@sensor_msgs/msg/FluidPressure[ignition.msgs.FluidPressure',
+                  f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/navsat_sensor/navsat@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat',
                   
                   '--ros-args',
-                  # Remappings for lidar
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/front_lidar/points',
-
+                  # Remappings for front lidar
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/front_lidar/points',
+                  # Remappings for rear lidar
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_lidar/link/lidar3d_link/sensor/velodyne_16/scan/points:='+ns+'/rear_lidar/points',
+                  
                   # Remappings for front stereo camera
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/front_stereo/left_cam/image_raw',
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/front_stereo/right_cam/image_raw',
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/front_stereo/left_cam/camera_info',
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/front_stereo/right_cam/camera_info',
-
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/front_stereo/left_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/front_stereo/right_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/front_stereo/left_cam/camera_info',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/front_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/front_stereo/right_cam/camera_info',
+                  
+                  # Remappings for rear stereo camera
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/image:='+ns+'/rear_stereo/left_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/image:='+ns+'/rear_stereo/right_cam/image_raw',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/left_camera_link/sensor/left_camera_sensor/camera_info:='+ns+'/rear_stereo/left_cam/camera_info',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/rear_stereo/link/right_camera_link/sensor/right_camera_sensor/camera_info:='+ns+'/rear_stereo/right_cam/camera_info',
+                  
                   # Remappings for IMU and other sensors
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/base_link/sensor/air_pressure_sensor/air_pressure:='+ns+'/air_pressure',
-                  '-r', f'/world/{w_name}/model/{m_name}_0/link/base_link/sensor/navsat_sensor/navsat:='+ns+'/gps',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/imu_sensor/imu:='+ns+'/imu',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/air_pressure_sensor/air_pressure:='+ns+'/air_pressure',
+                  '-r', f'/world/{w_name}/model/{m_name}_0/model/x500/link/base_link/sensor/navsat_sensor/navsat:='+ns+'/gps',
                   ],
         parameters=[
             {'use_sim_time': True},
@@ -280,8 +324,10 @@ def launch_setup(context, *args, **kwargs):
         name='image_stitcher',
         parameters=[
             {'use_sim_time': True},
-            {'front_left_topic': f'/{ns}/left_cam/image_raw'},
-            {'front_right_topic': f'/{ns}/right_cam/image_raw'},
+            {'front_left_topic': f'/{ns}/front_stereo/left_cam/image_raw'},
+            {'front_right_topic': f'/{ns}/front_stereo/right_cam/image_raw'},
+            {'rear_left_topic': f'/{ns}/rear_stereo/left_cam/image_raw'},
+            {'rear_right_topic': f'/{ns}/rear_stereo/right_cam/image_raw'},
             {'verbose': False}  # Disable debug messages
         ],
         output='log',  # Redirect output to log file instead of terminal
@@ -340,6 +386,8 @@ def launch_setup(context, *args, **kwargs):
         # Lidar transforms
         front_lidar_tf_node,
         front_lidar2gazebo_tf_node,
+        rear_lidar_tf_node,
+        rear_lidar2gazebo_tf_node,
         
         # Bridge for sensor data from Gazebo
         ros_gz_bridge,

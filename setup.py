@@ -1,6 +1,6 @@
 import os
 from glob import glob
-from setuptools import setup
+from setuptools import setup, find_packages
 package_name = 'gps_denied_navigation_sim'
 
 def recursive_data_files(directory):
@@ -12,7 +12,7 @@ def recursive_data_files(directory):
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
@@ -39,6 +39,7 @@ setup(
             'tf_relay = gps_denied_navigation_sim.tf_relay:main',
             'image_stitcher = gps_denied_navigation_sim.image_stitcher:main',
             'trajectory_publisher = gps_denied_navigation_sim.gt_trajectory_publisher:main',
+            'path_error_calculator = gps_denied_navigation_sim.path_error_calculator:main',
         ],
     },
 )
