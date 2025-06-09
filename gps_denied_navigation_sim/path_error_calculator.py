@@ -25,11 +25,13 @@ class PathErrorCalculator(Node):
         self.declare_parameter("file_name", "path_error_analysis")
         self.declare_parameter("max_time_diff", 0.1)  # Max time difference for pose association (seconds)
         self.declare_parameter("publish_rate", 10.0)  # Hz for error publishing
+        self.declare_parameter("auto_time_offset", True)  # Enable automatic time offset detection
         
         self.output_dir = self.get_parameter('output_directory').get_parameter_value().string_value
         self.file_name = self.get_parameter('file_name').get_parameter_value().string_value
         self.max_time_diff = self.get_parameter('max_time_diff').get_parameter_value().double_value
         self.publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
+        self.auto_time_offset = self.get_parameter('auto_time_offset').get_parameter_value().bool_value
         
         # Create output directory
         self.create_folder(self.output_dir)
@@ -39,6 +41,10 @@ class PathErrorCalculator(Node):
         self.est_poses = []  # List of (timestamp, pose) tuples
         self.error_data = []  # List of error calculations
         self.data_lock = Lock()
+        
+        # Time offset compensation
+        self.time_offset = None  # Will be calculated automatically
+        self.time_offset_calculated = False
         
         # Recording state
         self.recording_enabled = False
@@ -81,6 +87,29 @@ class PathErrorCalculator(Node):
         if not os.path.exists(directory_path):
             os.makedirs(directory_path)
 
+    def calculate_time_offset(self):
+        """Calculate time offset between GT and EST timestamps when both have data"""
+        if (not self.auto_time_offset or self.time_offset_calculated or 
+            not self.gt_poses or not self.est_poses):
+            return
+        
+        # Use the first available timestamps to calculate offset
+        gt_time = self.gt_poses[0][0]
+        est_time = self.est_poses[0][0]
+        
+        # Calculate offset to align EST time to GT time
+        self.time_offset = gt_time - est_time
+        self.time_offset_calculated = True
+        
+        self.get_logger().info(f"Calculated time offset: {self.time_offset:.6f} seconds")
+        self.get_logger().info(f"GT time: {gt_time:.6f}, EST time: {est_time:.6f}")
+
+    def apply_time_offset(self, timestamp):
+        """Apply time offset to estimated timestamps"""
+        if self.time_offset is not None:
+            return timestamp + self.time_offset
+        return timestamp
+
     def gt_path_callback(self, msg):
         """Callback for ground truth path messages"""
         with self.data_lock:
@@ -89,6 +118,13 @@ class PathErrorCalculator(Node):
                 latest_pose = msg.poses[-1]
                 timestamp = self.msg_to_timestamp(latest_pose.header)
                 self.gt_poses.append((timestamp, latest_pose.pose))
+                
+                # Debug: Log timestamp values (reduced frequency)
+                if len(self.gt_poses) % 10 == 1:  # Log every 10th message
+                    self.get_logger().info(f"GT Path - Timestamp: {timestamp:.6f}, frame_id: {latest_pose.header.frame_id}")
+                
+                # Calculate time offset if needed
+                self.calculate_time_offset()
                 
                 # Keep only recent poses (last 60 seconds for memory management)
                 current_time = timestamp
@@ -100,8 +136,16 @@ class PathErrorCalculator(Node):
             # Extract the latest pose from the path
             if msg.poses:
                 latest_pose = msg.poses[-1]
-                timestamp = self.msg_to_timestamp(latest_pose.header)
+                raw_timestamp = self.msg_to_timestamp(latest_pose.header)
+                timestamp = self.apply_time_offset(raw_timestamp)
                 self.est_poses.append((timestamp, latest_pose.pose))
+                
+                # Debug: Log timestamp values (reduced frequency)
+                if len(self.est_poses) % 10 == 1:  # Log every 10th message
+                    self.get_logger().info(f"EST Path - Raw: {raw_timestamp:.6f}, Adjusted: {timestamp:.6f}, frame_id: {latest_pose.header.frame_id}")
+                
+                # Calculate time offset if needed
+                self.calculate_time_offset()
                 
                 # Keep only recent poses (last 60 seconds for memory management)
                 current_time = timestamp
@@ -165,8 +209,8 @@ class PathErrorCalculator(Node):
         if len(gt_recent) < 2 or len(est_recent) < 2:
             return 0.0
         
-        # Calculate GT velocity
-        gt_recent.sort()
+        # Calculate GT velocity - sort by timestamp (first element of tuple)
+        gt_recent.sort(key=lambda x: x[0])
         gt_dt = gt_recent[-1][0] - gt_recent[-2][0]
         if gt_dt < 1e-6:
             return 0.0
@@ -176,8 +220,8 @@ class PathErrorCalculator(Node):
         gt_dz = gt_recent[-1][1].position.z - gt_recent[-2][1].position.z
         gt_vel = math.sqrt(gt_dx*gt_dx + gt_dy*gt_dy + gt_dz*gt_dz) / gt_dt
         
-        # Calculate estimated velocity
-        est_recent.sort()
+        # Calculate estimated velocity - sort by timestamp (first element of tuple)
+        est_recent.sort(key=lambda x: x[0])
         est_dt = est_recent[-1][0] - est_recent[-2][0]
         if est_dt < 1e-6:
             return 0.0
@@ -202,6 +246,9 @@ class PathErrorCalculator(Node):
             closest_gt_pose, time_diff = self.find_closest_pose(current_time, self.gt_poses)
             
             if closest_gt_pose is None or time_diff > self.max_time_diff:
+                # Only log occasionally to avoid spam
+                if len(self.error_data) % 50 == 0:
+                    self.get_logger().warn(f"No matching pose found - time_diff: {time_diff:.6f} > threshold: {self.max_time_diff}")
                 return
             
             # Calculate errors
@@ -226,6 +273,10 @@ class PathErrorCalculator(Node):
                 'est_position': [current_est_pose.position.x, current_est_pose.position.y, current_est_pose.position.z]
             }
             self.error_data.append(error_entry)
+            
+            # Log successful error calculation occasionally
+            if len(self.error_data) % 20 == 1:
+                self.get_logger().info(f"Error calculated - Position: {pos_error:.3f}m, Orientation: {ori_error:.3f}rad, Time diff: {time_diff:.3f}s")
             
             # Limit stored error data to prevent memory issues
             if len(self.error_data) > 10000:
