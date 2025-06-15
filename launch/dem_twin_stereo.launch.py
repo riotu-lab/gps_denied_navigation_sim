@@ -120,6 +120,18 @@ def launch_setup(context, *args, **kwargs):
         output='log',  # Redirect output to log file
     )
 
+    # Add static identity transform between map and global
+    camerainit2map_tf_node = Node(
+        package='tf2_ros',
+        name='camerainit2map_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'camera_init'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
+        output='log',  # Redirect output to log file
+    )
+
     # Add map to map_frd transform (FRD = Forward-Right-Down)
     # This is a 90-degree rotation around X to convert from ENU to FRD
     map2map_frd_tf_node = Node(
@@ -377,6 +389,7 @@ def launch_setup(context, *args, **kwargs):
         
         # TF tree setup - static transforms
         map2global_tf_node,
+        camerainit2map_tf_node,
         map2map_frd_tf_node,
         map2pose_tf_node,
         

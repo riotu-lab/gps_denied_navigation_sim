@@ -5,9 +5,9 @@ cam:
   max_n: 2             # Mono camera
   use_stereo: true    # Disable stereo
   stereo_pair: [0, 1]
-  do_calib_ext: false  # Disable all calibration
-  do_calib_int: false  # Disable all calibration
-  do_calib_dt: false   # Disable all calibration
+  do_calib_ext: true  # Disable all calibration
+  do_calib_int: true  # Disable all calibration
+  do_calib_dt: true   # Disable all calibration
   n_pts: 40            # Increase feature count further
   fast: 15             # Lower threshold for more features
   grid_x: 4            # Small grid

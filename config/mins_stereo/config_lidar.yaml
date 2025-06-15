@@ -8,7 +8,7 @@ lidar:
   init_cov_dt: 1e-4
   init_cov_ex_o: 1e-6
   init_cov_ex_p: 1e-6
-  max_range: 300.0  # Working settings from before
+  max_range: 50.0  # Working settings from before
   min_range: 1.0    
   chi2_mult: 1
   raw_do_downsample: true
