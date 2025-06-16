@@ -194,6 +194,22 @@ def launch_setup(context, *args, **kwargs):
         output='screen',
          )
 
+    # Adaptive image stitcher for camera feeds (handles single camera automatically)
+    adaptive_image_stitcher_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='adaptive_image_stitcher',
+        name='adaptive_image_stitcher',
+        parameters=[
+            {'use_sim_time': True},
+            {'namespace_filter': f'/{ns}/'},  # Auto-detect cameras in the target namespace
+            {'output_topic': f'/{ns}/camera/stitched_image'},
+            {'verbose': False},  # Disable debug messages
+            {'discovery_timeout': 10.0},  # Give more time for camera discovery
+            {'stitch_rate': 10.0}
+        ],
+        output='log',  # Redirect output to log file instead of terminal
+    )
+
     rviz_node = Node(
             package='rviz2',
             executable='rviz2',
@@ -246,6 +262,7 @@ def launch_setup(context, *args, **kwargs):
         mavros_launch,
         # random_trajectories_node,  # Uncomment if you want this node
         gimbal_node,
+        adaptive_image_stitcher_node,
         ros_gz_bridge,
         rviz_node,
         # mins_node,

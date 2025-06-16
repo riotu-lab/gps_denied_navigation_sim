@@ -330,17 +330,17 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # Image monitor node for camera feeds
-    image_stitcher_node = Node(
+    adaptive_image_stitcher_node = Node(
         package='gps_denied_navigation_sim',
-        executable='image_stitcher',
-        name='image_stitcher',
+        executable='adaptive_image_stitcher',
+        name='adaptive_image_stitcher',
         parameters=[
             {'use_sim_time': True},
-            {'front_left_topic': f'/{ns}/front_stereo/left_cam/image_raw'},
-            {'front_right_topic': f'/{ns}/front_stereo/right_cam/image_raw'},
-            {'rear_left_topic': f'/{ns}/rear_stereo/left_cam/image_raw'},
-            {'rear_right_topic': f'/{ns}/rear_stereo/right_cam/image_raw'},
-            {'verbose': False}  # Disable debug messages
+            {'namespace_filter': f'/{ns}/'},  # Auto-detect cameras in the target namespace
+            {'output_topic': f'/{ns}/camera/stitched_image'},
+            {'verbose': False},  # Disable debug messages
+            {'discovery_timeout': 10.0},  # Give more time for camera discovery
+            {'stitch_rate': 10.0}
         ],
         output='log',  # Redirect output to log file instead of terminal
     )
@@ -409,7 +409,7 @@ def launch_setup(context, *args, **kwargs):
         # gimbal_node,
         
         # Camera and trajectory visualization
-        image_stitcher_node,
+        adaptive_image_stitcher_node,
         trajectory_publisher_node,
         
         # RViz should be started last, after all transforms are established

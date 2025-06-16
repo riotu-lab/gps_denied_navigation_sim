@@ -38,6 +38,7 @@ setup(
             'test_stereo = gps_denied_navigation_sim.test_stereo:main',
             'tf_relay = gps_denied_navigation_sim.tf_relay:main',
             'image_stitcher = gps_denied_navigation_sim.image_stitcher:main',
+            'adaptive_image_stitcher = gps_denied_navigation_sim.adaptive_image_stitcher:main',
             'trajectory_publisher = gps_denied_navigation_sim.gt_trajectory_publisher:main',
             'path_error_calculator = gps_denied_navigation_sim.path_error_calculator:main',
         ],

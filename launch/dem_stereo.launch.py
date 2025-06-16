@@ -124,18 +124,6 @@ def launch_setup(context, *args, **kwargs):
         output='log',  # Redirect output to log file
     )
 
-    # Add static identity transform between fast lio & map
-    camerainit2map_tf_node = Node(
-        package='tf2_ros',
-        name='camerainit2map_tf_node',
-        executable='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'map', 'camera_init'],
-        parameters=[
-                {"use_sim_time": True},
-        ],
-        output='log',  # Redirect output to log file
-    )
-
     # Add map to map_frd transform (FRD = Forward-Right-Down)
     # This is a 90-degree rotation around X to convert from ENU to FRD
     map2map_frd_tf_node = Node(
@@ -182,6 +170,19 @@ def launch_setup(context, *args, **kwargs):
     # From SDF - Front lidar transform from base_link
     # <pose relative_to="base_link" degrees="true">0.05 0.0 -0.17 0 45 0</pose>
     base_frame = 'target/base_link'
+
+    # Add static identity transform between fast lio & map
+    camerainit2map_tf_node = Node(
+        package='tf2_ros',
+        name='camerainit2map_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', base_frame, 'camera_init'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
+        output='log',  # Redirect output to log file
+    )
+
     front_lidar_tf_node = Node(
         package='tf2_ros',
         name='front_lidar_tf_node',
@@ -290,15 +291,17 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # Image monitor node for camera feeds
-    image_stitcher_node = Node(
+    adaptive_image_stitcher_node = Node(
         package='gps_denied_navigation_sim',
-        executable='image_stitcher',
-        name='image_stitcher',
+        executable='adaptive_image_stitcher',
+        name='adaptive_image_stitcher',
         parameters=[
             {'use_sim_time': True},
-            {'front_left_topic': f'/{ns}/left_cam/image_raw'},
-            {'front_right_topic': f'/{ns}/right_cam/image_raw'},
-            {'verbose': False}  # Disable debug messages
+            {'namespace_filter': f'/{ns}/'},  # Auto-detect cameras in the target namespace
+            {'output_topic': f'/{ns}/camera/stitched_image'},
+            {'verbose': False},  # Disable debug messages
+            {'discovery_timeout': 10.0},  # Give more time for camera discovery
+            {'stitch_rate': 10.0}
         ],
         output='log',  # Redirect output to log file instead of terminal
     )
@@ -347,12 +350,12 @@ def launch_setup(context, *args, **kwargs):
         
         # TF tree setup - static transforms
         map2global_tf_node,
-        camerainit2map_tf_node,
         map2map_frd_tf_node,
         map2pose_tf_node,
         
         # Dynamic transform for the drone position
         odom2base_tf_node, 
+        camerainit2map_tf_node,
         
         # Lidar transforms
         front_lidar_tf_node,
@@ -365,7 +368,7 @@ def launch_setup(context, *args, **kwargs):
         # gimbal_node,
         
         # Camera and trajectory visualization
-        image_stitcher_node,
+        adaptive_image_stitcher_node,
         trajectory_publisher_node,
         
         # RViz should be started last, after all transforms are established
