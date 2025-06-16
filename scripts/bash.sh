@@ -14,6 +14,7 @@ alias orb_slam='. ~/shared_volume/orb_slam3_ws/src/ORB-SLAM3-ROS2-Docker/run_orb
 alias cbgps='cd ~/shared_volume/ros2_ws && colcon build --packages-select gps_denied_navigation_sim'
 alias cbov='cd ~/shared_volume/openvins_ws && colcon build --packages-select ov_msckf'
 alias cbspark='cd ~/shared_volume/spark_ws && colcon build'
+alias cb_livo='source ~/shared_volume/ws_livox/install/setup.bash && cd ~/shared_volume/livo2_ws && colcon build --symlink-install'
 alias cb_lio='source ~/shared_volume/ws_livox/install/setup.bash && cd ~/shared_volume/lio_ws && colcon build --symlink-install'
 alias cb_rtmap='source ~/shared_volume/rtabmap_ws/install/setup.bash && cd ~/shared_volume/rtabmap_ws && colcon build --symlink-install'
 
@@ -21,7 +22,7 @@ alias cb_rtmap='source ~/shared_volume/rtabmap_ws/install/setup.bash && cd ~/sha
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 # export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 # export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-export ROS_DOMAIN_ID=71
+export ROS_DOMAIN_ID=0
 
 ############################## MINS ##############################
 ################# 1- Launch the simulation #######################
@@ -31,6 +32,7 @@ alias twin_taif_dem_mins='ros2 launch gps_denied_navigation_sim dem_twin_stereo.
 #### Stereo sim
 alias stereo_tug_dem_mins='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=tugbot_depot localization_model:=mins'
 alias stereo_taif_dem_mins='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif_world localization_model:=mins'
+alias stereo_taif1_dem_mins='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif1_world localization_model:=mins'
 #### Mono sim
 alias mono_tug_dem_mins='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot localization_model:=mins'
 alias mono_taif_dem_mins='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_world localization_model:=mins'

@@ -18,6 +18,9 @@ def launch_setup(context, *args, **kwargs):
     if world_type == 'taif_world':
         # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
         xpos, ypos, zpos = '-583.3', '352.6', '1828.0'
+    elif world_type == 'taif1_world':
+        # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
+        xpos, ypos, zpos = '-583.3', '352.6', '835.0'
     elif world_type == 'dem_world':
         xpos, ypos, zpos = '0.0', '200.0', '900.0'
     elif world_type == 'tugbot_depot':
@@ -115,6 +118,18 @@ def launch_setup(context, *args, **kwargs):
         name='map2global_tf_node',
         executable='static_transform_publisher',
         arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
+        output='log',  # Redirect output to log file
+    )
+
+    # Add static identity transform between fast lio & map
+    camerainit2map_tf_node = Node(
+        package='tf2_ros',
+        name='camerainit2map_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'camera_init'],
         parameters=[
                 {"use_sim_time": True},
         ],
@@ -332,6 +347,7 @@ def launch_setup(context, *args, **kwargs):
         
         # TF tree setup - static transforms
         map2global_tf_node,
+        camerainit2map_tf_node,
         map2map_frd_tf_node,
         map2pose_tf_node,
         
