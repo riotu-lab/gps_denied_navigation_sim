@@ -7,7 +7,7 @@ alias zenoh='ros2 run rmw_zenoh_cpp rmw_zenohd'
 alias sss='source install/setup.bash'
 alias qgc='cd ~/shared_volume && ./QGroundControl.AppImage'
 alias px4='cd ~/shared_volume/PX4-Autopilot && make px4_sitl gz_x500_twin_stereo_twin_velodyne'
-alias px4_taif='cd ~/shared_volume/PX4-Autopilot && make px4_sitl gz_x500_twin_stereo_twin_velodyne PX4_GZ_WORLD=taif_world' 
+alias px4_taif='cd ~/shared_volume/PX4-Autopilot && PX4_GZ_MODEL_POSE="0,0,1930,0,0,0" make px4_sitl gz_x500_stereo_cam_3d_lidar PX4_GZ_WORLD=taif_world' 
 alias sensors_visualization='ros2 launch gps_denied_navigation_sim sensors_visualization.launch.py'
 alias orb_slam='. ~/shared_volume/orb_slam3_ws/src/ORB-SLAM3-ROS2-Docker/run_orb_slam.sh'
 
