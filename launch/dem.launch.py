@@ -27,10 +27,10 @@ def launch_setup(context, *args, **kwargs):
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     if localization_model == 'ov':
-        rviz_file_name = 'dem_ov.rviz'
+        rviz_file_name = 'gps_denied_localization.rviz'
     else:
-        rviz_file_name = 'dem_mins.rviz'
-    rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
+        rviz_file_name = 'gps_denied_localization.rviz'
+    rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
     m_name = 'x500_mono_cam_3d_lidar'
@@ -50,6 +50,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('gps_denied_navigation_sim'),
+                'launch',
                 'gz_sim.launch.py'
             ])
         ]),
@@ -75,6 +76,7 @@ def launch_setup(context, *args, **kwargs):
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('gps_denied_navigation_sim'),
+                'launch',
                 'mavros.launch.py'
             ])
         ]),

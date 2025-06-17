@@ -32,9 +32,9 @@ def launch_setup(context, *args, **kwargs):
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     if localization_model == 'ov':
-        rviz_file_name = 'dem_stereo_only_ov.rviz'
+        rviz_file_name = 'gps_denied_localization.rviz'
     else:
-        rviz_file_name = 'dem_stereo_only_mins.rviz'
+        rviz_file_name = 'gps_denied_localization.rviz'
     rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
@@ -356,7 +356,7 @@ def launch_setup(context, *args, **kwargs):
         # Dynamic transform for the drone position
         odom2base_tf_node, 
         camerainit2map_tf_node,
-        
+
         # Lidar transforms
         front_lidar_tf_node,
         front_lidar2gazebo_tf_node,

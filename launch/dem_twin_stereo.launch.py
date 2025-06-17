@@ -28,9 +28,9 @@ def launch_setup(context, *args, **kwargs):
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     if localization_model == 'ov':
-        rviz_file_name = 'dem.rviz'
+        rviz_file_name = 'gps_denied_localization.rviz'
     else:
-        rviz_file_name = 'dem.rviz'
+        rviz_file_name = 'gps_denied_localization.rviz'
     rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
