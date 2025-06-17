@@ -28,12 +28,12 @@
     <!-- 3D Lidar-->
     <include merge='true'>
       <uri>model://velodyne_16</uri>
-      <pose relative_to="base_link" degrees="true">0.20 0.0 -0.15 0 45 0</pose>
+      <pose relative_to="base_link" degrees="true">0.0 0.0 -0.12 0 90 0</pose>
     </include>
     <joint name="LidarJoint3D" type="fixed">
       <parent>base_link</parent>
       <child>lidar3d_link</child>
-      <pose relative_to="base_link" degrees="true">0.20 0.0 -0.15 0 45 0</pose>
+      <pose relative_to="base_link" degrees="true">0.0 0.0 -0.12 0 90 0</pose>
     </joint>
 
     <!-- 1D Lidar-->
