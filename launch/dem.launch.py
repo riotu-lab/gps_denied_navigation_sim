@@ -240,6 +240,18 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
     )
 
+    # Add static identity transform between map and global
+    camerainit2map_tf_node = Node(
+        package='tf2_ros',
+        name='camerainit2map_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '1.5708', '1.5708', '0', ns+'/'+odom_frame, 'camera_init'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
+        output='log',  # Redirect output to log file
+    )
+
     # Add static transform between lidar_link and lidar0
     lidar_link2lidar0_tf_node = Node(
         package='tf2_ros',
@@ -269,6 +281,7 @@ def launch_setup(context, *args, **kwargs):
         rviz_node,
         # mins_node,
         map2global_tf_node,
+        camerainit2map_tf_node,
         # lidar_link2lidar0_tf_node,
         # imu2base_link_tf_node,
     ]
