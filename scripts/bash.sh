@@ -52,6 +52,7 @@ alias stereo_ov='source ~/shared_volume/openvins_ws/install/setup.bash && ros2 l
 ############################## LIO ##############################
 alias fast_lio='source ~/shared_volume/lio_ws/install/setup.bash && ros2 launch fast_lio mapping.launch.py config_file:=velodyne.yaml'
 alias outdoor_lio='source ~/shared_volume/lio_ws/install/setup.bash && ros2 launch fast_lio mapping.launch.py config_file:=velodyne_outdoor.yaml'
+alias taif_lio='source ~/shared_volume/lio_ws/install/setup.bash && ros2 launch fast_lio mapping.launch.py config_file:=taif_outdoor.yaml'
 
 ############################## Spark ##############################
 alias spark='source ~/shared_volume/spark_ws/install/setup.bash && ros2 launch spark_fast_lio mapping_dem_sim.launch.py'
