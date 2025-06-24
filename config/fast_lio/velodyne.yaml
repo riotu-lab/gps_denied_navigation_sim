@@ -31,16 +31,21 @@
             fov_degree:    360.0
             det_range:     100.0
             extrinsic_est_en:  false      # true: enable the online estimation of IMU-LiDAR extrinsic,
-            extrinsic_T: [ 0., 0., 0.28]
-            extrinsic_R: [ 1., 0., 0., 
-                        0., 1., 0., 
-                        0., 0., 1.]
-
+            ### Twin LiDAR Model
+            # extrinsic_T: [0.05, 0.0, -0.17]
+            # extrinsic_R: [ 0.7071, 0., 0.7071, 
+            #             0., 1., 0., 
+            #             -0.7071, 0., 0.7071]
+            ### Stereo Model
+            extrinsic_T: [0.0, 0.0, -0.12]
+            extrinsic_R: [ 1.0000,  0.0000,  0.0000,
+                        0.0000,  0.0000, -1.0000,
+                        0.0000,  1.0000,  0.0000]
         publish:
-            path_en:  false
-            scan_publish_en:  true       # false: close all the point cloud output
-            dense_publish_en: true       # false: low down the points number in a global-frame point clouds scan.
-            scan_bodyframe_pub_en: true  # true: output the point cloud scans in IMU-body-frame
+            path_en:  true
+            scan_publish_en:  false       # false: close all the point cloud output
+            dense_publish_en: false       # false: low down the points number in a global-frame point clouds scan.
+            scan_bodyframe_pub_en: false  # true: output the point cloud scans in IMU-body-frame
 
         pcd_save:
             pcd_save_en: true

@@ -1,0 +1,53 @@
+/**:
+    ros__parameters:
+        feature_extract_enable: false
+        point_filter_num: 2              # Reduced for better point density in sparse outdoor environment
+        max_iteration: 4                 # Increased for better convergence in complex terrain
+        filter_size_surf: 0.3            # Smaller for finer surface detail in mountainous terrain
+        filter_size_map: 0.4             # Balanced for outdoor terrain mapping
+        cube_side_length: 2000.0         # Increased for large-scale outdoor environment (2km cube)
+        runtime_pos_log_enable: true     # Enable for outdoor navigation analysis
+        map_file_path: "./taif_terrain_map.pcd"  # Descriptive filename for Taif terrain
+
+        common:
+            lid_topic:  "/target/front_lidar/points"
+            imu_topic:  "/target/mavros/imu/data_raw"
+            time_sync_en: false         # ONLY turn on when external time synchronization is really not possible
+            time_offset_lidar_to_imu: 0.0 # Time offset between lidar and IMU calibrated by other algorithms, e.g. LI-Init (can be found in README).
+                                        # This param will take effect no matter what time_sync_en is. So if the time offset is not known exactly, please set as 0.0
+
+        preprocess:
+            lidar_type: 2                # 1 for Livox serials LiDAR, 2 for Velodyne LiDAR, 3 for ouster LiDAR, 
+            scan_line: 32
+            scan_rate: 10                # only need to be set for velodyne, unit: Hz,
+            timestamp_unit: 2            # the unit of time/t field in the PointCloud2 rostopic: 0-second, 1-milisecond, 2-microsecond, 3-nanosecond.
+            blind: 1.5                   # Reduced for mountainous terrain to capture closer obstacles
+
+        mapping:
+            acc_cov: 0.05               # Reduced for outdoor stable flight conditions
+            gyr_cov: 0.05               # Reduced for outdoor stable flight conditions  
+            b_acc_cov: 0.00005          # Reduced bias noise for outdoor environment
+            b_gyr_cov: 0.00005          # Reduced bias noise for outdoor environment
+            fov_degree:    360.0
+            det_range:     300.0         # Increased for large-scale outdoor terrain (300m range)
+            extrinsic_est_en:  false     # true: enable the online estimation of IMU-LiDAR extrinsic,
+            ### Twin LiDAR Model
+            # extrinsic_T: [0.05, 0.0, -0.17]
+            # extrinsic_R: [ 0.7071, 0., 0.7071, 
+            #             0., 1., 0., 
+            #             -0.7071, 0., 0.7071]
+            ### Stereo Model
+            extrinsic_T: [0.0, 0.0, -0.12]
+            extrinsic_R: [ 1.0000,  0.0000,  0.0000,
+                        0.0000,  0.0000, -1.0000,
+                        0.0000,  1.0000,  0.0000]
+        publish:
+            path_en:  true               # Enable for trajectory visualization in outdoor environment
+            scan_publish_en:  false       # Enable for terrain visualization and debugging
+            dense_publish_en: false       # Enable for detailed terrain mapping
+            scan_bodyframe_pub_en: false # Keep disabled for computational efficiency
+
+        pcd_save:
+            pcd_save_en: true
+            interval: 500                # Save every 500 frames to manage memory in large outdoor environment
+                                        # Prevents memory crash while maintaining good map coverage
