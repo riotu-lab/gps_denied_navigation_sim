@@ -247,7 +247,7 @@ python3 run_path_error_analysis.py auto --duration 60
 # 4. Repeat for other algorithms (FastLIO, ORB-SLAM, etc.)
 ros2 launch gps_denied_navigation_sim dem_stereo.launch.py use_fast_lio:=true
 ros2 run gps_denied_navigation_sim path_error_calculator --ros-args \
-    -p estimated_topic:="/fast_lio/path" \
+    -p estimated_topic:="/path" \
     -p output_dir:="/home/user/shared_volume/error_analysis/fast_lio/"
 python3 run_path_error_analysis.py auto --duration 60
 ```
