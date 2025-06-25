@@ -19,8 +19,8 @@ def launch_setup(context, *args, **kwargs):
         # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
         xpos, ypos, zpos = '-583.3', '352.6', '1828.0'
     elif world_type == 'taif1_world':
-        # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
-        xpos, ypos, zpos = '-583.3', '352.6', '835.0'
+        xpos, ypos, zpos = '-475.6', '536.5', '910.0'
+        # xpos, ypos, zpos = '-948.0', '252.4', '754.0'
     elif world_type == 'dem_world':
         xpos, ypos, zpos = '0.0', '200.0', '900.0'
     elif world_type == 'tugbot_depot':
