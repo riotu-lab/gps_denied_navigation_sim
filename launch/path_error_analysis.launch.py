@@ -32,6 +32,24 @@ def generate_launch_description():
         description='Rate for publishing error metrics (Hz)'
     )
 
+    monitor_rate_arg = DeclareLaunchArgument(
+        'monitor_rate',
+        default_value='2.0',
+        description='Rate for monitoring pose data (Hz)'
+    )
+
+    estimated_path_topic_arg = DeclareLaunchArgument(
+        'estimated_path_topic',
+        default_value='/path',
+        description='Topic for estimated path data (body frame)'
+    )
+
+    gt_path_topic_arg = DeclareLaunchArgument(
+        'gt_path_topic',
+        default_value='/target/gt_path',
+        description='Topic for ground truth path data (target/base_link frame)'
+    )
+
     # Path Error Calculator Node
     path_error_calculator_node = Node(
         package='gps_denied_navigation_sim',
@@ -51,10 +69,27 @@ def generate_launch_description():
         ]
     )
 
+    # TF Monitor Node to print frame poses from path topics
+    tf_monitor_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='tf_monitor',
+        name='tf_monitor',
+        output='screen',
+        parameters=[{
+            'monitor_rate': LaunchConfiguration('monitor_rate'),
+            'estimated_path_topic': LaunchConfiguration('estimated_path_topic'),
+            'gt_path_topic': LaunchConfiguration('gt_path_topic'),
+        }]
+    )
+
     return LaunchDescription([
         output_directory_arg,
         file_name_arg,
         max_time_diff_arg,
         publish_rate_arg,
+        monitor_rate_arg,
+        estimated_path_topic_arg,
+        gt_path_topic_arg,
         path_error_calculator_node,
+        tf_monitor_node,
     ]) 

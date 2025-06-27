@@ -41,6 +41,7 @@ setup(
             'adaptive_image_stitcher = gps_denied_navigation_sim.adaptive_image_stitcher:main',
             'trajectory_publisher = gps_denied_navigation_sim.gt_trajectory_publisher:main',
             'path_error_calculator = gps_denied_navigation_sim.path_error_calculator:main',
+            'tf_monitor = gps_denied_navigation_sim.tf_monitor:main',
         ],
     },
 )
