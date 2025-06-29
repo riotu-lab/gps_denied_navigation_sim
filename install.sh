@@ -46,7 +46,10 @@ if [ ! -d "$ROS2_SRC/gps_denied_navigation_sim" ]; then
     cd $ROS2_SRC
     git clone $SIM_PKG_URL --branch mins_modification
 else
-    cd $ROS2_SRC/gps_denied_navigation_sim && git pull origin main
+    cd $ROS2_SRC/gps_denied_navigation_sim
+    git fetch origin
+    git checkout mins_modification
+    git pull origin mins_modification
 fi
 
 # Clone and build PX4-Autopilot if it doesn't exist
