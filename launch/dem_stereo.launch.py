@@ -176,7 +176,7 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='camerainit2map_tf_node',
         executable='static_transform_publisher',
-        arguments=['0', '0', '0', '1.5708', '1.5708', '3.14', ns+'/'+odom_frame, 'camera_init'],
+        arguments=['0', '0', '0', '1.5708', '1.5708', '0', ns+'/'+odom_frame, 'camera_init'],
         parameters=[
                 {"use_sim_time": True},
         ],

@@ -43,6 +43,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('gps_denied_navigation_sim'),
+                'launch',
                 'gz_sim.launch.py'
             ])
         ]),
@@ -69,6 +70,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
                 FindPackageShare('gps_denied_navigation_sim'),
+                'launch',
                 'mavros.launch.py'
             ])
         ]),
