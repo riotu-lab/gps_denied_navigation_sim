@@ -19,8 +19,8 @@ def generate_launch_description():
     # for original dem use dem_world
     # for Taif DEM use taif_world
     # For empty world use default
-    # w_name='taif_world'
-    w_name='taif_world2'
+    w_name='taif_world'
+    # w_name='taif_world2'
     # w_name='tugbot_depot'
     world_name = {'gz_world': w_name}
     autostart_id = {'px4_autostart_id': '4022'}
