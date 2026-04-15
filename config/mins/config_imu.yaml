@@ -1,0 +1,8 @@
+%YAML:1.0 # need to specify the file type at the top!
+
+imu:
+  accel_noise: 1.2e-4 #5.8860e-02  # [ m / s^2 / sqrt(Hz) ]   ( accel "white noise" )
+  accel_bias: 9.5e-2 #1.0000e-02   # [ m / s^3 / sqrt(Hz) ].  ( accel bias diffusion )
+  gyro_noise: 1.2e-5 #1.7453e-03     # [ rad / s / sqrt(Hz) ]   ( gyro "white noise" )
+  gyro_bias: 6.1e-4 #1.0000e-04       # [ rad / s^2 / sqrt(Hz) ] ( gyro bias diffusion )
+  topic: "/target/mavros/imu/data_raw"

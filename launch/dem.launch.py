@@ -39,7 +39,28 @@ def launch_setup(context, *args, **kwargs):
     # for original dem use dem_world
     # for Taif DEM use taif_world
     # For empty world use default
+    w_name='taif_test'
+    # w_name='taif_world2'
     # w_name='tugbot_depot'
+    world_name = {'gz_world': w_name}
+    autostart_id = {'px4_autostart_id': '4022'}
+    instance_id = {'instance_id': f'{m_id}'}
+    # for taif DEM use
+    # xpos = {'xpos': '135.0'}
+    # ypos = {'ypos': '100.0'}
+    # zpos = {'zpos': '2000.0'}
+
+    # For original DEM use
+    # xpos = {'xpos': '0.0'}
+    # ypos = {'ypos': '200.0'}
+    # zpos = {'zpos': '900.0'}
+    
+    # xpos = {'xpos': '-50.0'}
+    # ypos = {'ypos': '100.0'}
+    # zpos = {'zpos': '2000.0'}
+    xpos = {'xpos': '-97.800292'}
+    ypos = {'ypos': '-293.259292'}
+    zpos = {'zpos': '58.0'}
     headless= {'headless' : '0'}
 
     # Namespace

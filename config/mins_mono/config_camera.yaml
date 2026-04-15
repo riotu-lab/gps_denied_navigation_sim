@@ -50,3 +50,15 @@ cam0:
   intrinsics: [317.21, 317.21, 376.0, 240.0]
   resolution: [752, 480]
   topic: "/target/camera"
+# cam1:
+#   timeoffset:  0.005
+#   T_imu_cam: #rotation from camera to IMU R_CtoI, position of camera in IMU p_CinI
+#     - [-0.01036,-0.01075,0.99990,1.70544]
+#     - [-0.99994,-0.00178,-0.01038,-0.22770]
+#     - [0.00189,-0.99994,-0.01073,-0.11611]
+#     - [0.0, 0.0, 0.0, 1.0]
+#   distortion_coeffs: [-5.4921981799999998e-02,1.4243657430000001e-01,7.5412299999999996e-05,-6.7560530000000001e-04]
+#   distortion_model: radtan
+#   intrinsics: [8.1378205539589999e+02,8.0852165574269998e+02,6.1386419539320002e+02,2.4941049348650000e+02]
+#   resolution: [1280, 560]
+#   topic: "/stereo/right/image_raw"

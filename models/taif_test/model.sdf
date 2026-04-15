@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+    <model name="taif_test">
+      <static>true</static>
+      <pose>71.26 -70.85 0.0 0 0 0</pose>
+
+      <link name="ground">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>model://taif_test/textures/taif_test_height_map.tif</uri>
+              <size>1710.34 1700.3 150.6</size>
+              <pos>71.26 -70.85  0.0</pos>
+            </heightmap>
+          </geometry>
+        </collision>
+        <visual name="ground_visual">
+          <geometry>
+            <heightmap>
+              <use_terrain_paging>false</use_terrain_paging>
+              <texture>
+                <diffuse>model://taif_test/textures/taif_test_aerial.png</diffuse>
+                <normal>model://taif_test/textures/taif_test_aerial.png</normal>
+                <size>1710.34 1700.3 150.6</size>
+              </texture>
+              <uri>model://taif_test/textures/taif_test_height_map.tif</uri>
+              <size>1710.34 1700.3 150.6</size>
+              <pos>71.26 -70.85 0.0</pos>
+              <sampling>2</sampling>
+
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+
+
+
+    </model>
+</sdf>
