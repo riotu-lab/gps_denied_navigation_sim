@@ -310,7 +310,7 @@ def launch_setup(context, *args, **kwargs):
 def generate_launch_description():
     ld = LaunchDescription()
     world_type_arg = DeclareLaunchArgument(
-        'world_type', default_value='taif_world', description='World type: taif_world, dem_world, tugbot_depot')
+        'world_type', default_value='taif_world', description='World type: taif_world, dem_world, tugbot_depot', 'taif_test4')
     localization_model_arg = DeclareLaunchArgument(
         'localization_model', default_value='mins', description='Localization model: mins or ov')
 

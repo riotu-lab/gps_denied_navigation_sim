@@ -5,7 +5,7 @@ alias gs='gedit ~/shared_volume/bash.sh'
 alias src='source ~/.bashrc'
 alias zenoh='ros2 run rmw_zenoh_cpp rmw_zenohd'
 alias sss='source install/setup.bash'
-alias qgc='cd ~/shared_volume && ./QGroundControl.AppImage'
+alias qgc='cd ~/shared_volume && ./QGroundControl-x86_64.AppImage'
 alias px4='cd ~/shared_volume/PX4-Autopilot && make px4_sitl gz_x500_twin_stereo_twin_velodyne'
 alias px4_taif='cd ~/shared_volume/PX4-Autopilot && PX4_GZ_MODEL_POSE="0,0,1930,0,0,0" make px4_sitl gz_x500_stereo_cam_3d_lidar PX4_GZ_WORLD=taif_world' 
 alias sensors_visualization='ros2 launch gps_denied_navigation_sim sensors_visualization.launch.py'
@@ -38,6 +38,10 @@ alias stereo_taif1='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py w
 alias mono_tug='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot'
 alias mono_taif='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_world'
 alias mono_taif1='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif1_world'
+
+################# TERCOM #################
+alias tercom='ros2 launch tercom_nav tercom_nav.launch.py \
+    params_file:=$(ros2 pkg prefix tercom_nav)/share/tercom_nav/config/taif_test4_params.yaml'
 
 ############################## MINS ##############################
 alias mins_mono='source ~/shared_volume/mins_ws/install/setup.bash && cd ~/shared_volume && ros2 run mins subscribe ros2_ws/src/gps_denied_navigation_sim/config/mins_mono/config.yaml'
