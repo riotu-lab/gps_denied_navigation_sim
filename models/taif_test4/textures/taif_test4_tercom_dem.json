@@ -1,0 +1,18 @@
+{
+  "vertical_datum": "EGM96 (orthometric / MSL)",
+  "horizontal_crs": "EPSG:32637",
+  "source": "Mapbox Terrain DEM v1",
+  "source_zoom": 15,
+  "geographic_bounds": {
+    "west": 40.341796875,
+    "south": 21.248422235627014,
+    "east": 40.374755859375,
+    "north": 21.279137394108716
+  },
+  "elevation_range_m": {
+    "min": 1725.3631591796875,
+    "max": 2011.148681640625
+  },
+  "pixel_size_m": 5.925691522684703,
+  "note": "PX4 barometer references MSL (consistent with EGM96). GPS altitude uses WGS84 ellipsoidal height \u2014 apply geoid correction if using GPS altitude directly."
+}
