@@ -129,6 +129,17 @@ if [ ! -d "$ROS2_SRC/mavros" ]; then
     cd $ROS2_SRC/mavros && git checkout ros2_humble
 fi
 
+# Clone TERCOM pkgs
+echo "Cloning TERCOM package ... " && sleep 1
+if [ ! -d "$ROS2_SRC/tercom_nav" ]; then
+    cd $ROS2_SRC
+    git clone https://github.com/mzahana/tercom_nav.git
+fi
+if [ ! -d "$ROS2_SRC/tercom_rviz_plugins" ]; then
+    cd $ROS2_SRC
+    git clone https://github.com/mzahana/tercom_rviz_plugins.git
+fi
+
 cd $ROS2_WS && rosdep init && rosdep update && rosdep install --from-paths src --ignore-src -r -y
 
 cd $ROS2_WS && MAKEFLAGS='j1 -l1' colcon  build --packages-up-to mavros --executor sequential
