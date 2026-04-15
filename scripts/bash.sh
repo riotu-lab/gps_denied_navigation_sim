@@ -38,6 +38,7 @@ alias stereo_taif1='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py w
 alias mono_tug='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot'
 alias mono_taif='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_world'
 alias mono_taif1='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif1_world'
+alias mono_taif4='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_test4'
 
 ################# TERCOM #################
 alias tercom='ros2 launch tercom_nav tercom_nav.launch.py \
