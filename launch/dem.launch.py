@@ -15,11 +15,17 @@ def launch_setup(context, *args, **kwargs):
 
     # Set world and position based on world_type
     if world_type == 'taif_world':
-        xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
+        # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
+        xpos, ypos, zpos = '-583.3', '352.6', '1828.0'
+    elif world_type == 'taif1_world':
+        # xpos, ypos, zpos = '-475.6', '536.5', '910.0'
+        xpos, ypos, zpos = '-948.0', '252.4', '754.0'
     elif world_type == 'dem_world':
         xpos, ypos, zpos = '0.0', '200.0', '900.0'
     elif world_type == 'tugbot_depot':
         xpos, ypos, zpos = '0.0', '0.0', '0.1'
+    elif world_type == 'taif_test4':
+        xpos, ypos, zpos = '-97.800292', '-293.259292', '130.0'
     else:
         xpos, ypos, zpos = '0.0', '0.0', '1.0'
     w_name = world_type
@@ -36,36 +42,6 @@ def launch_setup(context, *args, **kwargs):
     m_name = 'x500_mono_cam_3d_lidar'
     model_name = {'gz_model_name': m_name}
     m_id=0
-    # for original dem use dem_world
-    # for Taif DEM use taif_world
-    # For empty world use default
-    w_name='taif_test4'
-    # w_name='taif_world2'
-    # w_name='tugbot_depot'
-    world_name = {'gz_world': w_name}
-    autostart_id = {'px4_autostart_id': '4022'}
-    instance_id = {'instance_id': f'{m_id}'}
-    # for taif DEM use
-    # xpos = {'xpos': '135.0'}
-    # ypos = {'ypos': '100.0'}
-    # zpos = {'zpos': '2000.0'}
-
-    # For original DEM use
-    # xpos = {'xpos': '0.0'}
-    # ypos = {'ypos': '200.0'}
-    # zpos = {'zpos': '900.0'}
-    
-    # xpos = {'xpos': '-50.0'}
-    # ypos = {'ypos': '100.0'}
-    # zpos = {'zpos': '2000.0'}
-
-    # xpos = '-97.800292'
-    # ypos = '-293.259292'
-    # zpos = '58.0'
-
-    xpos = '-97.800292'
-    ypos = '-293.259292'
-    zpos = '130.0'
 
     headless= {'headless' : '0'}
 
