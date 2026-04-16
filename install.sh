@@ -17,18 +17,6 @@ ROS2_SRC=$DEV_DIR/ros2_ws/src
 PX4_DIR=$DEV_DIR/PX4-Autopilot
 OSQP_SRC=$DEV_DIR
 
-# # Make sure that PX4 root directory is set
-# if [ -z "${PX4_ROOT}" ]; then
-#   echo "Error: PX4_ROOT environment variable is not set. Set it using export PX4_ROOT=<PX4-ROOT_deirectory_that_contains_PX4-Autopilot>"
-#   exit 1
-# fi
-
-# # Make sure that ROS2_WS directory is set
-# if [ -z "${ROS2_WS}" ]; then
-#   echo "Error: ROS2_WS environment variable is not set. Set it using export ROS2_WS=<ROS2_WS_deirectory_that_contains_ros2_ws>"
-#   exit 1
-# fi
-
 if [ ! -d "$ROS2_WS" ]; then
   echo "Creating $ROS2_SRC"
   mkdir -p $ROS2_SRC
@@ -147,6 +135,15 @@ cd $ROS2_WS && MAKEFLAGS='j1 -l1' colcon  build --packages-up-to mavros --execut
 cd $ROS2_WS && MAKEFLAGS='j1 -l1' colcon build --packages-up-to mavros_extras --executor sequential
 
 cd $ROS2_WS && colcon build
+
+BASHRC="$HOME/.bashrc"
+LINE='source /home/user/shared_volume/ros2_ws/src/gps_denied_navigation_sim/scripts/bash.sh'
+
+# Add only if it doesn't already exist
+grep -qxF "$LINE" "$BASHRC" || echo "$LINE" >> "$BASHRC"
+
+# Reload bashrc
+source "$BASHRC"
 
 echo "DONE. Pkgs are built. Models and airframe config files are copied to the respective folder in the ${PX4_DIR} directory"
 # echo "Source the ros2_ws and use <ros2 launch d2dtracker_sim interceptor.launch.py> to run the simulation"
