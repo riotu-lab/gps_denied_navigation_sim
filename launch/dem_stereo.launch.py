@@ -25,6 +25,8 @@ def launch_setup(context, *args, **kwargs):
         xpos, ypos, zpos = '0.0', '200.0', '900.0'
     elif world_type == 'tugbot_depot':
         xpos, ypos, zpos = '0.0', '0.0', '0.1'
+    elif world_type == 'taif_test4':
+        xpos, ypos, zpos = '-97.800292', '-293.259292', '130.0'
     else:
         xpos, ypos, zpos = '0.0', '0.0', '1.0'
     w_name = world_type
@@ -34,7 +36,7 @@ def launch_setup(context, *args, **kwargs):
     if localization_model == 'ov':
         rviz_file_name = 'gps_denied_localization.rviz'
     else:
-        rviz_file_name = 'gps_denied_localization.rviz'
+        rviz_file_name = 'rviz_tercom.rviz'
     rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
 
     # gz node

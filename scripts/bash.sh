@@ -23,17 +23,19 @@ alias cb_rtmap='source ~/shared_volume/rtabmap_ws/install/setup.bash && cd ~/sha
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 # export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 # export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-export ROS_DOMAIN_ID=0
+export ROS_DOMAIN_ID=18
 
 ################# Launch the simulation #######################
 #### Twin Stereo sim
 alias twin_tug='ros2 launch gps_denied_navigation_sim dem_twin_stereo.launch.py world_type:=tugbot_depot'
 alias twin_taif='ros2 launch gps_denied_navigation_sim dem_twin_stereo.launch.py world_type:=taif_world'
 alias twin_taif1='ros2 launch gps_denied_navigation_sim dem_twin_stereo.launch.py world_type:=taif1_world'
+alias twin_taif4='ros2 launch gps_denied_navigation_sim dem_twin_stereo.launch.py world_type:=taif_test4'
 #### Stereo sim
 alias stereo_tug='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=tugbot_depot'
 alias stereo_taif='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif_world'
 alias stereo_taif1='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif1_world'
+alias stereo_taif4='ros2 launch gps_denied_navigation_sim dem_stereo.launch.py world_type:=taif_test4'
 #### Mono sim
 alias mono_tug='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=tugbot_depot'
 alias mono_taif='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_world'
@@ -41,8 +43,7 @@ alias mono_taif1='ros2 launch gps_denied_navigation_sim dem.launch.py world_type
 alias mono_taif4='ros2 launch gps_denied_navigation_sim dem.launch.py world_type:=taif_test4'
 
 ################# TERCOM #################
-alias tercom='ros2 launch tercom_nav tercom_nav.launch.py \
-    params_file:=$(ros2 pkg prefix tercom_nav)/share/tercom_nav/config/taif_test4_params.yaml'
+alias tercom='ros2 launch tercom_nav tercom_nav.launch.py params_file:=$(ros2 pkg prefix tercom_nav)/share/tercom_nav/config/taif_test4_params.yaml mavros_ns:=target/mavros'
 
 ############################## MINS ##############################
 alias mins_mono='source ~/shared_volume/mins_ws/install/setup.bash && cd ~/shared_volume && ros2 run mins subscribe ros2_ws/src/gps_denied_navigation_sim/config/mins_mono/config.yaml'

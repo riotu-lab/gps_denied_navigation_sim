@@ -16,11 +16,17 @@ def launch_setup(context, *args, **kwargs):
 
     # Set world and position based on world_type
     if world_type == 'taif_world':
-        xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
+        # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
+        xpos, ypos, zpos = '-583.3', '352.6', '1828.0'
+    elif world_type == 'taif1_world':
+        # xpos, ypos, zpos = '-475.6', '536.5', '910.0'
+        xpos, ypos, zpos = '-948.0', '252.4', '754.0'
     elif world_type == 'dem_world':
         xpos, ypos, zpos = '0.0', '200.0', '900.0'
     elif world_type == 'tugbot_depot':
         xpos, ypos, zpos = '0.0', '0.0', '0.1'
+    elif world_type == 'taif_test4':
+        xpos, ypos, zpos = '-97.800292', '-293.259292', '130.0'
     else:
         xpos, ypos, zpos = '0.0', '0.0', '1.0'
     w_name = world_type
@@ -30,7 +36,7 @@ def launch_setup(context, *args, **kwargs):
     if localization_model == 'ov':
         rviz_file_name = 'gps_denied_localization.rviz'
     else:
-        rviz_file_name = 'gps_denied_localization.rviz'
+        rviz_file_name = 'rviz_tercom.rviz'
     rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
 
     # gz node
@@ -118,6 +124,9 @@ def launch_setup(context, *args, **kwargs):
         output='log',  # Redirect output to log file
     )
 
+    map_frame = 'map'
+    odom_frame= 'odom'
+    
     # Add static identity transform between map and global
     camerainit2map_tf_node = Node(
         package='tf2_ros',
@@ -144,8 +153,6 @@ def launch_setup(context, *args, **kwargs):
     )
 
     # Static TF map(or world) -> local_pose_ENU
-    map_frame = 'map'
-    odom_frame= 'odom'
     map2pose_tf_node = Node(
         package='tf2_ros',
         name='map2px4_'+ns+'_tf_node',
