@@ -29,7 +29,7 @@ def launch_setup(context, *args, **kwargs):
     if localization_model == 'ov':
         rviz_file_name = 'gps_denied_localization.rviz'
     else:
-        rviz_file_name = 'gps_denied_localization.rviz'
+        rviz_file_name = 'rviz_tercom.rviz'
     rviz_file_path = os.path.join(package_share_directory, 'rviz', rviz_file_name)
 
     # gz node
@@ -39,7 +39,7 @@ def launch_setup(context, *args, **kwargs):
     # for original dem use dem_world
     # for Taif DEM use taif_world
     # For empty world use default
-    w_name='taif_test'
+    w_name='taif_test4'
     # w_name='taif_world2'
     # w_name='tugbot_depot'
     world_name = {'gz_world': w_name}
@@ -58,9 +58,15 @@ def launch_setup(context, *args, **kwargs):
     # xpos = {'xpos': '-50.0'}
     # ypos = {'ypos': '100.0'}
     # zpos = {'zpos': '2000.0'}
-    xpos = {'xpos': '-97.800292'}
-    ypos = {'ypos': '-293.259292'}
-    zpos = {'zpos': '58.0'}
+
+    # xpos = '-97.800292'
+    # ypos = '-293.259292'
+    # zpos = '58.0'
+
+    xpos = '-97.800292'
+    ypos = '-293.259292'
+    zpos = '130.0'
+
     headless= {'headless' : '0'}
 
     # Namespace
@@ -310,7 +316,7 @@ def launch_setup(context, *args, **kwargs):
 def generate_launch_description():
     ld = LaunchDescription()
     world_type_arg = DeclareLaunchArgument(
-        'world_type', default_value='taif_world', description='World type: taif_world, dem_world, tugbot_depot', 'taif_test4')
+        'world_type', default_value='taif_world', description='World type: taif_world, dem_world, tugbot_depot, taif_test4')
     localization_model_arg = DeclareLaunchArgument(
         'localization_model', default_value='mins', description='Localization model: mins or ov')
 
