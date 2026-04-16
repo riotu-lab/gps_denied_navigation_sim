@@ -54,5 +54,16 @@
       <pose relative_to="base_link" degrees="true">-0.05 0.0 -0.17 0 45 180</pose>
     </joint>
 
+    <!-- 1D Lidar-->
+    <include merge='true'>
+      <uri>model://lidar</uri>
+      <pose degrees="true">0.16 0.0 0.12 0 90 0</pose>
+    </include>
+    <joint name="LidarJoint" type="fixed">
+      <parent>pitch_link</parent>
+      <child>lidar_link</child>
+      <pose relative_to="base_link" degrees="true">0.16 0.0 0.12 0 90 0</pose>
+    </joint>
+    
   </model>
 </sdf> 
