@@ -45,6 +45,21 @@
         <lidar>
           <scan>
             <horizontal>
+              <samples>1</samples> <!-- Change samples to 1 -->
+              <resolution>1</resolution>
+              <min_angle>0</min_angle> <!-- Set min and max angle to 0 -->
+              <max_angle>0</max_angle>
+              <resolution>1</resolution>
+            </horizontal>
+            <vertical>
+              <samples>1</samples> <!-- Change samples to 1 -->
+              <min_angle>0</min_angle> <!-- Set min and max angle to 0 -->
+              <max_angle>0</max_angle>
+              <resolution>1</resolution>
+            </vertical>
+          </scan>
+          <!-- <scan>
+            <horizontal>
               <samples>640</samples>
               <resolution>1</resolution>
               <min_angle>-1.396263</min_angle>
@@ -56,7 +71,7 @@
               <max_angle>0.261799</max_angle>
               <resolution>1</resolution>
             </vertical>
-          </scan>
+          </scan> -->
           <range>
             <min>0.080000000000000002</min>
             <max>1000</max>
