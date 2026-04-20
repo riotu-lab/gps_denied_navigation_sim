@@ -19,7 +19,7 @@ def generate_launch_description():
     # for original dem use dem_world
     # for Taif DEM use taif_world
     # For empty world use default
-    w_name='taif_test'
+    w_name='taif_test4'
     # w_name='taif_world2'
     # w_name='tugbot_depot'
     world_name = {'gz_world': w_name}
@@ -40,7 +40,7 @@ def generate_launch_description():
     # zpos = {'zpos': '2000.0'}
     xpos = {'xpos': '-97.800292'}
     ypos = {'ypos': '-293.259292'}
-    zpos = {'zpos': '58.0'}
+    zpos = {'zpos': '132.0'}
     headless= {'headless' : '0'}
 
     # Namespace
@@ -196,7 +196,7 @@ def generate_launch_description():
         output='screen',
          )
 
-    rviz_file_name = 'dem.rviz'
+    rviz_file_name = 'rviz_tercom.rviz'
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
     rviz_node = Node(
