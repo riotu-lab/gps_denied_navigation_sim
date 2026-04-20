@@ -42,7 +42,6 @@ def launch_setup(context, *args, **kwargs):
     m_name = 'x500_mono_cam_3d_lidar'
     model_name = {'gz_model_name': m_name}
     m_id=0
-
     headless= {'headless' : '0'}
 
     # Namespace
