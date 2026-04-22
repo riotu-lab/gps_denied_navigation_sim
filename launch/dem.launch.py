@@ -25,10 +25,24 @@ def launch_setup(context, *args, **kwargs):
     elif world_type == 'tugbot_depot':
         xpos, ypos, zpos = '0.0', '0.0', '0.1'
     elif world_type == 'taif_test4':
-        xpos, ypos, zpos = '-97.800292', '-293.259292', '130.0'
+        xpos, ypos, zpos = '71.26', '-70.86', '76.4'
     else:
         xpos, ypos, zpos = '0.0', '0.0', '1.0'
     w_name = world_type
+
+    # Vertical offset (metres) for the `map → target/odom` static TF.
+    #
+    # MAVROS local_position publishes target/odom → target/base_link with
+    # local_z = 0 at PX4 home (= spawn). The Gazebo GPS plugin, however,
+    # reports altitude using `spherical_coordinates.elevation` as its z=0
+    # reference (not the heightmap's DEM_min shift), so at spawn GPS alt =
+    # world_origin_alt + spawn_z_gazebo. When the ESKF converts to ENU via
+    # z = gps_alt - world_origin_alt, the world_origin_alt term cancels and
+    # ESKF.z ≡ gazebo_z. Therefore the `map` frame's Z convention is simply
+    # Gazebo Z, and we must lift target/odom by spawn_z so that
+    #   target/base_link.z_in_map = spawn_z + mavros_local_z = gazebo_z
+    # which matches the ESKF output and the Gazebo-referenced DEM pointcloud.
+    map_odom_z = float(zpos)
 
     # RViz config selection
     package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
@@ -99,18 +113,20 @@ def launch_setup(context, *args, **kwargs):
         package='tf2_ros',
         name='map2px4_'+ns+'_tf_node',
         executable='static_transform_publisher',
-        arguments=[xpos, ypos, '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
+        arguments=[xpos, ypos, str(map_odom_z), '0', '0', '0', map_frame, ns+'/'+odom_frame],
     )
 
-    # Static TF target/base_link to lidar link
-    # The valuse are taken from the model.sdf of x500_d435_3d_lidar
+    # Static TF target/base_link -> lidar_link
+    # Values taken from x500_mono_cam_3d_lidar/model.sdf LidarJoint:
+    #   <pose relative_to="base_link" degrees="true">0.16 0.0 0.12 0 90 0</pose>
+    # static_transform_publisher positional args are: x y z yaw pitch roll.
     base_frame = 'target/base_link'
     lidar_frame= 'lidar_link'
     base2lidar_tf_node = Node(
         package='tf2_ros',
         name='base2lidar_'+ns+'_tf_node',
         executable='static_transform_publisher',
-        arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
+        arguments=['0.16', '0.0', '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
     )
 
     # Transport rgb and depth images from GZ topics to ROS topics    
