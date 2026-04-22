@@ -1,0 +1,63 @@
+%YAML:1.0 # need to specify the file type at the top!
+
+cam:
+  enabled: true
+  max_n: 2             # Mono camera
+  use_stereo: true    # Disable stereo
+  stereo_pair: [0, 1]
+  do_calib_ext: true  # Disable all calibration
+  do_calib_int: true  # Disable all calibration
+  do_calib_dt: true   # Disable all calibration
+  n_pts: 40            # Increase feature count further
+  fast: 15             # Lower threshold for more features
+  grid_x: 4            # Small grid
+  grid_y: 3            # Small grid
+  min_px_dist: 30      # Reduce spacing to get more features
+  knn: 0.7             # Selective matching
+  downsample: false    # Keep full resolution
+  histogram_method: "CLAHE"  # Better for indoor lighting
+  max_slam: 5          # Increase SLAM features slightly
+  max_msckf: 12        # Increase MSCKF features slightly
+  feat_rep: "GLOBAL_3D"  # Switch back to simpler 3D representation
+  init_cov_dt: 1e+0    # Large but reasonable initial covariances
+  init_cov_ex_o: 1e+0  
+  init_cov_ex_p: 1e+0  
+  init_cov_in_k: 1e+1  # Large intrinsic covariances
+  init_cov_in_c: 1e+1  
+  init_cov_in_r: 1e+0  
+  sigma_px: 100.0       # Dramatically increase pixel noise to match observed residuals
+  chi2_mult: 100.0      # Very permissive outlier rejection
+
+  # feature related - more permissive for indoor
+  fi_min_dist: 0.2     # Lower minimum for closer features
+  fi_max_dist: 25      # Increase maximum for more features
+  fi_max_baseline: 10000 # More permissive baseline
+  fi_max_cond_number: 50000 # More permissive condition number
+
+  # ==================================================================
+  # ==================================================================
+
+cam0:
+  timeoffset: 0.000
+  T_imu_cam: #rotation from camera to IMU R_CtoI, position of camera in IMU p_CinI
+    - [0.000000000, -0.173648178, 0.984807753, 0.200000000]
+    - [-1.000000000, 0.000000000, 0.000000000, 0.090000000]
+    - [-0.000000000, -0.984807753, -0.173648178, -0.100000000]
+    - [0.000000000, 0.000000000, 0.000000000, 1.000000000]
+  distortion_coeffs: [-0.25, 0.12, -0.00028, 0.00005]
+  distortion_model: radtan
+  intrinsics: [317.21, 317.21, 376.0, 240.0]
+  resolution: [752, 480]
+  topic: "/target/front_stereo/left_cam/image_raw"
+cam1:
+  timeoffset:  0.00
+  T_imu_cam: #rotation from camera to IMU R_CtoI, position of camera in IMU p_CinI
+    - [0.000000000, -0.173648178, 0.984807753, 0.200000000]
+    - [-1.000000000, 0.000000000, 0.000000000, -0.090000000]
+    - [-0.000000000, -0.984807753, -0.173648178, -0.100000000]
+    - [0.000000000, 0.000000000, 0.000000000, 1.000000000]
+  distortion_coeffs: [-0.25, 0.12, -0.00028, 0.00005]
+  distortion_model: radtan
+  intrinsics: [317.21, 317.21, 376.0, 240.0]
+  resolution: [752, 480]
+  topic: "/target/front_stereo/right_cam/image_raw"

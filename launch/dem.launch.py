@@ -2,45 +2,60 @@
 
 import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, OpaqueFunction
 from launch_ros.actions import Node
 from ament_index_python import get_package_share_directory
 from launch_ros.substitutions import FindPackageShare
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 
-def generate_launch_description():
-    ld = LaunchDescription()
+def launch_setup(context, *args, **kwargs):
+    world_type = LaunchConfiguration('world_type').perform(context)
+    localization_model = LaunchConfiguration('localization_model').perform(context)
+
+    # Set world and position based on world_type
+    if world_type == 'taif_world':
+        # xpos, ypos, zpos = '-50.0', '100.0', '2000.0'
+        xpos, ypos, zpos = '-583.3', '352.6', '1828.0'
+    elif world_type == 'taif1_world':
+        # xpos, ypos, zpos = '-475.6', '536.5', '910.0'
+        xpos, ypos, zpos = '-948.0', '252.4', '754.0'
+    elif world_type == 'dem_world':
+        xpos, ypos, zpos = '0.0', '200.0', '900.0'
+    elif world_type == 'tugbot_depot':
+        xpos, ypos, zpos = '0.0', '0.0', '0.1'
+    elif world_type == 'taif_test4':
+        xpos, ypos, zpos = '71.26', '-70.86', '76.4'
+    else:
+        xpos, ypos, zpos = '0.0', '0.0', '1.0'
+    w_name = world_type
+
+    # Vertical offset (metres) for the `map → target/odom` static TF.
+    #
+    # MAVROS local_position publishes target/odom → target/base_link with
+    # local_z = 0 at PX4 home (= spawn). The Gazebo GPS plugin, however,
+    # reports altitude using `spherical_coordinates.elevation` as its z=0
+    # reference (not the heightmap's DEM_min shift), so at spawn GPS alt =
+    # world_origin_alt + spawn_z_gazebo. When the ESKF converts to ENU via
+    # z = gps_alt - world_origin_alt, the world_origin_alt term cancels and
+    # ESKF.z ≡ gazebo_z. Therefore the `map` frame's Z convention is simply
+    # Gazebo Z, and we must lift target/odom by spawn_z so that
+    #   target/base_link.z_in_map = spawn_z + mavros_local_z = gazebo_z
+    # which matches the ESKF output and the Gazebo-referenced DEM pointcloud.
+    map_odom_z = float(zpos)
+
+    # RViz config selection
+    package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
+    if localization_model == 'ov':
+        rviz_file_name = 'gps_denied_localization.rviz'
+    else:
+        rviz_file_name = 'rviz_tercom.rviz'
+    rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
 
     # gz node
     m_name = 'x500_mono_cam_3d_lidar'
     model_name = {'gz_model_name': m_name}
     m_id=0
-    # for original dem use dem_world
-    # for Taif DEM use taif_world
-    # For empty world use default
-    w_name='taif_test4'
-    # w_name='taif_world2'
-    # w_name='tugbot_depot'
-    world_name = {'gz_world': w_name}
-    autostart_id = {'px4_autostart_id': '4022'}
-    instance_id = {'instance_id': f'{m_id}'}
-    # for taif DEM use
-    # xpos = {'xpos': '135.0'}
-    # ypos = {'ypos': '100.0'}
-    # zpos = {'zpos': '2000.0'}
-
-    # For original DEM use
-    # xpos = {'xpos': '0.0'}
-    # ypos = {'ypos': '200.0'}
-    # zpos = {'zpos': '900.0'}
-    
-    # xpos = {'xpos': '-50.0'}
-    # ypos = {'ypos': '100.0'}
-    # zpos = {'zpos': '2000.0'}
-    xpos = {'xpos': '-97.800292'}
-    ypos = {'ypos': '-293.259292'}
-    zpos = {'zpos': '132.0'}
     headless= {'headless' : '0'}
 
     # Namespace
@@ -58,18 +73,17 @@ def generate_launch_description():
             'gz_ns': ns,
             'headless': headless['headless'],
             'gz_model_name': model_name['gz_model_name'],
-            'gz_world': world_name['gz_world'],
-            'px4_autostart_id': autostart_id['px4_autostart_id'],
-            'instance_id': instance_id['instance_id'],
-            'xpos': xpos['xpos'],
-            'ypos': ypos['ypos'],
-            'zpos': zpos['zpos']
+            'gz_world': w_name,
+            'px4_autostart_id': '4022',
+            'instance_id': f'{m_id}',
+            'xpos': xpos,
+            'ypos': ypos,
+            'zpos': zpos
         }.items()
     )
 
     # MAVROS
     file_name = 'target_px4_pluginlists.yaml'
-    package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
     plugins_file_path = os.path.join(package_share_directory, file_name)
     file_name = 'target_px4_config.yaml'
     config_file_path = os.path.join(package_share_directory, file_name)
@@ -99,18 +113,20 @@ def generate_launch_description():
         package='tf2_ros',
         name='map2px4_'+ns+'_tf_node',
         executable='static_transform_publisher',
-        arguments=[str(xpos['xpos']), str(ypos['ypos']), '0', '0', '0', '0', map_frame, ns+'/'+odom_frame],
+        arguments=[xpos, ypos, str(map_odom_z), '0', '0', '0', map_frame, ns+'/'+odom_frame],
     )
 
-    # Static TF target/base_link to lidar link
-    # The valuse are taken from the model.sdf of x500_d435_3d_lidar
+    # Static TF target/base_link -> lidar_link
+    # Values taken from x500_mono_cam_3d_lidar/model.sdf LidarJoint:
+    #   <pose relative_to="base_link" degrees="true">0.16 0.0 0.12 0 90 0</pose>
+    # static_transform_publisher positional args are: x y z yaw pitch roll.
     base_frame = 'target/base_link'
     lidar_frame= 'lidar_link'
     base2lidar_tf_node = Node(
         package='tf2_ros',
         name='base2lidar_'+ns+'_tf_node',
         executable='static_transform_publisher',
-        arguments=[str(0), str(0), '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
+        arguments=['0.16', '0.0', '0.12', '0', '1.5707963267948966', '0', base_frame, lidar_frame],
     )
 
     # Transport rgb and depth images from GZ topics to ROS topics    
@@ -196,9 +212,22 @@ def generate_launch_description():
         output='screen',
          )
 
-    rviz_file_name = 'rviz_tercom.rviz'
-    package_share_directory = get_package_share_directory('gps_denied_navigation_sim')
-    rviz_file_path = os.path.join(package_share_directory, rviz_file_name)
+    # Adaptive image stitcher for camera feeds (handles single camera automatically)
+    adaptive_image_stitcher_node = Node(
+        package='gps_denied_navigation_sim',
+        executable='adaptive_image_stitcher',
+        name='adaptive_image_stitcher',
+        parameters=[
+            {'use_sim_time': True},
+            {'namespace_filter': f'/{ns}/'},  # Auto-detect cameras in the target namespace
+            {'output_topic': f'/{ns}/camera/stitched_image'},
+            {'verbose': False},  # Disable debug messages
+            {'discovery_timeout': 10.0},  # Give more time for camera discovery
+            {'stitch_rate': 10.0}
+        ],
+        output='log',  # Redirect output to log file instead of terminal
+    )
+
     rviz_node = Node(
             package='rviz2',
             executable='rviz2',
@@ -206,14 +235,81 @@ def generate_launch_description():
             output='screen',
             arguments=['-d', rviz_file_path],
         )
+    
+    # Add MINS node
+    mins_node = Node(
+        package='mins',
+        executable='mins',
+        name='mins_node',
+        output='screen',
+        # Add any parameters if needed
+        parameters=[
+            {'config_path': 'ros2_ws/src/gps_denied_navigation_sim/config/mins/config.yaml'}
+        ]
+    )
 
+    # Add static identity transform between map and global
+    map2global_tf_node = Node(
+        package='tf2_ros',
+        name='map2global_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'global', 'map'],
+    )
 
-    ld.add_action(gz_launch)
-    ld.add_action(map2pose_tf_node)
-    ld.add_action(base2lidar_tf_node)
-    ld.add_action(mavros_launch)
-    # ld.add_action(random_trajectories_node)
-    ld.add_action(gimbal_node)
-    ld.add_action(ros_gz_bridge)
-    ld.add_action(rviz_node)
+    # Add static identity transform between map and global
+    camerainit2map_tf_node = Node(
+        package='tf2_ros',
+        name='camerainit2map_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '1.5708', '1.5708', '0', ns+'/'+odom_frame, 'camera_init'],
+        parameters=[
+                {"use_sim_time": True},
+        ],
+        output='log',  # Redirect output to log file
+    )
+
+    # Add static transform between lidar_link and lidar0
+    lidar_link2lidar0_tf_node = Node(
+        package='tf2_ros',
+        name='lidar_link2lidar0_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'lidar_link', 'lidar0'],
+    )
+
+    # Add static transform between imu and target/base_link
+    imu2base_link_tf_node = Node(
+        package='tf2_ros',
+        name='imu2base_link_tf_node',
+        executable='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'imu', 'target/base_link'],
+    )
+
+    # Add all your actions to a list and return
+    return [
+        gz_launch,
+        map2pose_tf_node,
+        base2lidar_tf_node,
+        mavros_launch,
+        # random_trajectories_node,  # Uncomment if you want this node
+        gimbal_node,
+        adaptive_image_stitcher_node,
+        ros_gz_bridge,
+        rviz_node,
+        # mins_node,
+        map2global_tf_node,
+        camerainit2map_tf_node,
+        # lidar_link2lidar0_tf_node,
+        # imu2base_link_tf_node,
+    ]
+
+def generate_launch_description():
+    ld = LaunchDescription()
+    world_type_arg = DeclareLaunchArgument(
+        'world_type', default_value='taif_world', description='World type: taif_world, dem_world, tugbot_depot, taif_test4')
+    localization_model_arg = DeclareLaunchArgument(
+        'localization_model', default_value='mins', description='Localization model: mins or ov')
+
+    ld.add_action(world_type_arg)
+    ld.add_action(localization_model_arg)
+    ld.add_action(OpaqueFunction(function=launch_setup))
     return ld

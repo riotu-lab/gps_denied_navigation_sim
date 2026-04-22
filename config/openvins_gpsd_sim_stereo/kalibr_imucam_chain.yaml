@@ -1,0 +1,40 @@
+%YAML:1.0
+
+cam0:
+# Extrinsics that match the TF static transforms in the launch file
+# In the launch file: [0.10, -0.05, 0.0, 1.57079632679, 0, 1.57079632679]
+# Converting to T_imu_cam (camera in IMU frame)
+  T_imu_cam:
+    - [  0.0000, -0.1736,  0.9848, 0.20 ]
+    - [ -1.0000,  0.0000,  0.0000, 0.15 ]
+    - [  0.0000, -0.9848, -0.1736, 0.10 ]
+    - [  0.0000,  0.0000,  0.0000, 1.00 ]
+
+  cam_overlaps: [1]
+  camera_model: pinhole
+  distortion_coeffs: [-0.25, 0.12, -0.00028, 0.00005]
+  distortion_model: radtan
+  intrinsics: [317.21, 317.21, 376.0, 240.0]
+  resolution: [752, 480]
+  rostopic: "/target/stereo/left/image_raw"
+  #timeshift_cam_imu: 0.0  # Timeshift between camera and IMU
+
+cam1:
+# Extrinsics that match the TF static transforms in the launch file
+# In the launch file: [0.10, 0.05, 0.0, 1.57079632679, 0, 1.57079632679]
+# Converting to T_imu_cam (camera in IMU frame)
+  T_imu_cam:
+    - [  0.0000, -0.1736,  0.9848, 0.20 ]
+    - [ -1.0000,  0.0000,  0.0000, -0.15 ]
+    - [  0.0000, -0.9848, -0.1736, 0.10 ]
+    - [  0.0000,  0.0000,  0.0000, 1.00 ]
+
+
+  cam_overlaps: [0]
+  camera_model: pinhole
+  distortion_coeffs: [-0.25, 0.12, -0.00028, 0.00005]
+  distortion_model: radtan
+  intrinsics: [317.21, 317.21, 376.0, 240.0]
+  resolution: [752, 480]
+  rostopic: "/target/stereo/right/image_raw"
+  #timeshift_cam_imu: 0.0  # Timeshift between camera and IMU

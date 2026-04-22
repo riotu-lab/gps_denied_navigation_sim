@@ -1,0 +1,38 @@
+%YAML:1.0 # need to specify the file type at the top!
+
+lidar:
+  enabled: false
+  max_n: 1
+  do_calib_dt: true
+  do_calib_ext: true
+  init_cov_dt: 1e-4
+  init_cov_ex_o: 1e-6
+  init_cov_ex_p: 1e-6
+  max_range: 300.0  # Reduced from 250.0 to ensure we capture more points
+  min_range: 1.0    # Reduced from 0.5 to capture closer points
+  chi2_mult: 1
+  raw_do_downsample: true
+  raw_downsample_size: 0.3  # Reduced from 2.0 to keep more points
+  raw_noise: 0.01  # Slightly increased from 0.007
+  raw_remove_motion_blur: false
+  raw_point_dt: 1e-6
+  map_do_downsample: true
+  map_downsample_size: 0.3  # Reduced from 0.5 to keep more detail
+  map_noise: 0.5  # Updated to match raw_noise
+  map_ngbr_num: 10  # Increased from 5
+  map_ngbr_max_d: 10.0  # Increased from 10.0
+  map_decay_time: 120 # Increased from 30 sec
+  map_decay_dist: 100 # Increased from 30 m
+  map_use_icp: true  # Changed from false
+  map_icp_dist: 50 # Increased from 30 m
+  plane_max_p2pd: 0.2  # Increased from 0.1
+  plane_max_condi: 300.0  # Increased from 200.0
+
+lidar0:
+  timeoffset: 0.0
+  T_imu_lidar:
+    - [0.0, 0.0, -1.0, 0.0]
+    - [0.0, 1.0, 0.0, 0.0]
+    - [1.0, 0.0, 0.0, 0.12]
+    - [0.0, 0.0, 0.0, 1.0]
+  topic: "/lidar/points"  # Confirm this is the correct topic name

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# This script sets up the D2DTracker simulation environment
+# This script sets up the gps_denied_navigation simulation environment
 
 if [ -z "${DEV_DIR}" ]; then
   echo "Error: DEV_DIR environment variable is not set. Set it using export DEV_DIR=<DEV_DIR_deirectory_that_should_contain_PX4-Autopilot_and_ros2_ws>"
@@ -17,18 +17,6 @@ ROS2_SRC=$DEV_DIR/ros2_ws/src
 PX4_DIR=$DEV_DIR/PX4-Autopilot
 OSQP_SRC=$DEV_DIR
 
-# # Make sure that PX4 root directory is set
-# if [ -z "${PX4_ROOT}" ]; then
-#   echo "Error: PX4_ROOT environment variable is not set. Set it using export PX4_ROOT=<PX4-ROOT_deirectory_that_contains_PX4-Autopilot>"
-#   exit 1
-# fi
-
-# # Make sure that ROS2_WS directory is set
-# if [ -z "${ROS2_WS}" ]; then
-#   echo "Error: ROS2_WS environment variable is not set. Set it using export ROS2_WS=<ROS2_WS_deirectory_that_contains_ros2_ws>"
-#   exit 1
-# fi
-
 if [ ! -d "$ROS2_WS" ]; then
   echo "Creating $ROS2_SRC"
   mkdir -p $ROS2_SRC
@@ -44,9 +32,17 @@ fi
 # Clone the d2dtracker_sim if it doesn't exist
 if [ ! -d "$ROS2_SRC/gps_denied_navigation_sim" ]; then
     cd $ROS2_SRC
-    git clone $SIM_PKG_URL
+    git clone $SIM_PKG_URL --branch mins_modification
+    cd gps_denied_navigation_sim
+    git lfs install
+    git lfs pull
 else
-    cd $ROS2_SRC/gps_denied_navigation_sim && git pull origin main
+    cd $ROS2_SRC/gps_denied_navigation_sim
+    git fetch origin
+    git checkout mins_modification
+    git pull origin mins_modification
+    git lfs install
+    git lfs pull
 fi
 
 # Clone and build PX4-Autopilot if it doesn't exist
@@ -121,6 +117,17 @@ if [ ! -d "$ROS2_SRC/mavros" ]; then
     cd $ROS2_SRC/mavros && git checkout ros2_humble
 fi
 
+# Clone TERCOM pkgs
+echo "Cloning TERCOM package ... " && sleep 1
+if [ ! -d "$ROS2_SRC/tercom_nav" ]; then
+    cd $ROS2_SRC
+    git clone https://github.com/mzahana/tercom_nav.git
+fi
+if [ ! -d "$ROS2_SRC/tercom_rviz_plugins" ]; then
+    cd $ROS2_SRC
+    git clone https://github.com/mzahana/tercom_rviz_plugins.git
+fi
+
 cd $ROS2_WS && rosdep init && rosdep update && rosdep install --from-paths src --ignore-src -r -y
 
 cd $ROS2_WS && MAKEFLAGS='j1 -l1' colcon  build --packages-up-to mavros --executor sequential
@@ -128,6 +135,15 @@ cd $ROS2_WS && MAKEFLAGS='j1 -l1' colcon  build --packages-up-to mavros --execut
 cd $ROS2_WS && MAKEFLAGS='j1 -l1' colcon build --packages-up-to mavros_extras --executor sequential
 
 cd $ROS2_WS && colcon build
+
+BASHRC="$HOME/.bashrc"
+LINE='source /home/user/shared_volume/ros2_ws/src/gps_denied_navigation_sim/scripts/bash.sh'
+
+# Add only if it doesn't already exist
+grep -qxF "$LINE" "$BASHRC" || echo "$LINE" >> "$BASHRC"
+
+# Reload bashrc
+source "$BASHRC"
 
 echo "DONE. Pkgs are built. Models and airframe config files are copied to the respective folder in the ${PX4_DIR} directory"
 # echo "Source the ros2_ws and use <ros2 launch d2dtracker_sim interceptor.launch.py> to run the simulation"

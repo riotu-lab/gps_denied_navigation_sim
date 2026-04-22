@@ -1,0 +1,72 @@
+================================================================================
+MINS PATH ERROR ANALYSIS REPORT
+================================================================================
+
+Analysis Date: 2025-06-09 11:52:34
+Data Source: /media/asmbatati/UbuntuBackup/Docker/docker_shared_volumes/gpsdnav_shared_volume/error_analysis/path_error_analysis.csv
+Total Data Points: 41
+
+TRAJECTORY SUMMARY
+----------------------------------------
+Total Duration: 0.00 seconds
+Ground Truth Distance: 0.000 meters
+Estimated Distance: 16.636 meters
+GT Average Speed: 0.000 m/s
+EST Average Speed: 693168619.030 m/s
+
+ERROR STATISTICS
+----------------------------------------
+
+Position Error (meters):
+  Mean ± Std:     5.922754 ± 0.514287
+  Median:         6.032565
+  Min/Max:        5.145717 / 7.306507
+  95th Percentile: 6.828946
+  99th Percentile: 7.175322
+  RMSE:           5.944498
+  Skewness:       0.427
+  Kurtosis:       -0.149
+
+Orientation Error (radians):
+  Mean ± Std:     0.179640 ± 0.014188
+  Median:         0.178409
+  Min/Max:        0.152995 / 0.209970
+  95th Percentile: 0.200890
+  99th Percentile: 0.209844
+  RMSE:           0.180186
+  Skewness:       0.249
+  Kurtosis:       -0.543
+
+Velocity Error (m/s):
+  Mean ± Std:     0.000000 ± 0.000000
+  Median:         0.000000
+  Min/Max:        0.000000 / 0.000000
+  95th Percentile: 0.000000
+  99th Percentile: 0.000000
+  RMSE:           0.000000
+  Skewness:       nan
+  Kurtosis:       nan
+
+Time Synchronization (seconds):
+  Mean ± Std:     0.000000 ± 0.000000
+  Median:         0.000000
+  Min/Max:        0.000000 / 0.000000
+  95th Percentile: 0.000000
+  99th Percentile: 0.000000
+  RMSE:           0.000000
+  Skewness:       0.026
+  Kurtosis:       -1.229
+
+
+PERFORMANCE ASSESSMENT
+----------------------------------------
+Average Position Accuracy: 5.923 ± 0.514 meters
+Average Orientation Accuracy: 10.29 degrees
+Accuracy Classification: Low Precision
+
+
+RECOMMENDations FOR IMPROVEMENT
+----------------------------------------
+• Orientation errors are significant - check IMU calibration
+
+================================================================================

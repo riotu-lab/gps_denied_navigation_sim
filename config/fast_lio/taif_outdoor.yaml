@@ -1,0 +1,60 @@
+/**:
+    ros__parameters:
+        # === TAIF MOUNTAINOUS TERRAIN CONFIGURATION ===
+        # Optimized for GPS-denied navigation in Saudi Arabian mountainous terrain
+        # Terrain characteristics: 12.8km x 4.8km area, elevation 1874.6m, natural DEM terrain
+        # Location: 21.27081°N, 40.34730°E
+        
+        feature_extract_enable: false
+        point_filter_num: 2              # Reduced for better point density in outdoor sparse environment
+        max_iteration: 5                 # Increased for robust convergence in complex mountainous terrain
+        filter_size_surf: 0.25           # Fine surface resolution for detailed terrain mapping
+        filter_size_map: 0.35            # Balanced map resolution for outdoor environment
+        cube_side_length: 3000.0         # Large cube (3km) for extensive outdoor terrain coverage
+        runtime_pos_log_enable: true     # Enable position logging for outdoor navigation analysis
+        map_file_path: "./taif_mountainous_terrain.pcd"  # Descriptive map filename
+
+        common:
+            lid_topic:  "/target/front_lidar/points"
+            imu_topic:  "/target/mavros/imu/data_raw"
+            time_sync_en: false          # External sync disabled for simulation environment
+            time_offset_lidar_to_imu: 0.0 # No offset calibration needed for simulation
+
+        preprocess:
+            lidar_type: 2                # Velodyne LiDAR type for outdoor terrain scanning
+            scan_line: 32                # 32-line LiDAR for good vertical resolution
+            scan_rate: 10                # 10 Hz scan rate for outdoor navigation
+            timestamp_unit: 2            # Microsecond timestamp precision
+            blind: 1.0                   # 1m minimum range for mountainous terrain obstacles
+
+        mapping:
+            # IMU noise parameters optimized for outdoor aerial navigation
+            acc_cov: 0.03               # Low noise for stable outdoor flight conditions
+            gyr_cov: 0.03               # Low gyro noise for smooth outdoor maneuvers
+            b_acc_cov: 0.00003          # Very low bias for outdoor environment stability
+            b_gyr_cov: 0.00003          # Very low gyro bias for long outdoor missions
+            
+            # Sensor range and field of view for mountainous terrain
+            fov_degree: 360.0            # Full 360° coverage for terrain awareness
+            det_range: 500.0             # Extended 500m range for large-scale terrain mapping
+            
+            # Extrinsic calibration (keep estimation disabled for known setup)
+            extrinsic_est_en: false
+            
+            # Optimized extrinsic parameters for aerial vehicle over mountainous terrain
+            extrinsic_T: [0.0, 0.0, -0.15]  # Slightly increased Z offset for terrain clearance
+            extrinsic_R: [ 1.0000,  0.0000,  0.0000,
+                        0.0000,  0.0000, -1.0000,
+                        0.0000,  1.0000,  0.0000]
+
+        publish:
+            path_en: true                # Enable trajectory visualization for outdoor navigation
+            scan_publish_en: true        # Enable scan publishing for terrain visualization
+            dense_publish_en: true       # Enable dense point clouds for detailed terrain mapping
+            scan_bodyframe_pub_en: false # Disabled for computational efficiency in large terrain
+
+        pcd_save:
+            pcd_save_en: true
+            interval: 300                # Save every 300 frames for manageable file sizes
+                                        # Optimized for large outdoor environments to prevent memory overflow
+                                        # while maintaining comprehensive terrain coverage 
