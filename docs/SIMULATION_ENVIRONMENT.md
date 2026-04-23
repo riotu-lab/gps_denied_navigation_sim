@@ -17,11 +17,11 @@ The simulator ships with **six Gazebo worlds** — one indoor warehouse and five
 
 | `taif_test4` (default) | `taif_world` | `taif1_world` |
 |:-:|:-:|:-:|
-| ![](../media/world_models/taif_test4.png) | ![](../media/world_models/taif_world.png) | ![](../media/world_models/taif1_world.png) |
+| ![](./media/world_models/taif_test4.png) | ![](./media/world_models/taif_world.png) | ![](./media/world_models/taif1_world.png) |
 
 | `taif_test` | `dem_world` | `tugbot_depot` |
 |:-:|:-:|:-:|
-| ![](../media/world_models/taif_test.png) | ![](../media/world_models/dem_world.png) | ![](../media/world_models/tugbot_depot.png) |
+| ![](./media/world_models/taif_test.png) | ![](./media/world_models/dem_world.png) | ![](./media/world_models/tugbot_depot.png) |
 
 ---
 

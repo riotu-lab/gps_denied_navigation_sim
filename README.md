@@ -101,7 +101,7 @@ twin_tug   twin_taif   twin_taif1   twin_taif4
 | TERCOM (Terrain Contour Matching) localisation | [`docs/TERCOM.md`](docs/TERCOM.md) |
 | System architecture — ROS graph, data flow, launch graph | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
 | Recording bag/CSV data and comparing algorithm accuracy | [`docs/ALGORITHM_ANALYSIS.md`](docs/ALGORITHM_ANALYSIS.md) |
-| Build a Gazebo heightmap from real terrain (SRTM/Mapbox) | [`generate_dem.md`](generate_dem.md) |
+| Build a Gazebo heightmap from real terrain (SRTM/Mapbox) | [`docs/generate_dem.md`](docs/generate_dem.md) |
 | Per-world parameters (size, origin, physics) | [`worlds/WORLD_PARAMETERS.md`](worlds/WORLD_PARAMETERS.md) |
 | Per-algorithm setup guides | [`docs/fast_lio/`](docs/fast_lio), [`docs/fast_livo2/`](docs/fast_livo2), [`docs/mins/`](docs/mins), [`docs/openvins/`](docs/openvins), [`docs/orb_slam/`](docs/orb_slam), [`docs/rtabmap/`](docs/rtabmap), [`docs/spark/`](docs/spark), [`docs/kiss_matcher/`](docs/kiss_matcher), [`docs/resple/`](docs/resple), [`docs/super/`](docs/super) |
 | Utilities (`gps_to_enu`, `pose2openvins_matrix`, IMU noise conversion) | [`docs/utilities.md`](docs/utilities.md), [`docs/SIMULATION_ENVIRONMENT.md#gps-to-enu-coordinate-conversion`](docs/SIMULATION_ENVIRONMENT.md#gps-to-enu-coordinate-conversion) |

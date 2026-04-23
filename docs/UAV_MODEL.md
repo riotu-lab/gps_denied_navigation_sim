@@ -16,7 +16,7 @@ All models are installed into `PX4-Autopilot/Tools/simulation/gz/models/` by `in
 
 | x500_mono_cam_3d_lidar | x500_stereo_cam_3d_lidar | x500_twin_stereo_twin_velodyne |
 |:-:|:-:|:-:|
-| ![](../media/uav_models/gz_x500_mono_cam_3d_lidar.png) | ![](../media/uav_models/gz_x500_stereo_cam_3d_lidar.png) | ![](../media/uav_models/gz_x500_twin_stereo_twin_velodyne.png) |
+| ![](./media/uav_models/gz_x500_mono_cam_3d_lidar.png) | ![](./media/uav_models/gz_x500_stereo_cam_3d_lidar.png) | ![](./media/uav_models/gz_x500_twin_stereo_twin_velodyne.png) |
 | TERCOM · MINS-mono · OpenVINS-mono · FAST-LIO · FAST-LIVO2 · SPARK | MINS-stereo · OpenVINS-stereo · ORB-SLAM3 · RTAB-Map · FAST-LIO · FAST-LIVO2 | MINS twin-stereo · FAST-LIO (on either Velodyne) |
 
 ---
