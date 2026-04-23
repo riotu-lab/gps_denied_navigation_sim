@@ -8,9 +8,6 @@ if [ -z "${DEV_DIR}" ]; then
 fi
 echo "DEV_DIR=$DEV_DIR"
 sleep 1
-echo "GIT_USER=$GIT_USER"
-echo "GIT_TOKEN=$GIT_TOKEN"
-sleep 1
 
 ROS2_WS=$DEV_DIR/ros2_ws
 ROS2_SRC=$DEV_DIR/ros2_ws/src
@@ -24,7 +21,7 @@ fi
 
 SIM_PKG_URL=''
 if [[ -n "$GIT_USER" ]] && [[ -n "$GIT_TOKEN" ]]; then
-    SIM_PKG_URL=https://$GIT_USER:$GIT_TOKEN@riotu-lab/gps_denied_navigation_sim.git
+    SIM_PKG_URL=git@github.com:riotu-lab/gps_denied_navigation_sim.git
 else
     SIM_PKG_URL=https://github.com/riotu-lab/gps_denied_navigation_sim.git
 fi
@@ -32,15 +29,14 @@ fi
 # Clone the d2dtracker_sim if it doesn't exist
 if [ ! -d "$ROS2_SRC/gps_denied_navigation_sim" ]; then
     cd $ROS2_SRC
-    git clone $SIM_PKG_URL --branch mins_modification
+    git clone $SIM_PKG_URL
     cd gps_denied_navigation_sim
     git lfs install
     git lfs pull
 else
     cd $ROS2_SRC/gps_denied_navigation_sim
     git fetch origin
-    git checkout mins_modification
-    git pull origin mins_modification
+    git pull origin main
     git lfs install
     git lfs pull
 fi
