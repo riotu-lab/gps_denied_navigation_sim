@@ -26,7 +26,7 @@ else
     SIM_PKG_URL=https://github.com/riotu-lab/gps_denied_navigation_sim.git
 fi
 
-# Clone the d2dtracker_sim if it doesn't exist
+# Clone the repo if it doesn't exist
 if [ ! -d "$ROS2_SRC/gps_denied_navigation_sim" ]; then
     cd $ROS2_SRC
     git clone $SIM_PKG_URL
@@ -142,5 +142,5 @@ grep -qxF "$LINE" "$BASHRC" || echo "$LINE" >> "$BASHRC"
 source "$BASHRC"
 
 echo "DONE. Pkgs are built. Models and airframe config files are copied to the respective folder in the ${PX4_DIR} directory"
-# echo "Source the ros2_ws and use <ros2 launch d2dtracker_sim interceptor.launch.py> to run the simulation"
+echo "Use <zenoh> in terminal #1 then <mono_taif4> in terminal #2 to run the simulation and <tercom> in terminal #3 to run the tercom localization algorithm"
 cd $HOME

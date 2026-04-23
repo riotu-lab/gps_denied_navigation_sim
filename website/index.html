@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+    content="gps_denied_navigation_sim — a PX4 + Gazebo simulation package for developing and benchmarking GPS-denied navigation frameworks on multirotor UAVs. Built around TERCOM, MINS, OpenVINS, FAST-LIO, FAST-LIVO2, RTAB-Map and more.">
+  <meta name="keywords"
+    content="GPS-denied, TERCOM, ESKF, PX4, Gazebo, ROS 2, MAVROS, MINS, OpenVINS, FAST-LIO, SLAM, UAV, DEM">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>gps_denied_navigation_sim — PX4 + Gazebo benchmark for GPS-denied UAV navigation</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="gps_denied_navigation_sim">
+  <meta property="og:description"
+    content="A PX4 SITL + Gazebo benchmark for GPS-denied UAV navigation. Bundles TERCOM+ESKF, MINS, OpenVINS, FAST-LIO, and more.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="./static/images/favicon.svg">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs"></script>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose" });
+  </script>
+
+  <style>
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: white;
+      text-align: center;
+      margin: 0.5rem;
+    }
+
+    .stat-card .stat-number { font-size: 2.5rem; font-weight: 700; }
+    .stat-card .stat-label  { font-size: 0.95rem; opacity: 0.9; }
+    .stat-card.blue   { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); }
+    .stat-card.green  { background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); }
+    .stat-card.orange { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+    .stat-card.teal   { background: linear-gradient(135deg, #009688 0%, #00796B 100%); }
+
+    .figure-container { margin: 1.5rem 0; text-align: center; }
+    .figure-container img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+    .figure-caption { font-size: 0.9rem; color: #666; margin-top: 0.5rem; font-style: italic; }
+
+    .rq-box {
+      background: #f5f7ff;
+      border-left: 4px solid #2196F3;
+      padding: 1rem 1.5rem;
+      margin: 0.75rem 0;
+      border-radius: 0 8px 8px 0;
+    }
+    .rq-box strong { color: #1976D2; }
+
+    .pillar-tag {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0.25rem;
+      color: white;
+    }
+
+    .model-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+      height: 100%;
+    }
+    .model-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .model-card h4 { font-weight: 700; margin-bottom: 0.25rem; color: #1976D2; }
+    .model-card p  { font-size: 0.88rem; color: #555; }
+
+    .mermaid { background: white; border-radius: 8px; padding: 1rem; margin: 1rem 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+    pre { background: #2d2d2d; color: #f8f8f2; border-radius: 8px; padding: 1rem; overflow-x: auto; }
+    code { font-size: 0.92em; }
+
+    table.feature-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    .feature-table th {
+      background: #2196F3; color: white; padding: 0.5rem 0.75rem; text-align: left;
+    }
+    .feature-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #eee; }
+    .feature-table tr:nth-child(even) { background: #fafbfc; }
+  </style>
+</head>
+
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow:1; justify-content:center;">
+      <a class="navbar-item" href="#overview">Overview</a>
+      <a class="navbar-item" href="#architecture">Architecture</a>
+      <a class="navbar-item" href="#uavs">UAV Models</a>
+      <a class="navbar-item" href="#worlds">Worlds</a>
+      <a class="navbar-item" href="#tercom">TERCOM</a>
+      <a class="navbar-item" href="#algorithms">Algorithms</a>
+      <a class="navbar-item" href="#benchmark">Benchmark</a>
+      <a class="navbar-item" href="#get-started">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">gps_denied_navigation_sim</h1>
+          <p class="subtitle is-4" style="margin-top:.5rem; color:#555;">
+            A PX4 SITL + Gazebo benchmark for <strong>GPS-denied UAV navigation</strong>
+          </p>
+
+          <div class="is-size-6 publication-authors" style="margin-top:0.5rem;">
+            <span class="author-block">Mohamed Abdelkader &middot; Khaled Gabr &middot; Abdulrahman Al-Batati &middot; Imen Jarraya &middot; Muhammad Bilal Kadri &middot;  Wadii Boulila &middot; Anis Koubaa</span>
+          </div>
+
+          <div class="is-size-6 publication-authors" style="margin-top:0.35rem;">
+            <span class="author-block">Robotics and Internet-of-Things Laboratory &mdash; Prince Sultan University</span>
+          </div>
+
+          <div class="column has-text-centered" style="margin-top:1rem;">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://github.com/riotu-lab/gps_denied_navigation_sim"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Simulator</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/mzahana/tercom_nav"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>tercom_nav</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/mzahana/tercom_rviz_plugins"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>tercom_rviz_plugins</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/riotu-lab/gps_denied_navigation_docker"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-docker"></i></span>
+                  <span>Docker</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered is-multiline">
+        <div class="column is-3"><div class="stat-card blue">
+          <div class="stat-number">3</div><div class="stat-label">UAV Configurations</div>
+        </div></div>
+        <div class="column is-3"><div class="stat-card green">
+          <div class="stat-number">6</div><div class="stat-label">Gazebo Worlds</div>
+        </div></div>
+        <div class="column is-3"><div class="stat-card orange">
+          <div class="stat-number">10+</div><div class="stat-label">Integrated Algorithms</div>
+        </div></div>
+        <div class="column is-3"><div class="stat-card teal">
+          <div class="stat-number">ROS&nbsp;2</div><div class="stat-label">Humble + Gz Garden</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Overview -->
+<section class="section" id="overview">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Overview</h2>
+        <div class="content has-text-justified">
+          <p>
+            <strong>gps_denied_navigation_sim</strong> is an open-source simulation package that bundles everything
+            needed to develop, tune, and benchmark GPS-denied navigation on multirotor UAVs:
+            a PX4 SITL flight stack, Gazebo Garden worlds with real-terrain DEMs, X500 airframes with different sensor
+            payloads (mono / stereo / twin-stereo, 3D LiDAR, Velodyne), MAVROS plumbing, pre-baked RViz layouts, and
+            turnkey integrations with a dozen estimators.
+          </p>
+          <p>
+            The package is designed so that a single flight can be compared head-to-head across algorithms:
+            ground truth is always published on <code>/target/gt_path</code>, every launch file spawns the same
+            MAVROS namespace, and three analysis tools &mdash;
+            <em>path_error_calculator</em>, <em>data_sync_recorder</em>, and
+            <em>analyze_tercom_log.py</em> &mdash; turn live runs into CSVs and publication-quality figures.
+          </p>
+          <div class="rq-box">
+            <strong>Default stack:</strong> TERCOM + ESKF terrain-aided navigation on the <em>taif_test4</em>
+            heightmap world, with MAVROS ground truth, live RViz diagnostics, and CSV logging.
+          </div>
+          <div class="rq-box">
+            <strong>Drop-in estimators:</strong> TERCOM, MINS (mono / stereo / twin-stereo+LiDAR), OpenVINS,
+            FAST-LIO, FAST-LIVO2, ORB-SLAM3, RTAB-Map, SPARK-FAST-LIO, KISS-Matcher, RESPLE, SUPER.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section class="section" style="background:#f9fafb;" id="architecture">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">System Architecture</h2>
+    <p class="has-text-centered" style="margin-bottom:1rem;">
+      From Gazebo physics down to RViz diagnostics, with user-space algorithms sitting as drop-in consumers.
+    </p>
+
+    <div class="mermaid">
+graph TB
+    subgraph SIM [Gazebo + PX4 SITL]
+        GZ[Gazebo Garden<br/>world + heightmap]
+        PX4[PX4 SITL]
+        GZ --IMU/GPS/Cam/LiDAR--> PX4
+        PX4 --actuators--> GZ
+    end
+    subgraph BRIDGE [Transport]
+        MAV[MAVROS target/]
+        GZR[ros_gz_bridge]
+    end
+    PX4 --mavlink--> MAV
+    GZ --ign.msgs--> GZR
+    subgraph ROS [ROS 2 graph]
+        ALG[Localisation algorithm<br/>TERCOM / MINS / OpenVINS / FAST-LIO]
+        MAV --> ALG
+        GZR --> ALG
+    end
+    subgraph VIZ [Diagnostics]
+        RV[RViz2 + tercom_rviz_plugins]
+        CSV[CSV + figure analyser]
+    end
+    ALG --> RV
+    ALG --> CSV
+    MAV --> CSV
+    </div>
+  </div>
+</section>
+
+<!-- UAVs -->
+<section class="section" id="uavs">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">UAV Models</h2>
+    <p class="has-text-centered" style="margin-bottom:1.5rem;">
+      Three X500-derived platforms share the same flight controller and MAVROS namespace, differing only in payload.
+    </p>
+
+    <div class="columns is-multiline">
+      <div class="column is-4">
+        <div class="model-card">
+          <img src="./static/images/uav/gz_x500_mono_cam_3d_lidar.png" alt="x500_mono_cam_3d_lidar">
+          <h4>x500_mono_cam_3d_lidar</h4>
+          <p>Mono camera + 3D LiDAR + gimbal + rangefinder. Default for TERCOM and monocular VIO.</p>
+        </div>
+      </div>
+      <div class="column is-4">
+        <div class="model-card">
+          <img src="./static/images/uav/gz_x500_stereo_cam_3d_lidar.png" alt="x500_stereo_cam_3d_lidar">
+          <h4>x500_stereo_cam_3d_lidar</h4>
+          <p>Stereo pair + 3D LiDAR. Recommended for MINS-stereo, OpenVINS-stereo, ORB-SLAM3, RTAB-Map.</p>
+        </div>
+      </div>
+      <div class="column is-4">
+        <div class="model-card">
+          <img src="./static/images/uav/gz_x500_twin_stereo_twin_velodyne.png" alt="x500_twin_stereo_twin_velodyne">
+          <h4>x500_twin_stereo_twin_velodyne</h4>
+          <p>Four cameras (front + rear stereo) and two Velodyne VLP-16 LiDARs for full 360&deg; perception.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Worlds -->
+<section class="section" style="background:#f9fafb;" id="worlds">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Simulation Worlds</h2>
+    <p class="has-text-centered" style="margin-bottom:1.5rem;">
+      Six Gazebo worlds &mdash; one indoor warehouse and five outdoor DEMs derived from SRTM and Mapbox Terrain.
+    </p>
+
+    <div class="columns is-multiline">
+      <div class="column is-4"><div class="model-card">
+        <img src="./static/images/worlds/taif_test4.png" alt="taif_test4"><h4>taif_test4 (default)</h4>
+        <p>Heightmap DEM of Taif, Saudi Arabia. Default world for TERCOM.</p></div></div>
+      <div class="column is-4"><div class="model-card">
+        <img src="./static/images/worlds/taif_world.png" alt="taif_world"><h4>taif_world</h4>
+        <p>Collada-mesh DEM of the Taif region &mdash; larger extent, lower resolution.</p></div></div>
+      <div class="column is-4"><div class="model-card">
+        <img src="./static/images/worlds/taif1_world.png" alt="taif1_world"><h4>taif1_world</h4>
+        <p>Alternative Taif DEM tile (<code>taif1_dem</code>).</p></div></div>
+      <div class="column is-4"><div class="model-card">
+        <img src="./static/images/worlds/taif_test.png" alt="taif_test"><h4>taif_test</h4>
+        <p>Single-tile sandbox for heightmap placement debugging.</p></div></div>
+      <div class="column is-4"><div class="model-card">
+        <img src="./static/images/worlds/dem_world.png" alt="dem_world"><h4>dem_world</h4>
+        <p>Generic SRTM DEM over the Pacific Northwest for cross-geography tests.</p></div></div>
+      <div class="column is-4"><div class="model-card">
+        <img src="./static/images/worlds/tugbot_depot.png" alt="tugbot_depot"><h4>tugbot_depot</h4>
+        <p>Indoor warehouse (30&nbsp;&times;&nbsp;15&nbsp;&times;&nbsp;9&nbsp;m) with structured obstacles.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TERCOM -->
+<section class="section" id="tercom">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">TERCOM &mdash; default GPS-denied stack</h2>
+    <div class="content has-text-justified">
+      <p>
+        <strong>Terrain Contour Matching (TERCOM)</strong> estimates the UAV position by correlating a live
+        elevation profile (baro + rangefinder, corrected for attitude) against a pre-loaded GeoTIFF DEM.
+        A 15-state Error-State Kalman Filter fuses the TERCOM fixes with IMU prediction and optional
+        velocity and barometric updates. GPS is used <em>only once at startup</em> to initialise the filter.
+      </p>
+    </div>
+
+    <h3 class="title is-5">TERCOM match lifecycle</h3>
+    <div class="mermaid">
+sequenceDiagram
+    participant S as Sensors
+    participant C as ProfileCollector
+    participant M as Vectorised Matcher
+    participant E as eskf_node
+    S->>C: h_baro, h_agl, pos_enu, t
+    Note over C: wait until motion creates spacing &gt; min_spacing
+    C-->>C: h_terrain = h_baro - h_agl cos(roll) cos(pitch)
+    alt profile full (N samples)
+        C->>M: sample array + predicted UTM
+        M-->>M: M&times;N search grid, mask NoData, MAD scores
+        M->>E: position_fix (if accepted)
+        M->>E: match_quality
+    else rejected
+        M-->>E: rejection_reason
+    end
+    </div>
+
+    <h3 class="title is-5">ESKF state machine</h3>
+    <div class="mermaid">
+stateDiagram-v2
+    [*] --&gt; WAITING_GPS
+    WAITING_GPS --&gt; INITIALIZING : GPS fix
+    INITIALIZING --&gt; RUNNING : N samples averaged
+    INITIALIZING --&gt; WAITING_GPS : timeout
+    RUNNING --&gt; DIVERGED : NIS / covariance blow-up
+    DIVERGED --&gt; RESETTING : divergence_action
+    RESETTING --&gt; RUNNING : soft reset
+    RESETTING --&gt; WAITING_GPS : hard reset
+    </div>
+
+    <div class="content">
+      <p>Four dockable RViz panels (from <code>tercom_rviz_plugins</code>) provide live diagnostics:</p>
+      <ul>
+        <li><strong>Filter Status</strong> &mdash; ESKF state machine, NIS sparkline, &sigma; / innovation gauges, IMU biases</li>
+        <li><strong>TERCOM Quality</strong> &mdash; pipeline state, MAD / discrimination / roughness / noise bars</li>
+        <li><strong>Error History</strong> &mdash; live horizontal + vertical error vs. ground truth with RMS / max overlays</li>
+        <li><strong>Profiling</strong> &mdash; per-callback exec time and call frequency for every <code>tercom_nav</code> node</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Algorithms table -->
+<section class="section" style="background:#f9fafb;" id="algorithms">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Integrated Localisation Algorithms</h2>
+    <p class="has-text-centered" style="margin-bottom:1rem;">
+      Each algorithm ships with a setup document under <code>docs/</code> and an alias in <code>scripts/bash.sh</code>.
+    </p>
+    <table class="feature-table">
+      <thead>
+        <tr><th>Algorithm</th><th>Type</th><th>UAV</th><th>Alias</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>TERCOM + ESKF</strong></td><td>Terrain-aided INS</td><td>x500_mono_cam_3d_lidar</td><td><code>tercom</code></td></tr>
+        <tr><td>MINS (mono)</td><td>Filter-based VIO</td><td>x500_mono_cam_3d_lidar</td><td><code>mins_mono</code></td></tr>
+        <tr><td>MINS (stereo)</td><td>Filter-based VIO</td><td>x500_stereo_cam_3d_lidar</td><td><code>mins_stereo</code></td></tr>
+        <tr><td>MINS (twin stereo + LiDAR)</td><td>VI-LiDAR</td><td>x500_twin_stereo_twin_velodyne</td><td><code>mins_twin_stereo</code></td></tr>
+        <tr><td>OpenVINS (mono / stereo)</td><td>Filter-based VIO</td><td>mono / stereo</td><td><code>mono_ov</code>, <code>stereo_ov</code></td></tr>
+        <tr><td>FAST-LIO</td><td>LiDAR-Inertial Odom.</td><td>any LiDAR variant</td><td><code>fast_lio</code></td></tr>
+        <tr><td>FAST-LIVO2</td><td>LiDAR-Visual-Inertial</td><td>any with camera + LiDAR</td><td><code>livo</code></td></tr>
+        <tr><td>SPARK-FAST-LIO</td><td>LiDAR-Inertial (MIT)</td><td>any LiDAR variant</td><td><code>spark</code></td></tr>
+        <tr><td>RTAB-Map</td><td>Graph SLAM</td><td>stereo / LiDAR</td><td><code>rtmap</code></td></tr>
+        <tr><td>ORB-SLAM3</td><td>Feature VI-SLAM</td><td>stereo</td><td><code>orb_slam</code></td></tr>
+        <tr><td>KISS-Matcher / RESPLE / SUPER</td><td>LiDAR registration / SLAM</td><td>LiDAR variants</td><td>&mdash;</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Benchmark -->
+<section class="section" id="benchmark">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Benchmark Workflow</h2>
+    <p class="has-text-centered" style="margin-bottom:1rem;">
+      Record once, compare many &mdash; the simulator is designed around the following loop.
+    </p>
+
+    <div class="mermaid">
+graph LR
+    A[Start sim] --> B[Record bag<br/>GT + raw sensors]
+    B --> C[Replay bag --clock]
+    C --> D[Algorithm 1<br/>&rarr; CSV]
+    C --> E[Algorithm 2<br/>&rarr; CSV]
+    C --> F[Algorithm 3<br/>&rarr; CSV]
+    D --> G[analyze_path_errors.py]
+    E --> G
+    F --> G
+    G --> H[Merged figures<br/>RMSE, max, 3&sigma; consistency]
+    </div>
+
+    <div class="content">
+      <p>Three complementary tools:</p>
+      <ul>
+        <li><code>path_error_calculator</code> + <code>run_path_error_analysis.py</code> &mdash; online Euclidean / angular / velocity error between any pair of <code>nav_msgs/Path</code> topics with CSV export.</li>
+        <li><code>data_sync_recorder</code> &mdash; builds a replayable dataset with time-synchronised images + IMU + GPS + LiDAR + baro.</li>
+        <li><code>analyze_tercom_log.py</code> (from <code>tercom_nav</code>) &mdash; regenerates 15 publication-quality figures from a single TERCOM CSV (trajectory, RMSE, covariance consistency, NIS, filter health...).</li>
+      </ul>
+      <p>Full walk-through in <a href="https://github.com/riotu-lab/gps_denied_navigation_sim/blob/main/docs/ALGORITHM_ANALYSIS.md">docs/ALGORITHM_ANALYSIS.md</a>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Get Started -->
+<section class="section" style="background:#f9fafb;" id="get-started">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Get Started</h2>
+
+    <div class="content">
+      <p>Clone the simulator and run the installer (this also pulls PX4, MAVROS, mavlink, <code>tercom_nav</code> and <code>tercom_rviz_plugins</code>):</p>
+      <pre><code>cd ~/shared_volume/ros2_ws/src
+git clone https://github.com/riotu-lab/gps_denied_navigation_sim.git
+cd gps_denied_navigation_sim
+export DEV_DIR=~/shared_volume
+./install.sh</code></pre>
+
+      <p>Run the default TERCOM stack on <code>taif_test4</code>:</p>
+      <pre><code># Terminal 1 &mdash; RMW daemon
+zenoh
+
+# Terminal 2 &mdash; PX4 SITL + Gazebo + MAVROS + RViz
+mono_taif4
+
+# Terminal 3 &mdash; TERCOM + ESKF + diagnostics
+tercom</code></pre>
+
+      <p>Or try any other combination:</p>
+      <pre><code>stereo_taif4   # stereo UAV on taif_test4
+twin_taif      # twin-stereo + twin-Velodyne on taif_world
+mono_tug       # mono UAV in the tugbot_depot warehouse</code></pre>
+
+      <p>Full documentation: <a href="https://github.com/riotu-lab/gps_denied_navigation_sim/tree/main/docs">docs/</a> &mdash;
+        see <code>UAV_MODEL.md</code>, <code>SIMULATION_ENVIRONMENT.md</code>, <code>ALGORITHMS.md</code>,
+        <code>TERCOM.md</code>, <code>ARCHITECTURE.md</code>, and <code>ALGORITHM_ANALYSIS.md</code>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Citation -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Citation</h2>
+    <pre><code>@software{gps_denied_navigation_sim,
+  author  = {Abdelkader, Mohamed and Gabr, Khaled and Al-Batati, Abdulrahman and Koubaa, Anis},
+  title   = {gps_denied_navigation_sim: A PX4 + Gazebo benchmark for GPS-denied UAV navigation},
+  year    = {2025},
+  url     = {https://github.com/riotu-lab/gps_denied_navigation_sim},
+  institution = {Robotics and IoT Lab, Prince Sultan University}
+}</code></pre>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://github.com/riotu-lab/gps_denied_navigation_sim">
+        <i class="fab fa-github"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/mzahana/tercom_nav">
+        <i class="fas fa-satellite-dish"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/mzahana/tercom_rviz_plugins">
+        <i class="fas fa-chart-line"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>RIOTU Lab, Prince Sultan University &mdash; Riyadh, Saudi Arabia</p>
+          <p style="font-size:0.85rem; color:#999;">
+            Website template adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>,
+            licensed under <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
